@@ -1,0 +1,14 @@
+{
+  "name": "aimemory-site",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Knowledge base and memory site for memory.oldphoto.site",
+  "scripts": {
+    "docs:dev": "vitepress dev docs --host 0.0.0.0",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs --host 0.0.0.0"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}
