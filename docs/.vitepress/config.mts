@@ -17,7 +17,8 @@ export default defineConfig({
       { text: '关于我', link: '/about' },
       { text: 'Artifacts', link: '/artifacts/' },
       { text: 'Memory', link: '/memory/' },
-      { text: 'Projects', link: '/projects/' }
+      { text: 'Projects', link: '/projects/' },
+      { text: 'AI 路线图', link: '/ai-learning-roadmap.html' }
     ],
     sidebar: {
       '/artifacts/': [

@@ -44,6 +44,7 @@
 - [Artifacts 去重总结](/artifacts/artifacts_summary_dedup)
 - [Hermes 记忆快照](/memory/hermes_memory_snapshot)
 - [aimemory 项目化方案](/projects/project_plan)
+- [🧠 AI 大模型学习路线图](/ai-learning-roadmap.html)
 
 ### 部署相关
 - [Cloudflare Pages 部署说明](/projects/cloudflare_pages_deploy)
