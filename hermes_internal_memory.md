@@ -8,6 +8,8 @@
 > 4. **推送** — git add/commit/push，让其他机器共享更新
 >
 > 每台机器既是记忆的消费者，也是生产者。
+>
+> 💡 **新机器入口**：用户说出 **"恢复记忆"** 即触发以上完整流程。
 
 生成时间: 2026-05-09 10:58
 上次更新机器: MacBook (10.17.17.x)
@@ -16,6 +18,7 @@
 
 ## 1. Memory (我的笔记)
 
+- **触发词"恢复记忆"** — 用户说出这4个字，立即 git pull aimemory 项目，读取 `hermes_internal_memory.md` 恢复全部跨机器上下文。这是任何机器上第一次使用时的入口。
 - Docker-executor deploy fixes: Aliyun mirror for Alpine/Debian, block-style rsync/env in YAML, build frontend in CI to avoid slow remote node builds, drop container_name for compose.
 - In the `anyverse` project (`project/grid` branch): `realsense2_camera_msgs` is in `ros2_ws_4xx/src/d4xx` (not `l515`). If foxglove_bridge is missing topics/packages, uncomment them in `config/products/grid.json` and fix their `exclude_paths`. Target 10.17.1.23 uses port `8022` for SSH, while its `sshutils` backend runs on `18888`.
 - For anyverseconfigadmin CI deployments using shell executors across isolated target hosts (e.g., from 10.17.0.22 to 10.17.1.23), ensure the `gitlab-runner` system user on the runner host has SSH key-based authentication properly authorized on the target host's target user (e.g., `wujie`).
@@ -41,10 +44,11 @@
 
 ### 2026-05-09 — 建立跨机器记忆同步体系
 - **背景**: aimemory 项目已 git 化，用作所有机器的共享记忆中枢
-- **关键决策**: 每台机器 pull → 读取 internal_memory → 对话 → 更新 → push
+- **关键决策**: 约定触发词 **"恢复记忆"** — 用户说出即触发 pull → 读 internal_memory → 恢复全部上下文
+- **每台机器 SOP**: pull → 读 internal_memory → 对话 → 更新 → push
 - **新增文件**: `hermes_internal_memory.md`（结构化记忆导出，机器可读）
 - **README 更新**: 加入跨机器工作流说明
-- **目标**: 任意机器克隆项目 → 读此文件 → 恢复全部上下文
+- **目标**: 任意机器上输入"恢复记忆" → 恢复全部机器的所有上下文
 
 ---
 
