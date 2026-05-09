@@ -1,14 +1,33 @@
-# aimemory
+# aimemory — AI Memory & Cross-Machine Sync
 
-`aimemory` 是一个基于 VitePress 的文档站项目，用于承载：
+`aimemory` 是 Hermes Agent 的跨机器记忆中枢，承载：
 
-- 外部 artifacts 文档
-- Hermes 记忆快照
-- 项目化方案与部署说明
+- 🧠 **内部记忆导出** — `hermes_internal_memory.md`（Agent 的记忆数据库 + 用户偏好 + 会话历史）
+- 📸 **记忆快照** — `hermes_memory_snapshot.md`（人工可读版）
+- 📄 **外部 artifacts 文档**
+- 📋 **项目方案与部署说明**
+
+## 🔄 跨机器工作流
+
+任何机器上首次使用：
+
+```bash
+git clone git@github.com:1sunzichen/aimemory.git
+cd aimemory
+```
+
+然后对 Hermes 说：
+> "读一下 aimemory 里的 internal memory"
+
+Hermes 就会读取 `hermes_internal_memory.md`，恢复之前所有机器上的记忆和上下文。
+
+---
+
+## 📖 原说明
 
 推荐域名：`memory.oldphoto.site`
 
-## 本地开发
+### 本地开发
 
 ```bash
 npm install
