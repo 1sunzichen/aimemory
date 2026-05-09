@@ -23,7 +23,7 @@
 - In the `anyverse` project (`project/grid` branch): `realsense2_camera_msgs` is in `ros2_ws_4xx/src/d4xx` (not `l515`). If foxglove_bridge is missing topics/packages, uncomment them in `config/products/grid.json` and fix their `exclude_paths`. Target 10.17.1.23 uses port `8022` for SSH, while its `sshutils` backend runs on `18888`.
 - For anyverseconfigadmin CI deployments using shell executors across isolated target hosts (e.g., from 10.17.0.22 to 10.17.1.23), ensure the `gitlab-runner` system user on the runner host has SSH key-based authentication properly authorized on the target host's target user (e.g., `wujie`).
 - When editing nested-block config files (Nginx, JSON, etc.), NEVER use line-offset deletion (e.g., sed '+6d'). Always verify matching brackets with syntax checks (like `nginx -t`) before and after changes.
-- PPUS Feishu bot (cli_a9c0f5ad977a1ccd): push-only bot, @mentions must use TEXT message type. DM to 许诺/李俊 fails → use group @oc_06573d34b1b756a52e095b3caa300adf. Hermes 定时任务: 07:00 fetch_pai, 09:00 check-unknown-users, 10:00 daily fill-tag remind (bash daily_notify.sh), Mon 08:00 weekly report. Web service at 10.17.8.42:19001.
+- PPUS Feishu bot (cli_a9c0f5ad977a1ccd): push-only bot, @mentions must use TEXT message type. DM to 许诺/李俊 fails → use group @oc_06573d34b1b756a52e095b3caa300adf. Deployed to 10.17.0.22 (system crontab: 07:00 fetch/10:00 notify/Mon 08:00 weekly/1st monthly). 管理员王亚维(ou_2645c9dd...)已加入汇总接收人。发通知前必须先验证 PPUS_WEB_URL 链接可用。
 - 放风小程序 (formerly 灯火 dengHuo): /Users/wujie22qx/dengHuo — Node.js/Express + MySQL Docker (10.17.8.42:30306, db: walle). Frontend miniprogram/, backend server/ (port 3001). Mini-program AppID: wx3a6b2d6cf0f3f48a. Brand "放风", dark green theme.
 - **跨机器记忆同步协议**: 所有机器上，每次对话开始先 git pull aimemory 项目，读 memory.md 恢复上下文，对话结束后更新此文件 + snapshot，最后 git push。每台机器既是消费者也是生产者。
 
@@ -37,6 +37,7 @@
 - memory.oldphoto.site = VitePress on Cloudflare Pages.
 - AI study in ~/other/AI学习/.
 - CRITICAL: read actual files first before proposing changes. Never delete files without explicit confirmation.
+- **对话规则**: 执行复杂任务前先说计划，等用户说"可以"再动手。已记入 memory 作为固定规则。
 
 ## 3. Past Session Summaries (跨会话历史)
 
@@ -50,11 +51,15 @@
 - **README 更新**: 加入跨机器工作流说明
 - **目标**: 任意机器上输入"恢复记忆" → 恢复全部机器的所有上下文
 
-### 2026-05-09 — PPUS 定时任务重建
+### 2026-05-09 — PPUS 定时任务重建 + Web 服务自动启动 + 动态 IP
 - PPUS Hermes 定时任务全部报错，删除旧任务并重建为直接 bash 调用
 - 新增 `ppus-daily-fill-tag-remind` 每天 10:00 发填标签提醒给缺标签的人
 - 重建 `ppus-daily-fetch-pai` 每天 07:00 拉取阿里云 PAI 数据
 - 重建 `ppus-check-unknown-users` 每天 09:00 检查未登记用户
+- `run.sh` 和 `daily_notify.sh` 集成 web_app.py 自动启动（保活检查，没跑就启动）
+- 动态检测本机 LAN IP，自动拼 PPUS_WEB_URL，换机器/网络不用手动改
+- 已部署到 10.17.0.22（sjqpc），web 服务运行中，系统 crontab 已设
+- 管理员王亚维 (ou_2645c9dd6794ff083146a2b26e810728) 已加入汇总报表接收人
 
 ---
 
