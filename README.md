@@ -2,7 +2,7 @@
 
 `aimemory` 是 Hermes Agent 的跨机器记忆中枢，承载：
 
-- 🧠 **内部记忆导出** — `hermes_internal_memory.md`（Agent 的记忆数据库 + 用户偏好 + 会话历史）
+- 🧠 **内部记忆导出** — `memory.md`（Agent 的记忆数据库 + 用户偏好 + 会话历史）
 - 📸 **记忆快照** — `hermes_memory_snapshot.md`（人工可读版）
 - 📄 **外部 artifacts 文档**
 - 📋 **项目方案与部署说明**
@@ -19,7 +19,7 @@ cd aimemory
 然后对 Hermes 说：
 > "读一下 aimemory 里的 internal memory"
 
-Hermes 就会读取 `hermes_internal_memory.md`，恢复之前所有机器上的记忆和上下文。
+Hermes 就会读取 `memory.md`，恢复之前所有机器上的记忆和上下文。
 
 ---
 
