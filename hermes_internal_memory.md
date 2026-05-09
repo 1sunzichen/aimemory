@@ -1,10 +1,16 @@
 # Hermes Internal Memory (Agent's Knowledge Base)
 
-> 这个文件是我（Hermes Agent）的内部记忆导出。
-> 任何机器上 pull 这个 git 后，我读取此文件即可恢复上下文。
-> 自动维护，无需手动编辑。
+> ⚡ **跨机器记忆同步协议** — 任何机器上的 Hermes Agent 读取此文件后，应遵循以下 SOP：
+>
+> 1. **启动时** — git pull aimemory 项目，读取此文件恢复上下文
+> 2. **对话中** — 正常交互，记录新的记忆和用户信息
+> 3. **对话结束前** — 将此文件更新为最新状态（记忆 + 用户偏好 + 会话摘要）
+> 4. **推送** — git add/commit/push，让其他机器共享更新
+>
+> 每台机器既是记忆的消费者，也是生产者。
 
 生成时间: 2026-05-09 10:58
+上次更新机器: MacBook (10.17.17.x)
 
 ---
 
@@ -16,7 +22,7 @@
 - When editing nested-block config files (Nginx, JSON, etc.), NEVER use line-offset deletion (e.g., sed '+6d'). Always verify matching brackets with syntax checks (like `nginx -t`) before and after changes.
 - PPUS Feishu bot (cli_a9c0f5ad977a1ccd): push-only bot, @mentions must use TEXT message type. DM to 许诺/李俊 fails → use group @oc_06573d34b1b756a52e095b3caa300adf. Cron schedule: daily 07:00 fetch pai (2-day, dedup), 10:00 check_tags (7 days), Monday 08:00 weekly report, 1st of month 08:30 monthly report. Web service at 10.17.8.42:19001.
 - 放风小程序 (formerly 灯火 dengHuo): /Users/wujie22qx/dengHuo — Node.js/Express + MySQL Docker (10.17.8.42:30306, db: walle). Frontend miniprogram/, backend server/ (port 3001). Mini-program AppID: wx3a6b2d6cf0f3f48a. Brand "放风", dark green theme.
-- 每天首次对话流程: 先 git pull `/Users/wujie22qx/Desktop/aimemory`，对话结束后更新 hermes_memory_snapshot.md，不定期 git push。
+- **跨机器记忆同步协议**: 所有机器上，每次对话开始先 git pull aimemory 项目，读 hermes_internal_memory.md 恢复上下文，对话结束后更新此文件 + snapshot，最后 git push。每台机器既是消费者也是生产者。
 
 ## 2. User Profile (用户信息)
 
@@ -31,13 +37,15 @@
 
 ## 3. Past Session Summaries (跨会话历史)
 
-*（这里由我定期更新最近的会话摘要，方便跨机器恢复上下文）*
+*（每台机器在对话结束后，在此追加或更新最近的会话摘要）*
 
-### 2026-05-09 — 建立 cross-machine 记忆同步约定
-- 约定每天首次对话先 git pull aimemory 项目
-- 对话结束后更新 snapshot 并 git push
-- 建立了 `hermes_internal_memory.md` 作为跨机器记忆传输文件
+### 2026-05-09 — 建立跨机器记忆同步体系
+- **背景**: aimemory 项目已 git 化，用作所有机器的共享记忆中枢
+- **关键决策**: 每台机器 pull → 读取 internal_memory → 对话 → 更新 → push
+- **新增文件**: `hermes_internal_memory.md`（结构化记忆导出，机器可读）
+- **README 更新**: 加入跨机器工作流说明
+- **目标**: 任意机器克隆项目 → 读此文件 → 恢复全部上下文
 
 ---
 
-*下次会话：在新机器上读取此文件即可恢复以上所有上下文。*
+*此文件由各机器轮流维护。任何机器读取后，应按 SOP 继续更新。*

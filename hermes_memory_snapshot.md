@@ -23,7 +23,7 @@
    - Debian apt 源切 Aliyun，并裁剪不必要包
    - 删除固定 `container_name`，并清理历史容器名冲突
 9. 我知道你说的"22 机器"不是当前这个会话所在的 macOS，而是一台单独的 Linux 机器。
-10. aimemory 项目已 git 化，位于 `/Users/wujie22qx/Desktop/aimemory`。约定：每天首次对话前先 git pull，对话结束后更新 hermes_memory_snapshot.md，不定期 git add/commit/push。
+10. aimemory 项目已 git 化，位于 `/Users/wujie22qx/Desktop/aimemory`。建立了跨机器记忆同步协议: 每台机器对话前 pull → 读 internal_memory → 对话 → 更新 → push。`hermes_internal_memory.md` 是所有机器共享的记忆中枢。
 
 ---
 
