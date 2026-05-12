@@ -10,3 +10,4 @@
 ## 文章列表
 
 - [为什么要记录思考](/thoughts/why-write) `2026-05-12`
+- [欲望、自由与自我控制](/thoughts/desire-and-self-control) `2026-05-12`

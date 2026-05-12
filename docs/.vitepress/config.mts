@@ -60,7 +60,8 @@ export default defineConfig({
           text: '思考录',
           items: [
             { text: '文章列表', link: '/thoughts/' },
-            { text: '为什么要记录思考', link: '/thoughts/why-write' }
+            { text: '为什么要记录思考', link: '/thoughts/why-write' },
+            { text: '欲望、自由与自我控制', link: '/thoughts/desire-and-self-control' }
           ]
         }
       ]
