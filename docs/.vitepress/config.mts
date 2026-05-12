@@ -18,7 +18,8 @@ export default defineConfig({
       { text: 'Artifacts', link: '/artifacts/' },
       { text: 'Memory', link: '/memory/' },
       { text: 'Projects', link: '/projects/' },
-      { text: 'AI 路线图', link: '/ai-learning-roadmap/' }
+      { text: 'AI 路线图', link: '/ai-learning-roadmap/' },
+      { text: '思考录', link: '/thoughts/' }
     ],
     sidebar: {
       '/artifacts/': [
@@ -51,6 +52,15 @@ export default defineConfig({
             { text: '项目化方案', link: '/projects/project_plan' },
             { text: 'Cloudflare Pages 部署', link: '/projects/cloudflare_pages_deploy' },
             { text: 'Vercel 部署', link: '/projects/vercel_deploy' }
+          ]
+        }
+      ],
+      '/thoughts/': [
+        {
+          text: '思考录',
+          items: [
+            { text: '文章列表', link: '/thoughts/' },
+            { text: '为什么要记录思考', link: '/thoughts/why-write' }
           ]
         }
       ]

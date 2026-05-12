@@ -40,6 +40,9 @@
 ### 关于我
 - [关于 Patrick](/about)
 
+### 思考录
+- [为什么要记录思考](/thoughts/why-write)
+
 ### 技术与文档
 - [Artifacts 去重总结](/artifacts/artifacts_summary_dedup)
 - [Hermes 记忆快照](/memory/hermes_memory_snapshot)
