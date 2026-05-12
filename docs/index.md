@@ -60,7 +60,7 @@
 1. 项目部署文档
 2. 网络、代理、Docker、CI/CD 经验
 3. AI 工具与工作流的长期沉淀
-4. Aquaflow 公益行动记录
+4. [Aquaflow 公益行动](https://www.aquaflow777.com/) 记录
 5. 个人成长与职业路径思考
 
 如果你第一次来，推荐顺序是：

@@ -84,7 +84,7 @@
 
 ### 行动与内容沉淀项目化
 
-- `aquaflow-web`
+- [`aquaflow-web`](https://www.aquaflow777.com/)
 - `openclaw-memory`
 
 这类项目很能体现我的另一面：
@@ -127,6 +127,8 @@
 ---
 
 ## 🌊 Aquaflow（水流计划）
+
+官网：[aquaflow777.com](https://www.aquaflow777.com/)
 
 这是我非常重视、也会长期投入的一项公益行动。
 
