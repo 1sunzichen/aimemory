@@ -19,6 +19,7 @@ export default defineConfig({
       { text: 'Memory', link: '/memory/' },
       { text: 'Projects', link: '/projects/' },
       { text: 'AI 路线图', link: '/ai-learning-roadmap/' },
+      { text: 'AI 学习笔记', link: '/ai-learning-notes/' },
       { text: '思考录', link: '/thoughts/' }
     ],
     sidebar: {
@@ -52,6 +53,17 @@ export default defineConfig({
             { text: '项目化方案', link: '/projects/project_plan' },
             { text: 'Cloudflare Pages 部署', link: '/projects/cloudflare_pages_deploy' },
             { text: 'Vercel 部署', link: '/projects/vercel_deploy' }
+          ]
+        }
+      ],
+      '/ai-learning-notes/': [
+        {
+          text: 'AI 学习笔记',
+          items: [
+            { text: '目录', link: '/ai-learning-notes/' },
+            { text: 'RNN 循环神经网络', link: '/ai-learning-notes/rnn' },
+            { text: 'Transformer 编码器与解码器', link: '/ai-learning-notes/transformer-encoder-decoder' },
+            { text: 'GPT/Claude 纯解码器架构', link: '/ai-learning-notes/decoder-only' }
           ]
         }
       ],
