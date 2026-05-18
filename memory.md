@@ -51,6 +51,16 @@
 - **README 更新**: 加入跨机器工作流说明
 - **目标**: 任意机器上输入"恢复记忆" → 恢复全部机器的所有上下文
 
+### 2026-05-18 — PPUS 报表新维度 + 31 机器部署 Part 1
+
+- 报表新增 **项目维度**（DLC_项目_周/月/总汇总）和**部门维度**（DLC_部门_周/月/总汇总），共 27 张 Sheet
+- 项目来自用户通过 `http://10.17.0.22:19001/tags/<pinyin>` 填写的 `project_tag` 字段
+- 去掉了每日个人标签提醒（10:00 cron 删除，07:00 改为只拉阿里云 DLC 数据）
+- 删除了 `/etc/cron.d/issuego-deploy`（坏掉的 cron，不再需要）
+- **10.17.17.31 Part 1 完成**：目录/脚本/venv/数据库/Web 服务已就绪（端口 19001）
+- **Part 2 待做（2026-05-19）**：填 API Key → 验证 fetch_pai → 配置 crontab → systemd 自启
+- 部署文档：`/home/wujie/FSD/ppus/docs/deploy.md`（22 和 31 的 crontab 都在里面）
+
 ### 2026-05-09 — PPUS 定时任务重建 + Web 服务自动启动 + 动态 IP
 - PPUS Hermes 定时任务全部报错，删除旧任务并重建为直接 bash 调用
 - 新增 `ppus-daily-fill-tag-remind` 每天 10:00 发填标签提醒给缺标签的人
