@@ -1,25 +1,33 @@
 <template>
   <div class="ai-assistant">
-    <button class="ai-toggle" :class="{ active: isOpen }" @click="toggle" title="AI 学习助手">
+    <button class="ai-toggle" :class="{ active: isOpen, bouncing: showHint }" @click="toggle" title="AI 学习助手">
       <span v-if="!isOpen">🤖</span>
       <span v-else>✕</span>
     </button>
 
+    <!-- Idle hint toast -->
+    <div v-if="showHint && !isOpen" class="ai-hint" @click="toggle">
+      💡 有看不懂的概念？<span class="ai-hint-cta">问 AI 助手</span>
+      <button class="ai-hint-close" @click.stop="dismissHint">✕</button>
+    </div>
+
+    <!-- Text selection popup -->
     <div v-if="showPopup" class="ai-popup" :style="{ top: popupY + 'px', left: popupX + 'px' }">
       <button @click="askSelection">💬 让 AI 解释</button>
     </div>
 
+    <!-- Chat panel -->
     <div v-if="isOpen" class="ai-panel">
       <div class="ai-header">
         <span>🤖 AI 学习助手</span>
-        <button class="ai-clear" @click="clearChat" title="清空对话">🗑</button>
+        <div class="ai-header-actions">
+          <a class="ai-fork-btn" href="https://github.com/1sunzichen/aimemory/fork" target="_blank" title="Fork 本项目">⭐ Fork</a>
+          <button class="ai-clear" @click="clearChat" title="清空对话">🗑</button>
+        </div>
       </div>
       <div class="ai-messages" ref="msgEl">
         <div v-if="msgs.length === 0" class="ai-welcome">
           <p>👋 选中文字点「让 AI 解释」<br>或直接下面打字提问</p>
-          <p class="ai-fork">
-            <a href="https://github.com/1sunzichen/aimemory/fork" target="_blank">⭐ Fork 支持</a>
-          </p>
         </div>
         <div v-for="(m, i) in msgs" :key="i" class="ai-msg" :class="m.role">
           <div class="ai-role">{{ m.role === 'user' ? '你' : '🤖' }}</div>
@@ -43,7 +51,6 @@ import { useData } from 'vitepress'
 
 const { page, frontmatter } = useData()
 
-// Worker URL — replace after deployment
 const API = 'https://aimemory-ai.3023493319.workers.dev/api/chat'
 
 const isOpen = ref(false)
@@ -56,6 +63,9 @@ const popupX = ref(0)
 const popupY = ref(0)
 const msgEl = ref(null)
 const inputEl = ref(null)
+const showHint = ref(false)
+let idleTimer = null
+let hintDismissed = false
 
 // ── localStorage per page ──────────────────────────────────────────
 function storageKey() {
@@ -94,7 +104,11 @@ async function callApi(userMessages) {
 }
 
 // ── Actions ────────────────────────────────────────────────────────
-function toggle() { isOpen.value = !isOpen.value; if (isOpen.value) nextTick(() => inputEl.value?.focus()) }
+function toggle() {
+  isOpen.value = !isOpen.value
+  showHint.value = false
+  if (isOpen.value) nextTick(() => inputEl.value?.focus())
+}
 
 async function send() {
   const text = input.value.trim()
@@ -118,6 +132,7 @@ async function askSelection() {
   const text = selected.value
   if (!text) return
   isOpen.value = true
+  showHint.value = false
   msgs.value.push({ role: 'user', content: `请解释这段话：\n\n> ${text}` })
   loading.value = true
   save(); await nextTick(); scrollDown()
@@ -132,19 +147,30 @@ async function askSelection() {
 }
 
 function clearChat() { msgs.value = []; save() }
+function dismissHint() { showHint.value = false; hintDismissed = true }
 
 function scrollDown() {
   nextTick(() => { const el = msgEl.value; if (el) el.scrollTop = el.scrollHeight })
 }
 
+// ── Idle detection ─────────────────────────────────────────────────
+function resetIdleTimer() {
+  clearTimeout(idleTimer)
+  if (hintDismissed || isOpen.value) return
+  idleTimer = setTimeout(() => {
+    showHint.value = true
+  }, 45_000) // 45 seconds
+}
+
+function onActivity() { resetIdleTimer() }
+
 // ── Text selection ─────────────────────────────────────────────────
-function onMouseUp(e) {
+function onMouseUp() {
   setTimeout(() => {
     const sel = window.getSelection()
     const text = sel?.toString().trim()
     if (text && text.length > 5) {
       selected.value = text
-      // Position popup near selection end
       const range = sel.getRangeAt(0)
       const rect = range.getBoundingClientRect()
       popupX.value = Math.min(rect.right, window.innerWidth - 160) + window.scrollX
@@ -164,13 +190,22 @@ onMounted(() => {
   load()
   document.addEventListener('mouseup', onMouseUp)
   document.addEventListener('click', onClickOutside)
+  document.addEventListener('mousemove', onActivity)
+  document.addEventListener('scroll', onActivity)
+  document.addEventListener('keydown', onActivity)
+  resetIdleTimer()
 })
+
 onUnmounted(() => {
   document.removeEventListener('mouseup', onMouseUp)
   document.removeEventListener('click', onClickOutside)
+  document.removeEventListener('mousemove', onActivity)
+  document.removeEventListener('scroll', onActivity)
+  document.removeEventListener('keydown', onActivity)
+  clearTimeout(idleTimer)
 })
 
-watch(() => page.value?.relativePath, () => { load() })
+watch(() => page.value?.relativePath, () => { load(); hintDismissed = false; resetIdleTimer() })
 </script>
 
 <style scoped>
@@ -185,7 +220,39 @@ watch(() => page.value?.relativePath, () => { load() })
 }
 .ai-toggle:hover { transform: scale(1.08); }
 .ai-toggle.active { background: #e74c3c; }
+.ai-toggle.bouncing {
+  animation: bounce 0.6s ease-in-out 3;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
 
+/* Idle hint */
+.ai-hint {
+  position: fixed; bottom: 88px; right: 24px;
+  background: #1a1a2e; color: #fff; padding: 10px 16px;
+  border-radius: 12px; font-size: 14px; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+  display: flex; align-items: center; gap: 6px;
+  animation: fadeInUp .3s ease;
+  max-width: calc(100vw - 60px);
+}
+.ai-hint-cta {
+  color: #4a9eff; font-weight: 600; text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ai-hint-close {
+  background: none; border: none; color: rgba(255,255,255,.4);
+  cursor: pointer; font-size: 14px; padding: 0 0 0 6px; margin-left: 4px;
+}
+.ai-hint-close:hover { color: #fff; }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Selection popup */
 .ai-popup {
   position: absolute;
   background: #1a1a2e; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.3);
@@ -197,6 +264,7 @@ watch(() => page.value?.relativePath, () => { load() })
 }
 .ai-popup button:hover { background: rgba(255,255,255,.1); }
 
+/* Panel */
 .ai-panel {
   position: fixed; bottom: 88px; right: 24px;
   width: 400px; max-width: calc(100vw - 48px); height: 560px; max-height: calc(100vh - 140px);
@@ -210,6 +278,13 @@ watch(() => page.value?.relativePath, () => { load() })
   border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
 }
 @media (prefers-color-scheme: dark) { .ai-header { border-color: #333; color: #eee; } }
+.ai-header-actions { display: flex; align-items: center; gap: 8px; }
+.ai-fork-btn {
+  font-size: 12px; color: #f0c040; text-decoration: none;
+  background: rgba(240,192,64,.12); padding: 4px 10px;
+  border-radius: 6px; font-weight: 600; transition: .15s;
+}
+.ai-fork-btn:hover { background: rgba(240,192,64,.25); }
 .ai-clear { background: none; border: none; cursor: pointer; font-size: 16px; opacity: .5; }
 .ai-clear:hover { opacity: 1; }
 
@@ -218,8 +293,6 @@ watch(() => page.value?.relativePath, () => { load() })
   display: flex; flex-direction: column; gap: 14px;
 }
 .ai-welcome { text-align: center; color: #999; font-size: 14px; padding: 30px 10px; line-height: 1.8; }
-.ai-fork { margin-top: 16px; }
-.ai-fork a { color: #4a9eff; text-decoration: none; font-weight: 600; }
 
 .ai-msg { display: flex; gap: 8px; font-size: 14px; line-height: 1.6; }
 .ai-msg.user { flex-direction: row-reverse; }
