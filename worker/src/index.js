@@ -38,15 +38,15 @@ async function decryptKey(encryptedPayload, saltHex, password) {
   const iv = hexToBytes(ivHex);
   const authTag = hexToBytes(authTagHex);
   const ciphertext = hexToBytes(ciphertextHex);
-  const combined = new Uint8Array(iv.length + ciphertext.length + authTag.length);
-  combined.set(iv, 0);
-  combined.set(ciphertext, iv.length);
-  combined.set(authTag, iv.length + ciphertext.length);
+  // Combine ciphertext + auth tag (Web Crypto expects them together, IV separate)
+  const data = new Uint8Array(ciphertext.length + authTag.length);
+  data.set(ciphertext, 0);
+  data.set(authTag, ciphertext.length);
 
   const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: iv, additionalData: new Uint8Array(0), tagLength: 128 },
+    { name: 'AES-GCM', iv: iv, tagLength: 128 },
     derivedKey,
-    combined
+    data
   );
 
   return new TextDecoder().decode(decrypted);
