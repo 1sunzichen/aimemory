@@ -1,0 +1,9 @@
+name = "aimemory-ai"
+main = "src/index.js"
+compatibility_date = "2025-05-19"
+
+# 部署后运行: npx wrangler secret put KEY_PASSWORD  (输入: patrick)
+[vars]
+ENCRYPTED_KEY = "9f4feb634215b305d032bd46:d106797974dcf047b0ad639f1afae3d1:c2186796774aeab174aa2bc303e62188e473b36c1fa1e84da60c1172bc6ffb76551a60"
+KEY_SALT = "9f64307384e0919ca926397a3e686936"
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"

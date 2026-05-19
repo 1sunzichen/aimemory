@@ -1,4 +1,6 @@
-import DefaultTheme from 'vitepress/theme'
+import MyLayout from './MyLayout.vue'
 import './roadmap.css'
 
-export default DefaultTheme
+export default {
+  Layout: MyLayout,
+}
