@@ -44,7 +44,7 @@ import { useData } from 'vitepress'
 const { page, frontmatter } = useData()
 
 // Worker URL — replace after deployment
-const API = 'https://aimemory-ai.YOUR_SUBDOMAIN.workers.dev/api/chat'
+const API = 'https://aimemory-ai.3023493319.workers.dev/api/chat'
 
 const isOpen = ref(false)
 const msgs = ref([])
