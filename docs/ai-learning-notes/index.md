@@ -11,3 +11,7 @@
 | [GPT 与 Claude 的纯解码器架构](./decoder-only) | 没有编码器时，模型如何理解输入 |
 | [Embedding 矩阵与多头注意力](./embedding-and-multihead) | 词是怎么变成向量的，多头的含义和子空间 |
 | [反向传播：模型是怎么学习的](./backpropagation) | 误差如何从后往前传，链式法则，训练数据从哪来 |
+| [卷积 Convolution](./convolution) | 滤镜在数据上滑动加权求和，CNN 的核心操作 |
+| [BatchNorm 与 LayerNorm](./batchnorm-layernorm) | 两种归一化的区别，为什么 CNN 用 BN、Transformer 用 LN |
+| [均值、方差、标准差](./mean-variance-std) | 统计学基础，归一化前的必要概念 |
+| [Padding 与 Truncation](./padding-truncation) | 不等长句子怎么处理，补 0 对归一化的影响 |
