@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="ai-input">
-        <textarea v-model="input" @keydown.enter.exact.prevent="send" placeholder="问 AI..." rows="2" :disabled="loading" ref="inputEl"></textarea>
+        <textarea v-model="input" @keydown="onKeydown" placeholder="问 AI..." rows="2" :disabled="loading" ref="inputEl"></textarea>
         <button @click="send" :disabled="!input.trim() || loading">→</button>
       </div>
     </div>
@@ -104,6 +104,14 @@ async function callApi(userMessages) {
 }
 
 // ── Actions ────────────────────────────────────────────────────────
+function onKeydown(e) {
+  // Only send on Enter, skip if IME is composing (e.g. Chinese input method)
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+    e.preventDefault()
+    send()
+  }
+}
+
 function toggle() {
   isOpen.value = !isOpen.value
   showHint.value = false
@@ -113,8 +121,10 @@ function toggle() {
 async function send() {
   const text = input.value.trim()
   if (!text || loading.value) return
+  // Capture and clear immediately to prevent IME double-send
+  const msg = text
   input.value = ''
-  msgs.value.push({ role: 'user', content: text })
+  msgs.value.push({ role: 'user', content: msg })
   loading.value = true
   save(); scrollDown()
   try {
