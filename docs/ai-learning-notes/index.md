@@ -15,3 +15,4 @@
 | [BatchNorm 与 LayerNorm](./batchnorm-layernorm) | 两种归一化的区别，为什么 CNN 用 BN、Transformer 用 LN |
 | [均值、方差、标准差](./mean-variance-std) | 统计学基础，归一化前的必要概念 |
 | [Padding 与 Truncation](./padding-truncation) | 不等长句子怎么处理，补 0 对归一化的影响 |
+| [注意力机制：Q/K/V、缩放与两种实现](./attention-qkv-and-scaling) | Q/K/V 是什么、为什么除以 √d_k、点积 vs 加型注意力、自回归 |
