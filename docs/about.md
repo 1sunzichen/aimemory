@@ -1,5 +1,9 @@
 # 关于我
 
+<div style="text-align:center;margin:24px 0">
+  <img src="/photo.jpg" alt="个人照片" style="width:260px;border-radius:12px;" />
+</div>
+
 32 岁。北京。暂时一个人。
 
 ---
