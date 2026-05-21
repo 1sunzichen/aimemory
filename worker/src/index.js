@@ -138,24 +138,74 @@ Deployment guides (Cloudflare Pages, Vercel) and project planning documentation.
 - If you don't know something specific about this website, be honest — don't make up content
 - The website owner (Patrick/孙子宸) is learning AI himself, so treat all questions as legitimate`;
 
+// ── Diary helpers ──────────────────────────────────────────────────
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0, 10).replace(/-/g, '');
+}
+
 // ── Main handler ───────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    const origin = getAllowedOrigin(request);
+
     // CORS preflight
     if (request.method === 'OPTIONS') {
-      const origin = getAllowedOrigin(request);
       if (!origin) return new Response(null, { status: 403 });
       return new Response(null, {
         headers: {
           'Access-Control-Allow-Origin': origin,
-          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type',
           'Access-Control-Max-Age': '86400',
         },
       });
     }
 
-    const url = new URL(request.url);
+    const cors = (resp) => {
+      if (origin) resp.headers.set('Access-Control-Allow-Origin', origin);
+      return resp;
+    };
+
+    // ── GET /api/diary — 读取加密日记 ──────────────────────────────
+    if (request.method === 'GET' && url.pathname === '/api/diary') {
+      const encrypted = await env.DIARY.get('content');
+      return cors(new Response(JSON.stringify({ encrypted: encrypted || '' }), {
+        headers: { 'Content-Type': 'application/json' },
+      }));
+    }
+
+    // ── POST /api/diary — 保存加密日记（需要写入令牌）──────────────
+    if (request.method === 'POST' && url.pathname === '/api/diary') {
+      if (!origin) return new Response('Forbidden', { status: 403 });
+      const body = await request.json();
+      const { encrypted, write_token, date } = body;
+
+      if (!encrypted || !write_token || !date) {
+        return cors(new Response(JSON.stringify({ error: 'Missing fields' }), {
+          status: 400, headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+
+      // 验证写入令牌：SHA256(DIARY_SECRET + date + "write")[:12]
+      const expected = (await sha256Hex(env.DIARY_SECRET + date + 'write')).slice(0, 12);
+      if (write_token !== expected) {
+        return cors(new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+
+      await env.DIARY.put('content', encrypted);
+      return cors(new Response(JSON.stringify({ ok: true }), {
+        headers: { 'Content-Type': 'application/json' },
+      }));
+    }
+
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
       return new Response('Not found', { status: 404 });
     }
