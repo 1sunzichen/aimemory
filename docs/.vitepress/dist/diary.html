@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>日记</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: #f5f5f0;
+      font-family: -apple-system, "PingFang SC", sans-serif;
+    }
+
+    /* ── 锁屏 ── */
+    #lock {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.08);
+      padding: 48px 36px; width: 320px; text-align: center;
+    }
+    .card h2 { font-size: 32px; margin-bottom: 6px; }
+    .card .sub { color: #aaa; font-size: 13px; margin-bottom: 28px; }
+    .card input {
+      width: 100%; padding: 13px 16px; font-size: 20px;
+      letter-spacing: 6px; text-align: center;
+      border: 1.5px solid #e0e0e0; border-radius: 10px;
+      outline: none; text-transform: uppercase;
+    }
+    .card input:focus { border-color: #333; }
+    .card button {
+      width: 100%; margin-top: 14px; padding: 13px;
+      background: #1a1a1a; color: #fff; border: none;
+      border-radius: 10px; font-size: 15px; cursor: pointer;
+    }
+    .card button:hover { background: #444; }
+    .err { margin-top: 12px; color: #e44; font-size: 13px; min-height: 18px; }
+
+    /* ── 主界面 ── */
+    #main { display: none; max-width: 680px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* ── 日历 ── */
+    .cal-wrap {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+      margin-bottom: 24px; overflow: hidden;
+    }
+    .cal-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+    }
+    .cal-nav .cal-title { font-size: 16px; font-weight: 600; color: #111; }
+    .cal-nav button {
+      background: none; border: none; font-size: 20px;
+      cursor: pointer; color: #888; padding: 2px 8px; border-radius: 6px;
+    }
+    .cal-nav button:hover { background: #f0f0f0; color: #333; }
+    .cal-weekdays {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      border-top: 1px solid #f0f0f0; background: #fafafa;
+    }
+    .cal-weekdays span {
+      text-align: center; padding: 8px 0;
+      font-size: 11px; color: #bbb; letter-spacing: .5px;
+    }
+    .cal-days { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .cal-day {
+      min-height: 52px; padding: 8px 0 6px;
+      border-top: 1px solid #f5f5f5;
+      display: flex; flex-direction: column; align-items: center;
+      cursor: default; position: relative;
+    }
+    .cal-day.has-entry { cursor: pointer; }
+    .cal-day.has-entry:hover { background: #f9f9f7; }
+    .cal-day.selected { background: #f0f0eb !important; }
+    .day-num {
+      font-size: 14px; color: #333; width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+    }
+    .cal-day.today .day-num { background: #1a1a1a; color: #fff; }
+    .cal-day.other-month .day-num { color: #ddd; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: #888; margin-top: 3px; }
+    .cal-day.today .dot { background: #fff; opacity: .7; }
+    .cal-day.other-month .dot { background: #ddd; }
+    .cal-day.selected .dot { background: #555; }
+
+    /* ── 列表 ── */
+    .list-header {
+      font-size: 12px; color: #bbb; letter-spacing: .5px;
+      text-transform: uppercase; margin-bottom: 10px; padding-left: 4px;
+    }
+    .entry-item {
+      background: #fff; border-radius: 12px;
+      padding: 16px 20px; margin-bottom: 8px;
+      cursor: pointer; transition: box-shadow .15s;
+      border-left: 3px solid transparent;
+    }
+    .entry-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .entry-item.highlighted { border-left-color: #1a1a1a; }
+    .entry-item .e-date { font-size: 12px; color: #bbb; margin-bottom: 5px; }
+    .entry-item .e-preview {
+      font-size: 15px; color: #333;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .empty { text-align: center; color: #ccc; padding: 48px 0; font-size: 15px; }
+
+    /* ── 详情面板 ── */
+    #entry-panel {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.3); z-index: 100;
+      align-items: flex-end; justify-content: center;
+    }
+    #entry-panel.open { display: flex; }
+    .panel-body {
+      background: #fff; border-radius: 20px 20px 0 0;
+      width: 100%; max-width: 680px; max-height: 80vh;
+      padding: 24px 24px 40px; overflow-y: auto;
+    }
+    .panel-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 20px;
+    }
+    .panel-header h2 { font-size: 18px; color: #111; }
+    .panel-header .weekday { font-size: 13px; color: #bbb; margin-top: 3px; }
+    .close-btn {
+      background: #f0f0f0; border: none; border-radius: 50%;
+      width: 30px; height: 30px; font-size: 16px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .close-btn:hover { background: #e0e0e0; }
+    .panel-content {
+      font-size: 16px; line-height: 2; color: #333;
+      white-space: pre-wrap; word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 锁屏 -->
+<div id="lock">
+  <div class="card">
+    <h2>📔</h2>
+    <p class="sub">今日密码</p>
+    <input id="pwd" type="password" maxlength="6" placeholder="······" autocomplete="off" />
+    <button onclick="unlock()">进入</button>
+    <p class="err" id="err"></p>
+  </div>
+</div>
+
+<!-- 主界面：日历 + 列表 -->
+<div id="main">
+  <!-- 日历 -->
+  <div class="cal-wrap">
+    <div class="cal-nav">
+      <button onclick="changeMonth(-1)">‹</button>
+      <span class="cal-title" id="cal-title"></span>
+      <button onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="cal-weekdays">
+      <span>日</span><span>一</span><span>二</span><span>三</span>
+      <span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="cal-days" id="cal-days"></div>
+  </div>
+
+  <!-- 列表 -->
+  <p class="list-header" id="list-header"></p>
+  <div id="list-view"></div>
+</div>
+
+<!-- 详情面板（底部弹出） -->
+<div id="entry-panel" onclick="closePanel(event)">
+  <div class="panel-body">
+    <div class="panel-header">
+      <div>
+        <h2 id="panel-date"></h2>
+        <div class="weekday" id="panel-weekday"></div>
+      </div>
+      <button class="close-btn" onclick="closePanel()">×</button>
+    </div>
+    <div class="panel-content" id="panel-content"></div>
+  </div>
+</div>
+
+<script>
+  const _S = "极染悟心";
+  let _entries = {}, _calYear, _calMonth, _selectedKey = null;
+
+  function todayKey() {
+    const d = new Date();
+    return d.getFullYear().toString()
+      + String(d.getMonth()+1).padStart(2,"0")
+      + String(d.getDate()).padStart(2,"0");
+  }
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+  }
+
+  function keyToDate(key) {
+    return new Date(+key.slice(0,4), +key.slice(4,6)-1, +key.slice(6,8));
+  }
+
+  function dateToKey(y, m, d) {
+    return y.toString() + String(m+1).padStart(2,"0") + String(d).padStart(2,"0");
+  }
+
+  function loadEntries() {
+    const e = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (/^diary_\d{8}$/.test(k)) {
+        const content = localStorage.getItem(k);
+        if (content && content.trim()) e[k.replace("diary_","")] = content;
+      }
+    }
+    return e;
+  }
+
+  // ── 解锁 ─────────────────────────────────────────────────────
+  document.getElementById("pwd").addEventListener("keydown", e => {
+    if (e.key === "Enter") unlock();
+  });
+
+  async function unlock() {
+    const input = document.getElementById("pwd").value.trim().toUpperCase();
+    const err = document.getElementById("err");
+    err.textContent = "";
+    if (input.length !== 6) { err.textContent = "请输入6位密码"; return; }
+    const hash = await sha256(_S + todayKey());
+    if (input !== hash.slice(0,6).toUpperCase()) { err.textContent = "密码错误"; return; }
+
+    _entries = loadEntries();
+    const now = new Date();
+    _calYear = now.getFullYear();
+    _calMonth = now.getMonth();
+
+    document.getElementById("lock").style.display = "none";
+    document.getElementById("main").style.display = "block";
+    renderCalendar();
+    renderList();
+  }
+
+  // ── 日历 ─────────────────────────────────────────────────────
+  function renderCalendar() {
+    const months = ["一月","二月","三月","四月","五月","六月",
+                    "七月","八月","九月","十月","十一月","十二月"];
+    document.getElementById("cal-title").textContent = `${_calYear} · ${months[_calMonth]}`;
+
+    const today     = new Date();
+    const firstDay  = new Date(_calYear, _calMonth, 1).getDay();
+    const daysInMon = new Date(_calYear, _calMonth+1, 0).getDate();
+    const daysInPrev= new Date(_calYear, _calMonth, 0).getDate();
+
+    let html = "";
+
+    // 上月补位
+    for (let i = firstDay-1; i >= 0; i--) {
+      const d   = daysInPrev - i;
+      const m   = _calMonth === 0 ? 11 : _calMonth-1;
+      const y   = _calMonth === 0 ? _calYear-1 : _calYear;
+      const key = dateToKey(y, m, d);
+      const has = !!_entries[key];
+      html += dayCell(d, key, has, false, false);
+    }
+
+    // 本月
+    for (let d = 1; d <= daysInMon; d++) {
+      const key     = dateToKey(_calYear, _calMonth, d);
+      const has     = !!_entries[key];
+      const isToday = today.getFullYear()===_calYear && today.getMonth()===_calMonth && today.getDate()===d;
+      html += dayCell(d, key, has, isToday, false);
+    }
+
+    // 补足
+    const total = firstDay + daysInMon;
+    const rem   = (Math.ceil(total/7)*7) - total;
+    for (let d = 1; d <= rem; d++) {
+      const m   = _calMonth === 11 ? 0 : _calMonth+1;
+      const y   = _calMonth === 11 ? _calYear+1 : _calYear;
+      const key = dateToKey(y, m, d);
+      const has = !!_entries[key];
+      html += dayCell(d, key, has, false, true);
+    }
+
+    document.getElementById("cal-days").innerHTML = html;
+    highlightSelected();
+  }
+
+  function dayCell(d, key, has, isToday, otherMonth) {
+    const cls = ["cal-day",
+      has        ? "has-entry"   : "",
+      isToday    ? "today"       : "",
+      otherMonth ? "other-month" : "",
+    ].filter(Boolean).join(" ");
+    const click = has ? `onclick="selectDay('${key}')"` : "";
+    return `<div class="${cls}" ${click}>
+      <span class="day-num">${d}</span>
+      ${has ? '<span class="dot"></span>' : ""}
+    </div>`;
+  }
+
+  function changeMonth(delta) {
+    _calMonth += delta;
+    if (_calMonth > 11) { _calMonth = 0;  _calYear++; }
+    if (_calMonth < 0)  { _calMonth = 11; _calYear--; }
+    renderCalendar();
+    renderList();
+  }
+
+  function highlightSelected() {
+    document.querySelectorAll(".cal-day").forEach(el => el.classList.remove("selected"));
+    if (!_selectedKey) return;
+    document.querySelectorAll(".cal-day.has-entry").forEach(el => {
+      if (el.getAttribute("onclick") && el.getAttribute("onclick").includes(_selectedKey))
+        el.classList.add("selected");
+    });
+  }
+
+  // ── 列表 ─────────────────────────────────────────────────────
+  function renderList() {
+    const el   = document.getElementById("list-view");
+    const hdr  = document.getElementById("list-header");
+
+    // 只显示当前日历月的条目
+    const keys = Object.keys(_entries)
+      .filter(k => +k.slice(0,4)===_calYear && +k.slice(4,6)===_calMonth+1)
+      .sort((a,b) => b.localeCompare(a));
+
+    const months = ["一月","二月","三月","四月","五月","六月",
+                    "七月","八月","九月","十月","十一月","十二月"];
+    hdr.textContent = `${_calYear} 年 ${months[_calMonth]} · ${keys.length} 篇`;
+
+    if (!keys.length) {
+      el.innerHTML = '<p class="empty">这个月还没有日记</p>';
+      return;
+    }
+
+    el.innerHTML = keys.map(k => {
+      const preview = _entries[k].split("\n")[0].slice(0, 60);
+      const d       = keyToDate(k);
+      const label   = d.toLocaleDateString("zh-CN", {month:"long",day:"numeric",weekday:"short"});
+      const sel     = k === _selectedKey ? " highlighted" : "";
+      return `<div class="entry-item${sel}" id="item-${k}" onclick="openEntry('${k}')">
+        <div class="e-date">${label}</div>
+        <div class="e-preview">${preview || "（无内容）"}</div>
+      </div>`;
+    }).join("");
+  }
+
+  function selectDay(key) {
+    _selectedKey = key;
+    highlightSelected();
+
+    // 切换到该月
+    const y = +key.slice(0,4), m = +key.slice(4,6)-1;
+    if (y !== _calYear || m !== _calMonth) {
+      _calYear = y; _calMonth = m;
+      renderCalendar();
+      renderList();
+    } else {
+      renderList();
+      // 滚动到对应列表项
+      setTimeout(() => {
+        const el = document.getElementById("item-"+key);
+        if (el) el.scrollIntoView({ behavior:"smooth", block:"center" });
+      }, 50);
+    }
+    openEntry(key);
+  }
+
+  // ── 详情面板 ─────────────────────────────────────────────────
+  function openEntry(key) {
+    _selectedKey = key;
+    highlightSelected();
+    renderList();
+
+    const d = keyToDate(key);
+    document.getElementById("panel-date").textContent    = d.toLocaleDateString("zh-CN", {year:"numeric",month:"long",day:"numeric"});
+    document.getElementById("panel-weekday").textContent = d.toLocaleDateString("zh-CN", {weekday:"long"});
+    document.getElementById("panel-content").textContent = _entries[key] || "（无内容）";
+    document.getElementById("entry-panel").classList.add("open");
+  }
+
+  function closePanel(e) {
+    if (e && e.target !== document.getElementById("entry-panel")) return;
+    document.getElementById("entry-panel").classList.remove("open");
+  }
+</script>
+</body>
+</html>
