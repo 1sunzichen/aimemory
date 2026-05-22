@@ -7,6 +7,56 @@ layout: page
   <h1>🧠 AI 大模型学习路线图</h1>
   <p class="subtitle">从基础到实战，系统化掌握 LLM / RAG / ReAct / Agent · 点击任意卡片直达学习资源</p>
 
+  <!-- Phase 0: 数学预科 -->
+  <div class="phase p0">
+    <div class="phase-header">
+      <div class="phase-num">0</div>
+      <div class="phase-title">数学预科 · 高中生入门必读</div>
+    </div>
+    <div class="p0-banner">
+      <strong>📌 适合人群：</strong>仅有高中数学基础，首次接触 AI · 建议先学完本章再进入 Phase 1<br>
+      <strong>⏱ 预计周期：</strong>9 周 · 每天 1 小时 · 三门核心：线性代数 → 微积分（梯度）→ 概率论
+    </div>
+    <div class="rw-grid">
+      <div class="rw-card" onclick="document.getElementById('math-tutorial').open=true;document.getElementById('math-tutorial').scrollIntoView({behavior:'smooth'})">
+        <div class="card-label">线性代数（Week 1–4）</div>
+        <div class="card-sub">向量 · 矩阵乘法 · 点积 · 余弦相似度 · 低秩分解（LoRA 原理）</div>
+        <span class="rw-tag">⭐⭐⭐ 最重要</span>
+      </div>
+      <div class="rw-card" onclick="document.getElementById('math-tutorial').open=true;document.getElementById('math-tutorial').scrollIntoView({behavior:'smooth'})">
+        <div class="card-label">微积分 · 梯度下降（Week 5–7）</div>
+        <div class="card-sub">导数 · 偏导数 · 链式法则 · 梯度下降 · 反向传播直觉</div>
+        <span class="rw-tag">⭐⭐⭐ 最重要</span>
+      </div>
+      <div class="rw-card" onclick="document.getElementById('math-tutorial').open=true;document.getElementById('math-tutorial').scrollIntoView({behavior:'smooth'})">
+        <div class="card-label">概率论与统计（Week 8–9）</div>
+        <div class="card-sub">Softmax · 交叉熵损失 · 期望 · KL 散度 · 贝叶斯直觉</div>
+        <span class="rw-tag">⭐⭐ 重要</span>
+      </div>
+      <a class="rw-card" href="https://space.bilibili.com/88461692/channel/seriesdetail?sid=1528929" target="_blank">
+        <div class="card-label">推荐：线性代数的本质 <span class="zh-badge">B站</span></div>
+        <div class="card-sub">3Blue1Brown 动画版 · 中文字幕 · 16集每集10分钟 · 直觉优先无痛入门</div>
+        <span class="rw-tag">免费</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="rw-card" href="https://zh.d2l.ai/chapter_preliminaries/index.html" target="_blank">
+        <div class="card-label">推荐：动手学深度学习 第2章 <span class="zh-badge">中文</span></div>
+        <div class="card-sub">李沐著 · 数学 + Python 代码同步讲解 · 专为 AI 入门者设计</div>
+        <span class="rw-tag">免费</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="rw-card" href="https://www.khanacademy.org/math/linear-algebra" target="_blank">
+        <div class="card-label">推荐：Khan Academy 线性代数</div>
+        <div class="card-sub">全免费 · 从零开始 · 含练习题和即时反馈</div>
+        <span class="rw-tag">免费</span>
+        <span class="card-arrow">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <MathTutorial />
+
+
   <!-- Phase 1 -->
   <div class="phase p1">
     <div class="phase-header">
@@ -249,6 +299,7 @@ layout: page
       </div>
     </div>
     <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div> 数学预科</div>
       <div class="legend-item"><div class="legend-dot" style="background:#22d3ee"></div> 基础</div>
       <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> LLM 核心</div>
       <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div> RAG</div>

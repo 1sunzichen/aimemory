@@ -165,6 +165,98 @@
 }
 
 /* Phase 配色 */
+.rw .p0 .phase-num { background: #fbbf24; color: #0f172a; }
+.rw .p0 .rw-card  { border-left: 3px solid #fbbf24; }
+.rw .p0 .card-label { color: #fbbf24; }
+.rw .p0 .rw-tag { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
+
+.rw .p0-banner {
+  margin-left: 48px;
+  margin-bottom: 14px;
+  padding: 10px 14px;
+  background: rgba(251, 191, 36, 0.07);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 8px;
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.8;
+}
+.rw .p0-banner strong { color: #fbbf24; }
+
+/* 数学预科教程折叠面板 */
+.rw .math-tutorial {
+  margin: 40px 0;
+  padding: 28px;
+  background: rgba(251, 191, 36, 0.04);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: 12px;
+}
+.rw .math-tutorial > summary {
+  font-size: 17px;
+  font-weight: 600;
+  color: #fbbf24;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rw .math-tutorial > summary::before { content: "▶"; font-size: 12px; transition: transform .2s; }
+.rw .math-tutorial[open] > summary::before { transform: rotate(90deg); }
+.rw .math-tutorial > summary::-webkit-details-marker { display: none; }
+
+.rw .mt-body { margin-top: 24px; }
+.rw .mt-section { margin-bottom: 28px; }
+.rw .mt-section h3 {
+  font-size: 15px; font-weight: 600; color: #fbbf24;
+  margin-bottom: 14px; padding-bottom: 6px;
+  border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+  border-top: none; border-left: none; border-right: none;
+}
+.rw .mt-week {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+}
+.rw .mt-week h4 { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 8px; border: none; padding: 0; }
+.rw .mt-week p  { font-size: 12px; color: #94a3b8; line-height: 1.8; margin: 4px 0; }
+.rw .mt-week pre {
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  color: #a5f3fc;
+  overflow-x: auto;
+  line-height: 1.7;
+  font-family: 'Menlo', 'Courier New', monospace;
+  white-space: pre;
+}
+.rw .mt-week .hl { color: #fbbf24; font-weight: 600; }
+.rw .mt-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+.rw .mt-table th { background: rgba(251,191,36,0.1); color: #fbbf24; padding: 6px 10px; text-align: left; border: 1px solid rgba(251,191,36,0.2); }
+.rw .mt-table td { padding: 6px 10px; border: 1px solid #1e293b; color: #94a3b8; }
+.rw .mt-roadmap {
+  padding: 14px 16px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  font-size: 12px;
+  color: #64748b;
+  font-family: 'Menlo','Courier New',monospace;
+  line-height: 2.2;
+}
+.rw .mt-roadmap .ms { color: #a5f3fc; }
+.rw .mt-roadmap .mn { color: #fbbf24; }
+
+@media (max-width: 768px) {
+  .rw .p0-banner { margin-left: 0; }
+}
+
 .rw .p1 .phase-num { background: #22d3ee; color: #0f172a; }
 .rw .p1 .rw-card  { border-left: 3px solid #22d3ee; }
 .rw .p1 .card-label { color: #22d3ee; }
