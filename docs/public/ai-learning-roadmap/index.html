@@ -44,6 +44,35 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
 .p5 .card { border-left: 3px solid #fb7185; }
 .p5 .card-label { color: #fb7185; }
 .p5 .tag { background: rgba(251,113,133,0.15); color: #fb7185; }
+/* Phase 0 预科 */
+.p0 .phase-num { background: #fbbf24; color: #0f172a; }
+.p0 .card { border-left: 3px solid #fbbf24; }
+.p0 .card-label { color: #fbbf24; }
+.p0 .tag { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.p0-banner { margin-left: 48px; margin-bottom: 14px; padding: 10px 14px; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); border-radius: 8px; font-size: 12px; color: #94a3b8; line-height: 1.7; }
+.p0-banner strong { color: #fbbf24; }
+/* 数学预科教程 */
+.math-tutorial { margin: 40px 0; padding: 28px; background: rgba(251,191,36,0.04); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; }
+.math-tutorial > summary { font-size: 17px; font-weight: 600; color: #fbbf24; cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 8px; }
+.math-tutorial > summary::before { content: "▶"; font-size: 12px; transition: transform .2s; }
+.math-tutorial[open] > summary::before { transform: rotate(90deg); }
+.math-tutorial > summary::-webkit-details-marker { display: none; }
+.mt-body { margin-top: 24px; }
+.mt-section { margin-bottom: 28px; }
+.mt-section h3 { font-size: 15px; font-weight: 600; color: #fbbf24; margin-bottom: 14px; padding-bottom: 6px; border-bottom: 1px solid rgba(251,191,36,0.2); }
+.mt-week { margin-bottom: 18px; padding: 14px 16px; background: rgba(15,23,42,0.5); border-radius: 8px; border: 1px solid #1e293b; }
+.mt-week h4 { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 8px; }
+.mt-week p { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+.mt-week pre { font-size: 11px; background: rgba(0,0,0,0.3); border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; margin: 8px 0; color: #a5f3fc; overflow-x: auto; line-height: 1.7; font-family: 'Menlo', 'Courier New', monospace; }
+.mt-week .highlight { color: #fbbf24; font-weight: 600; }
+.mt-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+.mt-table th { background: rgba(251,191,36,0.1); color: #fbbf24; padding: 6px 10px; text-align: left; border: 1px solid rgba(251,191,36,0.2); }
+.mt-table td { padding: 6px 10px; border: 1px solid #1e293b; color: #94a3b8; }
+.mt-table tr:hover td { background: rgba(30,41,59,0.6); }
+.mt-roadmap { margin: 16px 0; padding: 14px 16px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #1e293b; font-size: 12px; color: #64748b; font-family: 'Menlo', 'Courier New', monospace; line-height: 2; }
+.mt-roadmap .step { color: #a5f3fc; }
+.mt-roadmap .arrow { color: #475569; }
+.mt-roadmap .note { color: #fbbf24; }
 .resources { margin-top: 40px; padding: 24px; background: rgba(30,41,59,0.4); border: 1px solid #334155; border-radius: 12px; }
 .resources h2 { font-size: 18px; margin-bottom: 16px; color: #e2e8f0; }
 .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -59,6 +88,7 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
   .grid { margin-left: 0; grid-template-columns: 1fr; }
   .phase-desc { margin-left: 0; }
   .res-grid { grid-template-columns: 1fr; }
+  .p0-banner { margin-left: 0; }
 }
 </style>
 </head>
@@ -66,6 +96,53 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
 <div class="container">
   <h1>🧠 AI 大模型学习路线图</h1>
   <p class="subtitle">从基础到实战，系统化掌握 LLM / RAG / ReAct / Agent · 点击任意卡片直达学习资源</p>
+
+  <!-- Phase 0: 数学预科 -->
+  <div class="phase p0">
+    <div class="phase-header">
+      <div class="phase-num">0</div>
+      <div class="phase-title">数学预科 · 高中生入门必读</div>
+    </div>
+    <div class="p0-banner">
+      <strong>📌 适合人群：</strong>仅有高中数学基础，首次接触 AI · 建议先学完本章再进入 Phase 1<br>
+      <strong>⏱ 预计周期：</strong>9 周 · 每天 1 小时 · 三门核心：线性代数 → 微积分（梯度）→ 概率论
+    </div>
+    <div class="grid">
+      <div class="card" onclick="document.getElementById('math-tutorial').open=true;document.getElementById('math-tutorial').scrollIntoView({behavior:'smooth'})">
+        <div class="card-label">线性代数（Week 1–4）</div>
+        <div class="card-sub">向量 · 矩阵乘法 · 点积 · 余弦相似度 · 低秩分解 (LoRA原理)</div>
+        <span class="tag">⭐⭐⭐ 最重要</span>
+      </div>
+      <div class="card" onclick="document.getElementById('math-tutorial').open=true;document.getElementById('math-tutorial').scrollIntoView({behavior:'smooth'})">
+        <div class="card-label">微积分 · 梯度下降（Week 5–7）</div>
+        <div class="card-sub">导数 · 偏导数 · 链式法则 · 梯度下降 · 反向传播直觉</div>
+        <span class="tag">⭐⭐⭐ 最重要</span>
+      </div>
+      <div class="card" onclick="document.getElementById('math-tutorial').open=true;document.getElementById('math-tutorial').scrollIntoView({behavior:'smooth'})">
+        <div class="card-label">概率论与统计（Week 8–9）</div>
+        <div class="card-sub">Softmax · 交叉熵损失 · 期望 · KL散度 · 贝叶斯直觉</div>
+        <span class="tag">⭐⭐ 重要</span>
+      </div>
+      <a class="card" href="https://space.bilibili.com/88461692/channel/seriesdetail?sid=1528929" target="_blank">
+        <div class="card-label">推荐：线性代数的本质</div>
+        <div class="card-sub">3Blue1Brown 动画版 · B站有中文字幕 · 16集每集10分钟 · 直觉优先无痛入门</div>
+        <span class="tag">B站</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card" href="https://zh.d2l.ai/chapter_preliminaries/index.html" target="_blank">
+        <div class="card-label">推荐：动手学深度学习 第2章</div>
+        <div class="card-sub">李沐著 · 数学+Python代码同步讲解 · 专为 AI 入门者设计</div>
+        <span class="tag">免费</span>
+        <span class="card-arrow">↗</span>
+      </a>
+      <a class="card" href="https://www.khanacademy.org/math/linear-algebra" target="_blank">
+        <div class="card-label">推荐：Khan Academy 线性代数</div>
+        <div class="card-sub">全免费 · 从零开始 · 有中文界面 · 含练习题和即时反馈</div>
+        <span class="tag">免费</span>
+        <span class="card-arrow">↗</span>
+      </a>
+    </div>
+  </div>
 
   <!-- Phase 1: 基础 -->
   <div class="phase p1">
@@ -266,6 +343,179 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
     </div>
   </div>
 
+  <!-- 数学预科详细教程 -->
+  <details class="math-tutorial" id="math-tutorial">
+    <summary>📐 数学预科详细教程（点击展开 · 9周完整内容）</summary>
+    <div class="mt-body">
+
+      <!-- 线性代数 -->
+      <div class="mt-section">
+        <h3>第一门：线性代数（Week 1–4）</h3>
+
+        <div class="mt-week">
+          <h4>Week 1 — 向量基础</h4>
+          <p><span class="highlight">向量</span> = 一列有序数字。AI 里每个词、每张图都被表示成向量（Embedding）。</p>
+          <pre>a = [1, 2, 3]    b = [4, 5, 6]
+
+点积（Dot Product）:
+a · b = 1×4 + 2×5 + 3×6 = 32
+→ Attention 机制本质就是做点积，判断两个词的"相关度"
+
+余弦相似度（向量数据库 RAG 用这个找最相似文档）:
+cos(θ) = (a · b) / (|a| × |b|)
+|a| = √(1²+2²+3²) = √14 ≈ 3.74</pre>
+          <p>练习：给定 q=[1,0,1]，k=[1,1,0]，计算点积和余弦相似度。</p>
+        </div>
+
+        <div class="mt-week">
+          <h4>Week 2 — 矩阵乘法（最重要！）</h4>
+          <p><span class="highlight">矩阵</span> = 向量的集合，二维数据表。把矩阵想象成"数据变换器"——输入向量，输出新向量。</p>
+          <pre>A (2×3) × B (3×2) = C (2×2)
+C[0][0] = 行0·列0 = 1×7 + 2×9 + 3×11 = 58
+
+理解 Self-Attention：
+Attention(Q,K,V) = softmax(QKᵀ / √d) × V
+  1. QKᵀ  → 矩阵乘法，算"每对词的相关度分数"
+  2. / √d  → 防止数值过大（d 是向量维度）
+  3. softmax → 分数变概率（概率之和=1）
+  4. × V  → 用概率加权汇聚 V，得到最终表示</pre>
+        </div>
+
+        <div class="mt-week">
+          <h4>Week 3 — 矩阵分解（理解 LoRA）</h4>
+          <p>大模型权重矩阵 4096×4096 ≈ 1600万参数。LoRA 用两个小矩阵代替，大幅压缩训练量：</p>
+          <pre>原始更新：ΔW (4096×4096) → 16,777,216 参数
+LoRA：   A (4096×8) × B (8×4096) → 只需 65,536 参数！节省 256 倍
+
+原理：大多数权重更新是"低秩"的——用小矩阵近似大矩阵，
+      损失极少精度，但训练速度和显存消耗大幅下降。</pre>
+        </div>
+
+        <div class="mt-week">
+          <h4>Week 4 — Python NumPy 实战</h4>
+          <pre>import numpy as np
+
+# 向量点积
+q = np.array([1, 0, 1])
+k = np.array([1, 1, 0])
+print(np.dot(q, k))          # → 1
+
+# 矩阵乘法 (Self-Attention 简化版)
+Q = np.random.randn(4, 3)    # 4个词，每词3维
+K = np.random.randn(4, 3)
+scores = Q @ K.T              # (4×4) attention分数矩阵
+print(scores.shape)           # (4, 4)</pre>
+        </div>
+      </div>
+
+      <!-- 微积分 -->
+      <div class="mt-section">
+        <h3>第二门：微积分 · 梯度下降（Week 5–7）</h3>
+
+        <div class="mt-week">
+          <h4>Week 5 — 导数与梯度下降</h4>
+          <p>AI 训练的核心目标：<span class="highlight">找让"损失函数"最小的参数</span>。</p>
+          <pre>梯度下降（像闭眼下山）：
+  1. 感受脚下坡度 → 计算梯度（偏导数）
+  2. 朝最陡下坡方向迈一步 → 更新参数
+  3. 重复，直到谷底 → 损失最小
+
+公式：θ_new = θ_old - lr × ∂L/∂θ
+                          ↑       ↑      ↑
+                        新参数  学习率  梯度
+
+偏导数示例：
+L(w₁, w₂) = w₁² + 2w₁w₂ + w₂²
+∂L/∂w₁ = 2w₁ + 2w₂   (把 w₂ 当常数，对 w₁ 求导)
+∂L/∂w₂ = 2w₁ + 2w₂   (把 w₁ 当常数，对 w₂ 求导)</pre>
+        </div>
+
+        <div class="mt-week">
+          <h4>Week 6 — 链式法则（反向传播的核心）</h4>
+          <pre>链式法则：y = f(g(x))  →  dy/dx = f'(g(x)) × g'(x)
+
+例：y = (x²+1)³
+令 u = x²+1，则 y = u³
+dy/dx = 3u² × 2x = 3(x²+1)² × 2x
+
+神经网络反向传播 = 链式法则的连续应用：
+  损失 L → 最后一层 → 倒数第二层 → ... → 第一层
+  每层都用链式法则把梯度"传回去"
+
+实际使用 PyTorch，它自动计算（autograd），不需要手算。</pre>
+        </div>
+
+        <div class="mt-week">
+          <h4>Week 7 — AI 常用函数速查</h4>
+          <table class="mt-table">
+            <tr><th>函数</th><th>导数</th><th>AI 用途</th></tr>
+            <tr><td>eˣ</td><td>eˣ</td><td>Softmax 分母</td></tr>
+            <tr><td>ln(x)</td><td>1/x</td><td>交叉熵损失</td></tr>
+            <tr><td>max(0, x)</td><td>0 或 1</td><td>ReLU 激活函数</td></tr>
+            <tr><td>1/(1+e⁻ˣ)</td><td>σ(x)(1-σ(x))</td><td>Sigmoid（二分类）</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- 概率论 -->
+      <div class="mt-section">
+        <h3>第三门：概率论与统计（Week 8–9）</h3>
+
+        <div class="mt-week">
+          <h4>Week 8 — Softmax 与交叉熵损失</h4>
+          <p><span class="highlight">Softmax</span>：把模型输出的原始分数变成概率分布（所有概率之和 = 1）。</p>
+          <pre>模型输出（logits）：["你好"→3.2, "再见"→1.1, "谢谢"→2.8]
+
+P("你好") = e³·² / (e³·² + e¹·¹ + e²·⁸)
+           = 24.5 / (24.5 + 3.0 + 16.4) = 55.7%
+
+交叉熵损失（衡量预测准不准）：
+  预测概率 P = [0.7, 0.2, 0.1]，正确答案是第一个
+  Loss = -log(0.7) = 0.357   ← 预测越准，Loss 越小
+  若 P[0]=0.01，Loss = -log(0.01) = 4.6  ← 预测很差</pre>
+        </div>
+
+        <div class="mt-week">
+          <h4>Week 9 — 期望与 KL 散度</h4>
+          <pre>期望（加权平均）：
+E[X] = Σ x × P(x)
+→ RLHF 的 Reward Model 估计"这个回答的期望质量"
+
+KL 散度（衡量两个概率分布的距离）：
+KL(P||Q) = Σ P(x) × log(P(x)/Q(x))
+KL = 0 → 两分布完全相同
+KL 越大 → 差异越大
+
+→ DPO/RLHF 训练时用来防止模型偏离原始分布太远
+   （防止模型"学歪"，忘掉原来的语言能力）</pre>
+        </div>
+      </div>
+
+      <!-- 学习路线 -->
+      <div class="mt-section">
+        <h3>9 周学习路线总览</h3>
+        <div class="mt-roadmap">
+          <span class="step">高中数学基础</span><br>
+          <span class="arrow">　↓</span><br>
+          <span class="step">Week 1–2：向量 + 矩阵乘法</span> <span class="note">← 最优先！！</span><br>
+          <span class="arrow">　↓</span><br>
+          <span class="step">Week 3：矩阵分解（LoRA 原理）</span><br>
+          <span class="arrow">　↓</span><br>
+          <span class="step">Week 4：Python NumPy 实战</span><br>
+          <span class="arrow">　↓</span><br>
+          <span class="step">Week 5–6：导数 + 梯度下降 + 链式法则</span><br>
+          <span class="arrow">　↓</span><br>
+          <span class="step">Week 7：常用函数导数速查</span><br>
+          <span class="arrow">　↓</span><br>
+          <span class="step">Week 8–9：Softmax + 交叉熵 + KL 散度</span><br>
+          <span class="arrow">　↓</span><br>
+          <span class="note">✅ 可以开始看 Phase 1 Transformer 架构了！</span>
+        </div>
+      </div>
+
+    </div>
+  </details>
+
   <!-- 资源推荐 -->
   <div class="resources">
     <h2>📚 推荐学习资源</h2>
@@ -302,6 +552,7 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
       </div>
     </div>
     <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div> 数学预科</div>
       <div class="legend-item"><div class="legend-dot" style="background:#22d3ee"></div> 基础</div>
       <div class="legend-item"><div class="legend-dot" style="background:#34d399"></div> LLM 核心</div>
       <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div> RAG</div>
