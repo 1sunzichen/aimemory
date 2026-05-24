@@ -20,6 +20,7 @@ export default defineConfig({
       { text: 'Projects', link: '/projects/' },
       { text: 'AI 路线图', link: '/ai-learning-roadmap/' },
       { text: 'AI 学习笔记', link: '/ai-learning-notes/' },
+      { text: '数学之美', link: '/math-beauty/' },
       { text: '思考录', link: '/thoughts/' }
     ],
     sidebar: {
