@@ -97,10 +97,10 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
 .exercise-block > summary::-webkit-details-marker { display: none; }
 .ex-body { margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .ex-item { display: flex; gap: 12px; padding: 10px 12px; border-radius: 8px; }
-.ex-num { flex-shrink: 0; width: 52px; text-align: center; font-size: 11px; font-weight: 700; padding: 3px 0; border-radius: 6px; }
+.ex-num { flex-shrink: 0; width: 58px; text-align: center; font-size: 11px; font-weight: 700; padding: 3px 0; border-radius: 6px; white-space: nowrap; }
 .ex-content { flex: 1; }
 .ex-content strong { display: block; font-size: 13px; margin-bottom: 4px; }
-.ex-content p { font-size: 11px; line-height: 1.7; color: #94a3b8; margin: 0; }
+.ex-content p { font-size: 11px; line-height: 1.8; color: #94a3b8; margin: 0; }
 .ex-content code { font-size: 10px; background: rgba(0,0,0,0.3); padding: 1px 4px; border-radius: 3px; }
 .p0-ex { background: rgba(251,191,36,0.04); border-color: rgba(251,191,36,0.2); }
 .p0-ex > summary { color: #fbbf24; }
@@ -183,13 +183,31 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
         <span class="card-arrow">↗</span>
       </a>
     </div>
-<!-- Phase 0 exercises -->
+<!-- 📝 工位练习：Phase 0 -->
   <details class="exercise-block p0-ex">
-    <summary>Practice Phase 0: Math Prep (3 exercises)</summary>
+    <summary>📝 工位练习 · 数学预科（3 项 · 纯手算 + 代码，不看视频）</summary>
     <div class="ex-body">
-      <div class="ex-item"><div class="ex-num">Ex 0-1</div><div class="ex-content"><strong>Hand-calculate Self-Attention</strong><p>Given 3 words with 2D vectors. Calculate the 3x3 attention score matrix, apply softmax per row, and compute weighted V outputs. Verify with NumPy.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 0-2</div><div class="ex-content"><strong>Implement Gradient Descent with NumPy</strong><p>Minimize f(x,y)=x^2+2xy+3y^2. Start at (3,2), lr=0.1, 20 iterations. Print (x,y,f) each step.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 0-3</div><div class="ex-content"><strong>Implement Softmax + Cross-Entropy</strong><p>Given logits=[2.0,1.0,0.1] with correct index 0. Implement softmax and cross-entropy loss in NumPy.</p></div></div>
+      <div class="ex-item">
+        <div class="ex-num">练习 0-1</div>
+        <div class="ex-content">
+          <strong>手算 Self-Attention（草稿纸即可）</strong>
+          <p>给定 3 个词，每词 2 维向量：q1=[1,0], k1=[1,1], v1=[2,0]；q2=[0,1], k2=[0,1], v2=[1,1]；q3=[1,1], k3=[1,0], v3=[0,2]。<br>① 算出 3x3 attention 分数矩阵（S[i][j] = qi·kj）<br>② 每行做 softmax 归一化<br>③ 用权重加权 V 得到输出向量<br>④ 用 NumPy 写代码验证手算结果</p>
+        </div>
+      </div>
+      <div class="ex-item">
+        <div class="ex-num">练习 0-2</div>
+        <div class="ex-content">
+          <strong>NumPy 实现梯度下降</strong>
+          <p>对 f(x,y) = x^2 + 2xy + 3y^2 做梯度下降。<br>① 手算偏导数<br>② 从 (3, 2) 出发，lr=0.1，迭代 20 步，打印每步的 (x, y, f)<br>③ 观察 f 是否收敛到 0，若不收敛调整学习率重试</p>
+        </div>
+      </div>
+      <div class="ex-item">
+        <div class="ex-num">练习 0-3</div>
+        <div class="ex-content">
+          <strong>手写 Softmax + 交叉熵损失</strong>
+          <p>logits = [2.0, 1.0, 0.1]，正确类别索引为 0。<br>① 用 NumPy 实现 softmax<br>② 用 NumPy 实现交叉熵：loss = -log(P[correct])<br>③ 改大/改小正确类别的 logit，观察 loss 变化</p>
+        </div>
+      </div>
     </div>
   </details>
   </div>
@@ -226,14 +244,14 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
         <span class="card-arrow">↗</span>
       </a>
     </div>
-<!-- Phase 1 exercises -->
+<!-- 📝 工位练习：Phase 1 -->
   <details class="exercise-block p1-ex">
-    <summary>Practice Phase 1: Foundations (4 exercises)</summary>
+    <summary>📝 工位练习 · 基础基石（4 项 · 读论文 + 写代码）</summary>
     <div class="ex-body">
-      <div class="ex-item"><div class="ex-num">Ex 1-1</div><div class="ex-content"><strong>Implement Scaled Dot-Product Attention from scratch</strong><p>Use only numpy. Support multi-head with shape (batch,heads,seq,d_k). Test that attention weights sum to 1 per row.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 1-2</div><div class="ex-content"><strong>Compare three tokenizers</strong><p>Load BPE (GPT-2), WordPiece (BERT), SentencePiece (LLaMA) via HuggingFace. Tokenize the same Chinese-English text. Compare token count and quality.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 1-3</div><div class="ex-content"><strong>Read Transformer paper, write 500-word summary</strong><p>Focus on Section 3. Explain Self-Attention, Multi-Head, Positional Encoding. Answer: why scale by sqrt(d_k)?</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 1-4</div><div class="ex-content"><strong>Prompt Engineering comparison</strong><p>Pick one task. Test zero-shot, few-shot (3 examples), Chain-of-Thought, and role-playing prompts. Compare quality in 300 words.</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 1-1</div><div class="ex-content"><strong>从零实现 Scaled Dot-Product Attention</strong><p>只 import numpy，不调深度学习框架。实现 attention(Q,K,V,mask=None)，支持多头。随机矩阵测试验证输出形状。自写测试验证 attention weights 每行和 = 1。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 1-2</div><div class="ex-content"><strong>对比三种 Tokenizer 的分词效果</strong><p>HuggingFace 加载 BPE(GPT-2)、WordPiece(BERT)、SentencePiece(LLaMA)。同一段中英混合文本分词，记录 token 数量和切分结果。写 200 字总结：哪种对中文最友好？</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 1-3</div><div class="ex-content"><strong>精读 Transformer 论文，写 500 字笔记</strong><p>读 Attention Is All You Need，重点 Section 3。用自己话解释 Self-Attention / Multi-Head / Positional Encoding。画 Encoder-Decoder 结构图。回答：为什么要除以 sqrt(d_k)？</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 1-4</div><div class="ex-content"><strong>Prompt Engineering 对比实验</strong><p>选一个任务（翻译/摘要/分类），设计 4 种 prompt：零样本、少样本(3例)、Chain-of-Thought、角色扮演。记录输出质量，写 300 字对比分析。</p></div></div>
     </div>
   </details>
   </div>
@@ -269,14 +287,14 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
         <span class="card-arrow">↗</span>
       </a>
     </div>
-<!-- Phase 2 exercises -->
+<!-- 📝 工位练习：Phase 2 -->
   <details class="exercise-block p2-ex">
-    <summary>Practice Phase 2: LLM Core (4 exercises)</summary>
+    <summary>📝 工位练习 · LLM 核心能力（4 项 · 微调 + 实验）</summary>
     <div class="ex-body">
-      <div class="ex-item"><div class="ex-num">Ex 2-1</div><div class="ex-content"><strong>LoRA fine-tuning (Colab free GPU)</strong><p>Use Qwen2.5-0.5B + HuggingFace PEFT. Prepare 50 JSONL training examples. Fine-tune with LoRA (r=8, alpha=16), 3 epochs. Compare outputs before/after.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 2-2</div><div class="ex-content"><strong>Implement DPO Loss</strong><p>Code the DPO loss function from scratch. Given chosen/rejected log probabilities, verify that higher chosen probability yields lower loss.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 2-3</div><div class="ex-content"><strong>In-Context Learning experiment</strong><p>Same task across 0/1/3/5-shot + CoT. Tabulate accuracy. Plot shot count vs. performance.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 2-4</div><div class="ex-content"><strong>Context window boundary test</strong><p>Place answer at 10%/50%/90% of a long document. Test at 4K/8K/16K/32K context lengths. Plot the Lost in the Middle curve.</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 2-1</div><div class="ex-content"><strong>LoRA 微调实战（Colab 免费 GPU）</strong><p>Qwen2.5-0.5B + HuggingFace PEFT，自备 50 条 JSONL 数据。LoRA(r=8,alpha=16)，微调 3 epoch。对比微调前后 5 个 case 的输出。保存 adapter，学会 merge 和 push 到 Hub。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 2-2</div><div class="ex-content"><strong>手写 DPO 损失函数</strong><p>不调库，用 NumPy/PyTorch 实现 DPO Loss。理解公式，给定 chosen/rejected 的 log prob 计算损失。构造数据验证：chosen 越高于 rejected 则 loss 越小。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 2-3</div><div class="ex-content"><strong>In-Context Learning 系统性实验</strong><p>同一分类任务，控制变量：0-shot、1-shot、3-shot、5-shot、5-shot+CoT。表格记录准确率，画折线图看 shot 数与效果的关系。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 2-4</div><div class="ex-content"><strong>"Lost in the Middle" 上下文窗口测试</strong><p>把答案放在文档 10%/50%/90% 位置，用 4K/8K/16K/32K 上下文测试。画"答案位置 vs 准确率"曲线。你的模型在哪个位置最容易"忘记"？</p></div></div>
     </div>
   </details>
   </div>
@@ -324,15 +342,15 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
         <span class="card-arrow">↗</span>
       </a>
     </div>
-<!-- Phase 3 exercises -->
+<!-- 📝 工位练习：Phase 3 -->
   <details class="exercise-block p3-ex">
-    <summary>Practice Phase 3: RAG (5 exercises)</summary>
+    <summary>📝 工位练习 · RAG 检索增强生成（5 项 · 搭系统 + 对比实验）</summary>
     <div class="ex-body">
-      <div class="ex-item"><div class="ex-num">Ex 3-1</div><div class="ex-content"><strong>Build RAG pipeline from scratch</strong><p>Chroma + sentence-transformers + LLM API. Index 20 documents. Implement embed, retrieve top-5, generate. Test with 10 questions. Bonus: Gradio UI.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 3-2</div><div class="ex-content"><strong>Chunking strategy comparison</strong><p>Compare Fixed-size (0 overlap), Fixed-size (128 overlap), and Semantic Chunking. Measure top-3 hit rate on 10 questions.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 3-3</div><div class="ex-content"><strong>Implement Hybrid Search</strong><p>BM25 + vector search with RRF fusion. Compare pure vector vs. pure BM25 vs. hybrid top-5 accuracy.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 3-4</div><div class="ex-content"><strong>Query Rewrite for better retrieval</strong><p>Write an LLM prompt to rewrite vague queries. Test 10 colloquial questions. Compare top-3 hit rate before/after. Bonus: implement HyDE.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 3-5</div><div class="ex-content"><strong>Evaluate RAG with RAGAS</strong><p>Install ragas. Generate 20 Q&A pairs from your RAG system. Evaluate Faithfulness, Answer Relevancy, Context Precision, Context Recall.</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 3-1</div><div class="ex-content"><strong>从零搭建 RAG Pipeline</strong><p>Chroma + sentence-transformers + 任意 LLM API。准备 20 篇文档建向量索引。实现 query,embed,top-5 retrieve,prompt,generate 全流程。10 个预设问题测试，加分：Gradio UI。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 3-2</div><div class="ex-content"><strong>切块策略对比实验</strong><p>同一批文档，三种切法：Fixed-size 512(overlap=0)、Fixed-size 512(overlap=128)、Semantic Chunking。统计 10 个问题的 top-3 命中率。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 3-3</div><div class="ex-content"><strong>实现混合搜索（Hybrid Search）</strong><p>BM25 + 向量检索双路召回。rank-bm25 + Chroma，RRF 合并排序。对比纯向量 vs 纯 BM25 vs 混合的 top-5 准确率。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 3-4</div><div class="ex-content"><strong>Query Rewrite 提升检索命中率</strong><p>口语化问题转精确查询。准备 10 个模糊问题，对比改写前后的 top-3 命中率。加分：实现 HyDE（先生成假设答案再检索）。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 3-5</div><div class="ex-content"><strong>用 RAGAS 评估 RAG 系统质量</strong><p>安装 ragas，用你的 RAG 系统生成 20 条问答。评估 Faithfulness / Answer Relevancy / Context Precision / Context Recall 四个指标。针对最差指标改进 pipeline。</p></div></div>
     </div>
   </details>
   </div>
@@ -379,14 +397,14 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
         <span class="card-arrow">↗</span>
       </a>
     </div>
-<!-- Phase 4 exercises -->
+<!-- 📝 工位练习：Phase 4 -->
   <details class="exercise-block p4-ex">
-    <summary>Practice Phase 4: ReAct and Agent (4 exercises)</summary>
+    <summary>📝 工位练习 · ReAct & Agent（4 项 · 从零实现智能体）</summary>
     <div class="ex-body">
-      <div class="ex-item"><div class="ex-num">Ex 4-1</div><div class="ex-content"><strong>Implement ReAct loop from scratch</strong><p>Pure Python (no LangChain). Define search + calculator tools. Implement Thought, Action, Observation loop. Test multi-step tasks.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 4-2</div><div class="ex-content"><strong>Function Calling calculator agent</strong><p>Use OpenAI/Claude Function Calling API. Define add/subtract/multiply/divide tools with JSON Schema. Handle errors like division by zero.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 4-3</div><div class="ex-content"><strong>Multi-tool orchestration agent</strong><p>Three tools: web_search, calculator, get_weather. Agent auto-selects tool order. Add FINAL_ANSWER termination. Test multi-step reasoning.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 4-4</div><div class="ex-content"><strong>LangChain Agent vs. native comparison</strong><p>Same task: find CEO, search CEO age. Implement with LangChain create_react_agent and native Python + OpenAI API. Compare LOC, control, debuggability.</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 4-1</div><div class="ex-content"><strong>从零实现 ReAct 循环</strong><p>纯 Python，不用 LangChain。定义 search + calculator 两个工具。实现 Thought-Action-Observation 循环。解析 LLM 输出，执行工具，结果喂回下一轮。测试多步推理。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 4-2</div><div class="ex-content"><strong>Function Calling 实现智能计算器</strong><p>OpenAI/Claude Function Calling API。定义加减乘除四个工具(JSON Schema)。测试"三加五乘以二"的自动拆解。处理除零等异常。对比 Function Calling vs ReAct 两种范式。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 4-3</div><div class="ex-content"><strong>多工具编排 Agent</strong><p>搜索+计算+天气，三个工具一个 Agent。Agent 自动选择工具顺序，无需人工指定。加 FINAL_ANSWER 终止条件防止死循环。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 4-4</div><div class="ex-content"><strong>LangChain Agent vs 原生实现对比</strong><p>同一任务双实现：查公司名，找 CEO，搜 CEO 年龄。LangChain 版 vs 原生 Python+OpenAI API。从代码行数、可控性、调试难度写对比。</p></div></div>
     </div>
   </details>
   </div>
@@ -432,14 +450,14 @@ h1 { text-align: center; font-size: 32px; margin-bottom: 8px; background: linear
         <span class="card-arrow">↗</span>
       </a>
     </div>
-<!-- Phase 5 exercises -->
+<!-- 📝 工位练习：Phase 5 -->
   <details class="exercise-block p5-ex">
-    <summary>Practice Phase 5: Engineering (4 exercises)</summary>
+    <summary>📝 工位练习 · 工程化与进阶（4 项 · 部署 + 优化 + 评估）</summary>
     <div class="ex-body">
-      <div class="ex-item"><div class="ex-num">Ex 5-1</div><div class="ex-content"><strong>Quantize and compare models</strong><p>Use llama.cpp to quantize Qwen2.5-7B to Q4_K_M, Q5_K_M, Q8_0. Compare model size, load time, and output quality (human score 1-5).</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 5-2</div><div class="ex-content"><strong>Deploy vLLM and benchmark</strong><p>Start vLLM server with Qwen2.5-7B. Benchmark QPS and latency at concurrency 1/4/8/16/32. Test with and without prefix caching.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 5-3</div><div class="ex-content"><strong>Write an evaluation script</strong><p>Create 20-question eval set (JSON). Use GPT-4 as LLM-as-Judge. Compute average score, std dev, per-category scores. Compare 2 models.</p></div></div>
-      <div class="ex-item"><div class="ex-num">Ex 5-4</div><div class="ex-content"><strong>Prompt Caching cost analysis</strong><p>Construct 4000-token system prompt + 2000-token user prompt. Call OpenAI/Anthropic APIs. Track cached_tokens. Calculate daily savings for 1000 calls.</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 5-1</div><div class="ex-content"><strong>模型量化对比实验</strong><p>llama.cpp 把 Qwen2.5-7B 量化为 Q4_K_M/Q5_K_M/Q8_0。记录模型大小、加载耗时、输出质量(人工1-5打分)。写结论：精度与速度如何取舍？</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 5-2</div><div class="ex-content"><strong>vLLM 部署与压测</strong><p>启动 vLLM 服务加载 Qwen2.5-7B。并发 1/4/8/16/32，记录 QPS 和平均延迟。开启 vs 关闭 prefix caching 各跑一轮。画出"并发 vs QPS"曲线。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 5-3</div><div class="ex-content"><strong>手写模型评估脚本</strong><p>自建 20 题评估集(JSON: question + reference_answer)。用 GPT-4 做 LLM-as-Judge 打分。自动统计：平均分、标准差、按分类得分。对比 2 个模型在你自建集上的表现。</p></div></div>
+      <div class="ex-item"><div class="ex-num">练习 5-4</div><div class="ex-content"><strong>Prompt Caching 成本收益分析</strong><p>4000 token 系统 prompt + 2000 token 用户 prompt。调 OpenAI/Anthropic API，记录 cached_tokens。算账：日均 1000 次调用能省多少钱？什么场景下收益最大？</p></div></div>
     </div>
   </details>
   </div>
