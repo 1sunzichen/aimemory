@@ -64,7 +64,8 @@ export default defineConfig({
             { text: '目录', link: '/ai-learning-notes/' },
             { text: 'RNN 循环神经网络', link: '/ai-learning-notes/rnn' },
             { text: 'Transformer 编码器与解码器', link: '/ai-learning-notes/transformer-encoder-decoder' },
-            { text: 'GPT/Claude 纯解码器架构', link: '/ai-learning-notes/decoder-only' }
+            { text: 'GPT/Claude 纯解码器架构', link: '/ai-learning-notes/decoder-only' },
+            { text: 'Softmax、欧拉数 e 与求导', link: '/ai-learning-notes/softmax-e-derivatives' }
           ]
         }
       ],
