@@ -46,12 +46,16 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://www.khanacademy.org/math/linear-algebra" target="_blank">
-        <div class="card-label">推荐：Khan Academy 线性代数</div>
-        <div class="card-sub">全免费 · 从零开始 · 含练习题和即时反馈</div>
-        <span class="rw-tag">免费</span>
-        <span class="card-arrow">↗</span>
-      </a>
     </div>
+<!-- Phase 0 exercises -->
+  <details class="exercise-block p0-ex">
+    <summary>Practice Phase 0: Math Prep (3 exercises)</summary>
+    <div class="ex-body">
+      <div class="ex-item"><div class="ex-num">Ex 0-1</div><div class="ex-content"><strong>Hand-calculate Self-Attention</strong><p>Given 3 words with 2D vectors. Calculate the 3x3 attention score matrix, apply softmax per row, and compute weighted V outputs. Verify with NumPy.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 0-2</div><div class="ex-content"><strong>Implement Gradient Descent with NumPy</strong><p>Minimize f(x,y)=x^2+2xy+3y^2. Start at (3,2), lr=0.1, 20 iterations. Print (x,y,f) each step.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 0-3</div><div class="ex-content"><strong>Implement Softmax + Cross-Entropy</strong><p>Given logits=[2.0,1.0,0.1] with correct index 0. Implement softmax and cross-entropy loss in NumPy.</p></div></div>
+    </div>
+  </details>
   </div>
 
   <MathTutorial />
@@ -83,12 +87,17 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://www.promptingguide.ai/zh" target="_blank">
-        <div class="card-label">Prompt Engineering <span class="zh-badge">中文</span></div>
-        <div class="card-sub">官方中文版完整指南 · Few-shot · Chain-of-Thought · Instruction Tuning · 提示词设计最佳实践</div>
-        <span class="rw-tag">入门必备</span>
-        <span class="card-arrow">↗</span>
-      </a>
     </div>
+<!-- Phase 1 exercises -->
+  <details class="exercise-block p1-ex">
+    <summary>Practice Phase 1: Foundations (4 exercises)</summary>
+    <div class="ex-body">
+      <div class="ex-item"><div class="ex-num">Ex 1-1</div><div class="ex-content"><strong>Implement Scaled Dot-Product Attention from scratch</strong><p>Use only numpy. Support multi-head with shape (batch,heads,seq,d_k). Test that attention weights sum to 1 per row.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 1-2</div><div class="ex-content"><strong>Compare three tokenizers</strong><p>Load BPE (GPT-2), WordPiece (BERT), SentencePiece (LLaMA) via HuggingFace. Tokenize the same Chinese-English text. Compare token count and quality.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 1-3</div><div class="ex-content"><strong>Read Transformer paper, write 500-word summary</strong><p>Focus on Section 3. Explain Self-Attention, Multi-Head, Positional Encoding. Answer: why scale by sqrt(d_k)?</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 1-4</div><div class="ex-content"><strong>Prompt Engineering comparison</strong><p>Pick one task. Test zero-shot, few-shot (3 examples), Chain-of-Thought, and role-playing prompts. Compare quality in 300 words.</p></div></div>
+    </div>
+  </details>
   </div>
 
   <!-- Phase 2 -->
@@ -117,11 +126,17 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://arxiv.org/abs/2104.09864" target="_blank">
-        <div class="card-label">长上下文 & 位置编码</div>
-        <div class="card-sub">RoPE 原论文 · YaRN · ALiBi · 旋转位置编码原理 · 长文本窗口扩展</div>
-        <span class="card-arrow">↗</span>
-      </a>
     </div>
+<!-- Phase 2 exercises -->
+  <details class="exercise-block p2-ex">
+    <summary>Practice Phase 2: LLM Core (4 exercises)</summary>
+    <div class="ex-body">
+      <div class="ex-item"><div class="ex-num">Ex 2-1</div><div class="ex-content"><strong>LoRA fine-tuning (Colab free GPU)</strong><p>Use Qwen2.5-0.5B + HuggingFace PEFT. Prepare 50 JSONL training examples. Fine-tune with LoRA (r=8, alpha=16), 3 epochs. Compare outputs before/after.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 2-2</div><div class="ex-content"><strong>Implement DPO Loss</strong><p>Code the DPO loss function from scratch. Given chosen/rejected log probabilities, verify that higher chosen probability yields lower loss.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 2-3</div><div class="ex-content"><strong>In-Context Learning experiment</strong><p>Same task across 0/1/3/5-shot + CoT. Tabulate accuracy. Plot shot count vs. performance.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 2-4</div><div class="ex-content"><strong>Context window boundary test</strong><p>Place answer at 10%/50%/90% of a long document. Test at 4K/8K/16K/32K context lengths. Plot the Lost in the Middle curve.</p></div></div>
+    </div>
+  </details>
   </div>
 
   <!-- Phase 3 -->
@@ -161,12 +176,18 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://www.microsoft.com/en-us/research/project/graphrag/" target="_blank">
-        <div class="card-label">Graph RAG</div>
-        <div class="card-sub">微软 GraphRAG · 知识图谱 + RAG · 实体关系检索 · 适合复杂知识库场景</div>
-        <span class="rw-tag">前沿</span>
-        <span class="card-arrow">↗</span>
-      </a>
     </div>
+<!-- Phase 3 exercises -->
+  <details class="exercise-block p3-ex">
+    <summary>Practice Phase 3: RAG (5 exercises)</summary>
+    <div class="ex-body">
+      <div class="ex-item"><div class="ex-num">Ex 3-1</div><div class="ex-content"><strong>Build RAG pipeline from scratch</strong><p>Chroma + sentence-transformers + LLM API. Index 20 documents. Implement embed, retrieve top-5, generate. Test with 10 questions. Bonus: Gradio UI.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 3-2</div><div class="ex-content"><strong>Chunking strategy comparison</strong><p>Compare Fixed-size (0 overlap), Fixed-size (128 overlap), and Semantic Chunking. Measure top-3 hit rate on 10 questions.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 3-3</div><div class="ex-content"><strong>Implement Hybrid Search</strong><p>BM25 + vector search with RRF fusion. Compare pure vector vs. pure BM25 vs. hybrid top-5 accuracy.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 3-4</div><div class="ex-content"><strong>Query Rewrite for better retrieval</strong><p>Write an LLM prompt to rewrite vague queries. Test 10 colloquial questions. Compare top-3 hit rate before/after. Bonus: implement HyDE.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 3-5</div><div class="ex-content"><strong>Evaluate RAG with RAGAS</strong><p>Install ragas. Generate 20 Q&A pairs from your RAG system. Evaluate Faithfulness, Answer Relevancy, Context Precision, Context Recall.</p></div></div>
+    </div>
+  </details>
   </div>
 
   <!-- Phase 4 -->
@@ -206,11 +227,17 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://github.com/e2b-dev/awesome-ai-agents" target="_blank">
-        <div class="card-label">代码执行 Agent</div>
-        <div class="card-sub">Code Interpreter · REPL 沙箱 · 自我调试 · 代码生成闭环 · 参考项目合集</div>
-        <span class="card-arrow">↗</span>
-      </a>
     </div>
+<!-- Phase 4 exercises -->
+  <details class="exercise-block p4-ex">
+    <summary>Practice Phase 4: ReAct and Agent (4 exercises)</summary>
+    <div class="ex-body">
+      <div class="ex-item"><div class="ex-num">Ex 4-1</div><div class="ex-content"><strong>Implement ReAct loop from scratch</strong><p>Pure Python (no LangChain). Define search + calculator tools. Implement Thought, Action, Observation loop. Test multi-step tasks like area times 3.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 4-2</div><div class="ex-content"><strong>Function Calling calculator agent</strong><p>Use OpenAI/Claude Function Calling API. Define add/subtract/multiply/divide tools with JSON Schema. Handle errors like division by zero.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 4-3</div><div class="ex-content"><strong>Multi-tool orchestration agent</strong><p>Three tools: web_search, calculator, get_weather. Agent auto-selects tool order. Add FINAL_ANSWER termination. Test multi-step reasoning.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 4-4</div><div class="ex-content"><strong>LangChain Agent vs. native comparison</strong><p>Same task: find CEO, search CEO age. Implement with LangChain create_react_agent and native Python + OpenAI API. Compare LOC, control, debuggability.</p></div></div>
+    </div>
+  </details>
   </div>
 
   <!-- Phase 5 -->
@@ -249,11 +276,17 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://platform.openai.com/docs/guides/prompt-caching" target="_blank">
-        <div class="card-label">缓存与成本</div>
-        <div class="card-sub">Prompt Caching · Speculative Decoding · 成本管控 · 延迟优化 · 省钱神器</div>
-        <span class="card-arrow">↗</span>
-      </a>
     </div>
+<!-- Phase 5 exercises -->
+  <details class="exercise-block p5-ex">
+    <summary>Practice Phase 5: Engineering (4 exercises)</summary>
+    <div class="ex-body">
+      <div class="ex-item"><div class="ex-num">Ex 5-1</div><div class="ex-content"><strong>Quantize and compare models</strong><p>Use llama.cpp to quantize Qwen2.5-7B to Q4_K_M, Q5_K_M, Q8_0. Compare model size, load time, and output quality (human score 1-5).</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 5-2</div><div class="ex-content"><strong>Deploy vLLM and benchmark</strong><p>Start vLLM server with Qwen2.5-7B. Benchmark QPS and latency at concurrency 1/4/8/16/32. Test with and without prefix caching.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 5-3</div><div class="ex-content"><strong>Write an evaluation script</strong><p>Create 20-question eval set (JSON). Use GPT-4 as LLM-as-Judge. Compute average score, std dev, per-category scores. Compare 2 models.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 5-4</div><div class="ex-content"><strong>Prompt Caching cost analysis</strong><p>Construct 4000-token system prompt + 2000-token user prompt. Call OpenAI/Anthropic APIs. Track cached_tokens. Calculate daily savings for 1000 calls.</p></div></div>
+    </div>
+  </details>
   </div>
 
   <!-- 资源推荐 -->
