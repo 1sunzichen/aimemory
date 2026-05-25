@@ -19,6 +19,7 @@ export default defineConfig({
       { text: 'Memory', link: '/memory/' },
       { text: 'Projects', link: '/projects/' },
       { text: 'AI 路线图', link: '/ai-learning-roadmap/' },
+      { text: '最简地基', link: '/ai-foundation-plain' },
       { text: '30天冲刺', link: '/30-day-agent-plan' },
       { text: 'AI 学习笔记', link: '/ai-learning-notes/' },
       { text: '数学之美', link: '/math-beauty/' },
