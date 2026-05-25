@@ -12,7 +12,8 @@
 > 💡 **新机器入口**：用户说出 **"恢复记忆"** 即触发以上完整流程。
 
 生成时间: 2026-05-09 10:58
-上次更新机器: MacBook (10.17.17.x)
+上次更新机器: MacBook (wujie22qx local)
+上次更新时间: 2026-05-25 13:00
 
 ---
 
@@ -72,5 +73,19 @@
 - 管理员王亚维 (ou_2645c9dd6794ff083146a2b26e810728) 已加入汇总报表接收人
 
 ---
+
+### 2026-05-25 — AI 学习路线图新增工位练习 + Transformer 手算推导
+
+- aimemory 网站：AI 学习路线图（`/ai-learning-roadmap/`）新增 24 个工位练习，每个 Phase 下面有可折叠的练习卡片
+  - Phase 0 数学预科：手算 Attention、梯度下降、Softmax（3 项）
+  - Phase 1 基础：从零实现 Attention、对比 Tokenizer、读论文、Prompt 对比（4 项）
+  - Phase 2 LLM：LoRA 微调、DPO Loss、ICL 实验、Lost in Middle（4 项）
+  - Phase 3 RAG：搭 Pipeline、切块对比、混合搜索、Query Rewrite、RAGAS 评估（5 项）
+  - Phase 4 Agent：ReAct、Function Calling、多工具编排、LangChain vs 原生（4 项）
+  - Phase 5 工程：量化对比、vLLM 压测、评估脚本、Prompt Caching 成本（4 项）
+- 修改文件：`docs/ai-learning-roadmap/index.md` 和 `docs/public/ai-learning-roadmap/index.html`，两个文件都要同步更新
+- 本地练习环境：`/Users/wujie22qx/AI/transformerTest/` — Python + NumPy，用于手算验证 Attention
+- 本次对话中带用户从零推导了 Self-Attention 的 Q·K 点积、softmax 归一化、加权 V，以及导数/梯度基础概念（极限定义、e 为什么特殊）
+- CF Pages 项目名 `aimemory`，推送即自动部署；部署失败通常看 build log（先看是否是 Vue template 的 tag 未闭合）
 
 *此文件由各机器轮流维护。任何机器读取后，应按 SOP 继续更新。*
