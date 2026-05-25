@@ -46,6 +46,11 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://www.khanacademy.org/math/linear-algebra" target="_blank">
+        <div class="card-label">推荐：Khan Academy 线性代数</div>
+        <div class="card-sub">全免费 · 从零开始 · 含练习题和即时反馈</div>
+        <span class="rw-tag">免费</span>
+        <span class="card-arrow">↗</span>
+      </a>
     </div>
 <!-- Phase 0 exercises -->
   <details class="exercise-block p0-ex">
@@ -87,6 +92,11 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://www.promptingguide.ai/zh" target="_blank">
+        <div class="card-label">Prompt Engineering <span class="zh-badge">中文</span></div>
+        <div class="card-sub">官方中文版完整指南 · Few-shot · Chain-of-Thought · Instruction Tuning · 提示词设计最佳实践</div>
+        <span class="rw-tag">入门必备</span>
+        <span class="card-arrow">↗</span>
+      </a>
     </div>
 <!-- Phase 1 exercises -->
   <details class="exercise-block p1-ex">
@@ -126,6 +136,10 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://arxiv.org/abs/2104.09864" target="_blank">
+        <div class="card-label">长上下文 & 位置编码</div>
+        <div class="card-sub">RoPE 原论文 · YaRN · ALiBi · 旋转位置编码原理 · 长文本窗口扩展</div>
+        <span class="card-arrow">↗</span>
+      </a>
     </div>
 <!-- Phase 2 exercises -->
   <details class="exercise-block p2-ex">
@@ -176,6 +190,11 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://www.microsoft.com/en-us/research/project/graphrag/" target="_blank">
+        <div class="card-label">Graph RAG</div>
+        <div class="card-sub">微软 GraphRAG · 知识图谱 + RAG · 实体关系检索 · 适合复杂知识库场景</div>
+        <span class="rw-tag">前沿</span>
+        <span class="card-arrow">↗</span>
+      </a>
     </div>
 <!-- Phase 3 exercises -->
   <details class="exercise-block p3-ex">
@@ -227,12 +246,16 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://github.com/e2b-dev/awesome-ai-agents" target="_blank">
+        <div class="card-label">代码执行 Agent</div>
+        <div class="card-sub">Code Interpreter · REPL 沙箱 · 自我调试 · 代码生成闭环 · 参考项目合集</div>
+        <span class="card-arrow">↗</span>
+      </a>
     </div>
 <!-- Phase 4 exercises -->
   <details class="exercise-block p4-ex">
     <summary>Practice Phase 4: ReAct and Agent (4 exercises)</summary>
     <div class="ex-body">
-      <div class="ex-item"><div class="ex-num">Ex 4-1</div><div class="ex-content"><strong>Implement ReAct loop from scratch</strong><p>Pure Python (no LangChain). Define search + calculator tools. Implement Thought, Action, Observation loop. Test multi-step tasks like area times 3.</p></div></div>
+      <div class="ex-item"><div class="ex-num">Ex 4-1</div><div class="ex-content"><strong>Implement ReAct loop from scratch</strong><p>Pure Python (no LangChain). Define search + calculator tools. Implement Thought, Action, Observation loop. Test multi-step tasks.</p></div></div>
       <div class="ex-item"><div class="ex-num">Ex 4-2</div><div class="ex-content"><strong>Function Calling calculator agent</strong><p>Use OpenAI/Claude Function Calling API. Define add/subtract/multiply/divide tools with JSON Schema. Handle errors like division by zero.</p></div></div>
       <div class="ex-item"><div class="ex-num">Ex 4-3</div><div class="ex-content"><strong>Multi-tool orchestration agent</strong><p>Three tools: web_search, calculator, get_weather. Agent auto-selects tool order. Add FINAL_ANSWER termination. Test multi-step reasoning.</p></div></div>
       <div class="ex-item"><div class="ex-num">Ex 4-4</div><div class="ex-content"><strong>LangChain Agent vs. native comparison</strong><p>Same task: find CEO, search CEO age. Implement with LangChain create_react_agent and native Python + OpenAI API. Compare LOC, control, debuggability.</p></div></div>
@@ -276,6 +299,10 @@ layout: page
         <span class="card-arrow">↗</span>
       </a>
       <a class="rw-card" href="https://platform.openai.com/docs/guides/prompt-caching" target="_blank">
+        <div class="card-label">缓存与成本</div>
+        <div class="card-sub">Prompt Caching · Speculative Decoding · 成本管控 · 延迟优化 · 省钱神器</div>
+        <span class="card-arrow">↗</span>
+      </a>
     </div>
 <!-- Phase 5 exercises -->
   <details class="exercise-block p5-ex">
