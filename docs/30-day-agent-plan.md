@@ -119,6 +119,9 @@ layout: page
   <div class="day-card"><div class="day-num">Day 28</div><div class="day-topic">面试准备</div><div class="day-what">10 个常见题自问自答</div><div class="day-out" style="color:#fb923c;">interview_qa.md</div></div>
   <div class="day-card"><div class="day-num">Day 29</div><div class="day-topic">投简历</div><div class="day-what">Boss/拉勾投 5 份 AI Agent 岗</div><div class="day-out" style="color:#fb923c;">投递记录</div></div>
   <div class="day-card"><div class="day-num">Day 30</div><div class="day-topic">🎯 复盘</div><div class="day-what">整理 GitHub 作品集+写博客</div><div class="day-out" style="color:#fb923c;">portfolio.md</div></div>
+  <div class="day-card"><div class="day-num">Day 31</div><div class="day-topic">多线程技术</div><div class="day-what">threading / asyncio，并发调 API 提速</div><div class="day-out" style="color:#fb923c;">async_demo.py</div></div>
+  <div class="day-card"><div class="day-num">Day 32</div><div class="day-topic">并行计算</div><div class="day-what">multiprocessing / concurrent.futures，批量任务加速</div><div class="day-out" style="color:#fb923c;">parallel_demo.py</div></div>
+  <div class="day-card"><div class="day-num">Day 33</div><div class="day-topic">异构计算</div><div class="day-what">CPU+GPU 协同，Apple Silicon 统一内存实战</div><div class="day-out" style="color:#fb923c;">hetero_compute.py</div></div>
 </div>
 <div class="pip-box"># Colab 上跑（不需要本地 GPU）<br>!pip install transformers peft datasets accelerate bitsandbytes</div>
 </div>
