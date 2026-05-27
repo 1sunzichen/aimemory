@@ -79,6 +79,7 @@ layout: page
       </div>
     </div>
   </details>
+  <MiniQuiz :tags="['phase0']" title="Phase 0 自测 · 数学基础" :count="5" />
   </div>
 
   <MathTutorial />
@@ -126,6 +127,7 @@ layout: page
       <div class="ex-item"><div class="ex-num">练习 1-4</div><div class="ex-content"><strong>Prompt Engineering 对比实验</strong><p>选一个任务（翻译/摘要/分类），设计 4 种 prompt：零样本、少样本(3例)、Chain-of-Thought、角色扮演。记录输出质量，写 300 字对比分析。</p></div></div>
     </div>
   </details>
+  <MiniQuiz :tags="['phase1']" title="Phase 1 自测 · 基础基石" :count="5" />
   </div>
 
   <!-- Phase 2 -->
@@ -169,6 +171,7 @@ layout: page
       <div class="ex-item"><div class="ex-num">练习 2-4</div><div class="ex-content"><strong>"Lost in the Middle" 上下文窗口测试</strong><p>把答案放在文档 10%/50%/90% 位置，用 4K/8K/16K/32K 上下文测试。画"答案位置 vs 准确率"曲线。你的模型在哪个位置最容易"忘记"？</p></div></div>
     </div>
   </details>
+  <MiniQuiz :tags="['phase2']" title="Phase 2 自测 · LLM 核心能力" :count="5" />
   </div>
 
   <!-- Phase 3 -->
@@ -225,6 +228,7 @@ layout: page
       <div class="ex-item"><div class="ex-num">练习 3-5</div><div class="ex-content"><strong>用 RAGAS 评估 RAG 系统质量</strong><p>安装 ragas，用你的 RAG 系统生成 20 条问答。评估 Faithfulness / Answer Relevancy / Context Precision / Context Recall 四个指标。针对最差指标改进 pipeline。</p></div></div>
     </div>
   </details>
+  <MiniQuiz :tags="['phase3']" title="Phase 3 自测 · RAG 检索增强" :count="5" />
   </div>
 
   <!-- Phase 4 -->
@@ -279,6 +283,7 @@ layout: page
       <div class="ex-item"><div class="ex-num">练习 4-4</div><div class="ex-content"><strong>LangChain Agent vs 原生实现对比</strong><p>同一任务双实现：查公司名，找 CEO，搜 CEO 年龄。LangChain 版 vs 原生 Python+OpenAI API。从代码行数、可控性、调试难度写对比。</p></div></div>
     </div>
   </details>
+  <MiniQuiz :tags="['phase4']" title="Phase 4 自测 · ReAct & Agent" :count="5" />
   </div>
 
   <!-- Phase 5 -->
@@ -332,6 +337,7 @@ layout: page
       <div class="ex-item"><div class="ex-num">练习 5-4</div><div class="ex-content"><strong>Prompt Caching 成本收益分析</strong><p>4000 token 系统 prompt + 2000 token 用户 prompt。调 OpenAI/Anthropic API，记录 cached_tokens。算账：日均 1000 次调用能省多少钱？什么场景下收益最大？</p></div></div>
     </div>
   </details>
+  <MiniQuiz :tags="['phase5']" title="Phase 5 自测 · 工程化与进阶" :count="5" />
   </div>
 
   <!-- 资源推荐 -->

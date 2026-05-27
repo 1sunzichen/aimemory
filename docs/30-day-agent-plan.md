@@ -61,6 +61,7 @@ layout: page
 <div class="week w1">
 <h2><span style="font-size:24px;">①</span> Week 1 · LLM 入门 + Prompt</h2>
 <div class="week-desc">目标：能调 API、会写 Prompt、让 LLM 调用你的函数</div>
+<MiniQuiz :tags="['phase0']" title="入学测验 · 数学基础检查" :count="5" />
 <div class="day-grid">
   <div class="day-card"><div class="day-num">Day 1</div><div class="day-topic">调通 API</div><div class="day-what">注册 DeepSeek，发第一个请求</div><div class="day-out" style="color:#22d3ee;">hello_llm.py</div></div>
   <div class="day-card"><div class="day-num">Day 2</div><div class="day-topic">对话循环</div><div class="day-what">命令行聊天，连续对话</div><div class="day-out" style="color:#22d3ee;">chat.py</div></div>
@@ -77,6 +78,7 @@ layout: page
 <div class="week w2">
 <h2><span style="font-size:24px;">②</span> Week 2 · RAG 检索增强生成</h2>
 <div class="week-desc">目标：从零搭一个知识库问答系统，给文档加 AI 搜索</div>
+<MiniQuiz :tags="['phase1']" title="Week 1 复习 · LLM 基础" :count="5" />
 <div class="day-grid">
   <div class="day-card"><div class="day-num">Day 8</div><div class="day-topic">Embedding</div><div class="day-what">把句子变向量，比相似度</div><div class="day-out" style="color:#34d399;">embedding_demo.py</div></div>
   <div class="day-card"><div class="day-num">Day 9</div><div class="day-topic">向量数据库</div><div class="day-what">Chroma 存 20 篇文档，搜</div><div class="day-out" style="color:#34d399;">chroma_demo.py</div></div>
@@ -93,6 +95,7 @@ layout: page
 <div class="week w3">
 <h2><span style="font-size:24px;">③</span> Week 3 · AI Agent 开发</h2>
 <div class="week-desc">目标：手写 Agent、多工具协作、让 AI 自己规划任务</div>
+<MiniQuiz :tags="['phase3']" title="Week 2 复习 · RAG 基础" :count="5" />
 <div class="day-grid">
   <div class="day-card"><div class="day-num">Day 15</div><div class="day-topic">ReAct 原理</div><div class="day-what">Thought→Action→Observation</div><div class="day-out" style="color:#a78bfa;">笔记</div></div>
   <div class="day-card"><div class="day-num">Day 16</div><div class="day-topic">手写 ReAct</div><div class="day-what">纯 Python，search+calculator</div><div class="day-out" style="color:#a78bfa;">react_agent.py</div></div>
@@ -109,6 +112,7 @@ layout: page
 <div class="week w4">
 <h2><span style="font-size:24px;">④</span> Week 4 · 微调 + 部署 + 求职</h2>
 <div class="week-desc">目标：微调自己的模型、部署上线、投简历面试</div>
+<MiniQuiz :tags="['phase4']" title="Week 3 复习 · Agent 基础" :count="5" />
 <div class="day-grid">
   <div class="day-card"><div class="day-num">Day 22</div><div class="day-topic">LoRA 概念</div><div class="day-what">只训一小撮参数，不碰公式</div><div class="day-out" style="color:#fb923c;">笔记</div></div>
   <div class="day-card"><div class="day-num">Day 23</div><div class="day-topic">准备数据</div><div class="day-what">Agent 自动生成 100 条 JSONL</div><div class="day-out" style="color:#fb923c;">training_data.jsonl</div></div>

@@ -21,6 +21,7 @@ export default defineConfig({
       { text: 'AI 路线图', link: '/ai-learning-roadmap/' },
       { text: '最简地基', link: '/ai-foundation-plain' },
       { text: '自测', link: '/ai-quiz/' },
+      { text: '错题本', link: '/ai-quiz/wrong/' },
       { text: '30天冲刺', link: '/30-day-agent-plan' },
       { text: 'AI 学习笔记', link: '/ai-learning-notes/' },
       { text: '数学之美', link: '/math-beauty/' },
