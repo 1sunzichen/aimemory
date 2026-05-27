@@ -39,6 +39,7 @@
 - AI study in ~/other/AI学习/.
 - CRITICAL: read actual files first before proposing changes. Never delete files without explicit confirmation.
 - **对话规则**: 执行复杂任务前先说计划，等用户说"可以"再动手。已记入 memory 作为固定规则。
+- **学习方式**: 每次讲知识点或写代码，必须主动提供：①还有哪些其他做法（2~3种替代方案+优缺点）②为什么选这个不选别的 ③建议的辅助对比文件。AI 教程天然只给一条路，用户需要"岔路口"才能举一反三、记得牢固。触发词：用户问"还有别的吗"/"为什么"/"有没有更好的"时，必须展开讲多种可能性。
 
 ## 3. Past Session Summaries (跨会话历史)
 
