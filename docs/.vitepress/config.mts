@@ -24,6 +24,7 @@ export default defineConfig({
       { text: '错题本', link: '/ai-quiz/wrong/' },
       { text: '30天冲刺', link: '/30-day-agent-plan' },
       { text: 'AI 学习笔记', link: '/ai-learning-notes/' },
+      { text: 'Electron 学习', link: '/electron/' },
       { text: '数学之美', link: '/math-beauty/' },
       { text: '思考录', link: '/thoughts/' }
     ],
@@ -80,6 +81,15 @@ export default defineConfig({
             { text: '文章列表', link: '/thoughts/' },
             { text: '为什么要记录思考', link: '/thoughts/why-write' },
             { text: '欲望、自由与自我控制', link: '/thoughts/desire-and-self-control' }
+          ]
+        }
+      ],
+      '/electron/': [
+        {
+          text: 'Electron 学习',
+          items: [
+            { text: '概览', link: '/electron/' },
+            { text: 'Hextech ARAM Picker 项目拆解', link: '/electron/hextech-project' }
           ]
         }
       ]

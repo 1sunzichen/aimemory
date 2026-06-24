@@ -5,8 +5,8 @@ compatibility_date = "2025-05-19"
 # 部署后运行: npx wrangler secret put KEY_PASSWORD  (输入: patrick)
 # 部署后运行: npx wrangler secret put DIARY_SECRET  (输入: 极染悟心)
 [vars]
-ENCRYPTED_KEY = "9f4feb634215b305d032bd46:d106797974dcf047b0ad639f1afae3d1:c2186796774aeab174aa2bc303e62188e473b36c1fa1e84da60c1172bc6ffb76551a60"
-KEY_SALT = "9f64307384e0919ca926397a3e686936"
+ENCRYPTED_KEY = "0013b5a521b4562df770697d:fe58b084f1d1eac93e947f057306001a:cb29487f9899fccfc184dfb5c18ed652e041977953b0f078b3d5c9318cf13aaa6fcab5"
+KEY_SALT = "1cd934af09e3618a18bae17bb5d5b964"
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 # 日记存储 KV（创建方法见下方 SETUP.md）
