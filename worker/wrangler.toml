@@ -11,6 +11,6 @@ DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 # 日记存储 KV（创建方法见下方 SETUP.md）
 # 创建后把 id 填到这里：npx wrangler kv namespace create DIARY
-[[kv_namespaces]]
-binding = "DIARY"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+# [[kv_namespaces]]
+# binding = "DIARY"
+# id = "REPLACE_WITH_KV_NAMESPACE_ID"

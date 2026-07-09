@@ -1,5 +1,5 @@
 <template>
-  <div class="ai-assistant">
+  <div class="ai-assistant" :class="{ dark: isDark }">
     <button class="ai-toggle" :class="{ active: isOpen, bouncing: showHint }" @click="toggle" title="AI 学习助手">
       <span v-if="!isOpen">🤖</span>
       <span v-else>✕</span>
@@ -49,7 +49,7 @@
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useData } from 'vitepress'
 
-const { page, frontmatter } = useData()
+const { page, frontmatter, isDark } = useData()
 
 const API = 'https://aimemory-ai.3023493319.workers.dev/api/chat'
 
@@ -281,13 +281,13 @@ watch(() => page.value?.relativePath, () => { load(); hintDismissed = false; res
   background: #fff; border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,.15);
   display: flex; flex-direction: column; overflow: hidden;
 }
-@media (prefers-color-scheme: dark) { .ai-panel { background: #1e1e2e; } }
+.ai-assistant.dark .ai-panel { background: #1e1e2e; }
 
 .ai-header {
   padding: 14px 18px; font-weight: 600; font-size: 15px;
   border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
 }
-@media (prefers-color-scheme: dark) { .ai-header { border-color: #333; color: #eee; } }
+.ai-assistant.dark .ai-header { border-color: #333; color: #eee; }
 .ai-header-actions { display: flex; align-items: center; gap: 8px; }
 .ai-fork-btn {
   font-size: 12px; color: #f0c040; text-decoration: none;
@@ -313,9 +313,7 @@ watch(() => page.value?.relativePath, () => { load(); hintDismissed = false; res
 .ai-msg.assistant .ai-content {
   background: #f0f0f5; border-radius: 4px 14px 14px 14px;
 }
-@media (prefers-color-scheme: dark) {
-  .ai-msg.assistant .ai-content { background: #2a2a3e; color: #ddd; }
-}
+.ai-assistant.dark .ai-msg.assistant .ai-content { background: #2a2a3e; color: #ddd; }
 .ai-content { padding: 10px 14px; max-width: 85%; word-break: break-word; }
 .ai-content :deep(code) { background: rgba(0,0,0,.08); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
 .ai-content :deep(pre) { background: rgba(0,0,0,.06); padding: 10px; border-radius: 8px; overflow-x: auto; margin: 6px 0; }
@@ -329,12 +327,12 @@ watch(() => page.value?.relativePath, () => { load(); hintDismissed = false; res
 .ai-input {
   padding: 12px 16px; border-top: 1px solid #eee; display: flex; gap: 8px; align-items: flex-end;
 }
-@media (prefers-color-scheme: dark) { .ai-input { border-color: #333; } }
+.ai-assistant.dark .ai-input { border-color: #333; }
 .ai-input textarea {
   flex: 1; border: 1px solid #ddd; border-radius: 10px; padding: 10px 14px;
   font-size: 14px; resize: none; outline: none; background: #fafafa; font-family: inherit;
 }
-@media (prefers-color-scheme: dark) { .ai-input textarea { background: #2a2a3e; border-color: #444; color: #eee; } }
+.ai-assistant.dark .ai-input textarea { background: #2a2a3e; border-color: #444; color: #eee; }
 .ai-input textarea:focus { border-color: #4a9eff; }
 .ai-input button {
   width: 40px; height: 40px; border-radius: 50%; border: none;

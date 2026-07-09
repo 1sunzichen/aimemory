@@ -211,7 +211,6 @@ export default {
     }
 
     // ── Origin check ───────────────────────────────────────────
-    const origin = getAllowedOrigin(request);
     if (!origin) {
       return new Response(JSON.stringify({ error: 'Access denied' }), {
         status: 403,
