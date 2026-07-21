@@ -2,6 +2,11 @@ name = "aimemory-ai"
 main = "src/index.js"
 compatibility_date = "2025-05-19"
 
+# 自定义域名路由（绕过 workers.dev 被墙问题）
+routes = [
+  { pattern = "ai.memory.oldphoto.site", custom_domain = true }
+]
+
 # 部署后运行: npx wrangler secret put KEY_PASSWORD  (输入: patrick)
 # 部署后运行: npx wrangler secret put DIARY_SECRET  (输入: 极染悟心)
 [vars]

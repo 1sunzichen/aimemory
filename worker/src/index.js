@@ -80,6 +80,7 @@ function isRateLimited(ip) {
 // ── Allowed origins ────────────────────────────────────────────────
 const ALLOWED_ORIGINS = [
   'https://memory.oldphoto.site',
+  'https://ai.memory.oldphoto.site',
   'https://aimemory.pages.dev',
   'https://aimemory-ai.3023493319.workers.dev',
   'http://localhost:5173',
