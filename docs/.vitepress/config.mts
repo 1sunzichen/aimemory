@@ -36,6 +36,7 @@ export default defineConfig({
             { text: '概览', link: '/artifacts/' },
             { text: '去重总结', link: '/artifacts/artifacts_summary_dedup' },
             { text: 'Clash 代理模式指南', link: '/artifacts/clash_proxy_modes_guide' },
+            { text: 'AI 助手故障分析', link: '/artifacts/ai-assistant-troubleshooting' },
             { text: '部署报告', link: '/artifacts/deployment_report' },
             { text: '网络问题详解', link: '/artifacts/network_explained' },
             { text: '服务注册表', link: '/artifacts/service_registry' }
