@@ -7,15 +7,9 @@ routes = [
   { pattern = "ai.memory.oldphoto.site", custom_domain = true }
 ]
 
-# 部署后运行: npx wrangler secret put KEY_PASSWORD  (输入: patrick)
-# 部署后运行: npx wrangler secret put DIARY_SECRET  (输入: 极染悟心)
-[vars]
-ENCRYPTED_KEY = "0013b5a521b4562df770697d:fe58b084f1d1eac93e947f057306001a:cb29487f9899fccfc184dfb5c18ed652e041977953b0f078b3d5c9318cf13aaa6fcab5"
-KEY_SALT = "1cd934af09e3618a18bae17bb5d5b964"
-DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
+# 部署后在 Cloudflare Dashboard → Settings → Secrets 新增:
+#   DEEPSEEK_KEY = sk-xxx
+#   DIARY_SECRET = 极染悟心 (日记功能用)
 
-# 日记存储 KV（创建方法见下方 SETUP.md）
-# 创建后把 id 填到这里：npx wrangler kv namespace create DIARY
-# [[kv_namespaces]]
-# binding = "DIARY"
-# id = "REPLACE_WITH_KV_NAMESPACE_ID"
+[vars]
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"

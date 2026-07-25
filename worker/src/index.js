@@ -2,63 +2,10 @@
  * Cloudflare Worker — DeepSeek API proxy for aimemory AI assistant.
  *
  * Security layers:
- *   1. API key AES-256-GCM encrypted + PBKDF2 salted (password in Worker Secret)
- *   2. Referer check — only from memory.oldphoto.site
+ *   1. API key stored as Cloudflare Secret (DEEPSEEK_KEY)
+ *   2. Referer check — only from allowed origins
  *   3. Per-IP rate limiting — 20 req/min
  */
-
-// ── Decrypt the API key at cold start ──────────────────────────────
-async function decryptKey(encryptedPayload, saltHex, password) {
-  const salt = hexToBytes(saltHex);
-  const [ivHex, authTagHex, ciphertextHex] = encryptedPayload.split(':');
-
-  // Derive key from password + salt using PBKDF2
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw',
-    new TextEncoder().encode(password),
-    'PBKDF2',
-    false,
-    ['deriveKey']
-  );
-
-  const derivedKey = await crypto.subtle.deriveKey(
-    {
-      name: 'PBKDF2',
-      salt: salt,
-      iterations: 100000,
-      hash: 'SHA-256',
-    },
-    keyMaterial,
-    { name: 'AES-GCM', length: 256 },
-    false,
-    ['decrypt']
-  );
-
-  // Combine IV + auth tag + ciphertext
-  const iv = hexToBytes(ivHex);
-  const authTag = hexToBytes(authTagHex);
-  const ciphertext = hexToBytes(ciphertextHex);
-  // Combine ciphertext + auth tag (Web Crypto expects them together, IV separate)
-  const data = new Uint8Array(ciphertext.length + authTag.length);
-  data.set(ciphertext, 0);
-  data.set(authTag, ciphertext.length);
-
-  const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: iv, tagLength: 128 },
-    derivedKey,
-    data
-  );
-
-  return new TextDecoder().decode(decrypted);
-}
-
-function hexToBytes(hex) {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-  }
-  return bytes;
-}
 
 // ── Rate limiter ───────────────────────────────────────────────────
 const rateLimitMap = new Map();
@@ -143,10 +90,6 @@ Deployment guides (Cloudflare Pages, Vercel) and project planning documentation.
 async function sha256Hex(str) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10).replace(/-/g, '');
 }
 
 // ── Main handler ───────────────────────────────────────────────────
@@ -239,15 +182,6 @@ export default {
         });
       }
 
-      // Decrypt API key (cached in global scope after first request)
-      if (!globalThis.__cachedKey) {
-        globalThis.__cachedKey = await decryptKey(
-          env.ENCRYPTED_KEY,
-          env.KEY_SALT,
-          env.KEY_PASSWORD
-        );
-      }
-
       const recentMessages = messages.slice(-20);
       const fullMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
       if (pageTitle) {
@@ -262,7 +196,7 @@ export default {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${globalThis.__cachedKey}`,
+          'Authorization': `Bearer ${env.DEEPSEEK_KEY}`,
         },
         body: JSON.stringify({
           model: 'deepseek-chat',
