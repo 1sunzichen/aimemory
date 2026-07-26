@@ -4,7 +4,7 @@ compatibility_date = "2025-05-19"
 
 # 自定义域名路由（绕过 workers.dev 被墙问题）
 routes = [
-  { pattern = "ai.memory.oldphoto.site", custom_domain = true }
+  { pattern = "ai.oldphoto.site", custom_domain = true }
 ]
 
 # 部署后在 Cloudflare Dashboard → Settings → Secrets 新增:
