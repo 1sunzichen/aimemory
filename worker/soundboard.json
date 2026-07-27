@@ -1,0 +1,15 @@
+{
+  "sound_dir": ".",
+  "keys": {
+    "1": "dz.mp3",
+    "2": "sz.mp3",
+    "3": "fz.mp3",
+    "4": "lql.mp3",
+    "5": "db.mp3",
+    "6": "tl.mp3",
+    "7": "300.mp3", 
+    "8": "txym.mp3",
+    "9": "dfd.mp3"
+  },
+  "pid_file": "~/.soundboard.pid"
+}

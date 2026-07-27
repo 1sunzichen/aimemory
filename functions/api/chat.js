@@ -1,46 +1,11 @@
 /**
  * Cloudflare Pages Function — DeepSeek API proxy for aimemory AI assistant.
- * 部署在 memory.oldphoto.site/api/chat，与站点同域名，手机端不会被墙。
+ * 部署在 memory.oldphoto.site/api/chat，与站点同域名。
  *
  * 需要在 Cloudflare Pages Dashboard → Settings → Environment variables 设置:
- *   ENCRYPTED_KEY    (从 worker/wrangler.toml 抄过来)
- *   KEY_SALT         (从 worker/wrangler.toml 抄过来)
- *   KEY_PASSWORD     (Secret: patrick)
+ *   DEEPSEEK_KEY     (DeepSeek API key，值: sk-xxx)
  *   DEEPSEEK_API_URL (https://api.deepseek.com/v1/chat/completions)
  */
-
-// ── Decrypt the API key ───────────────────────────────────────────
-async function decryptKey(encryptedPayload, saltHex, password) {
-  const salt = hexToBytes(saltHex);
-  const [ivHex, authTagHex, ciphertextHex] = encryptedPayload.split(':');
-
-  const keyMaterial = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']
-  );
-  const derivedKey = await crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
-    keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['decrypt']
-  );
-
-  const iv = hexToBytes(ivHex);
-  const authTag = hexToBytes(authTagHex);
-  const ciphertext = hexToBytes(ciphertextHex);
-  const data = new Uint8Array(ciphertext.length + authTag.length);
-  data.set(ciphertext, 0);
-  data.set(authTag, ciphertext.length);
-
-  const decrypted = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv, tagLength: 128 }, derivedKey, data
-  );
-  return new TextDecoder().decode(decrypted);
-}
-
-function hexToBytes(hex) {
-  const bytes = new Uint8Array(hex.length / 2);
-  for (let i = 0; i < hex.length; i += 2)
-    bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
-  return bytes;
-}
 
 // ── Rate limiter ──────────────────────────────────────────────────
 const rateLimitMap = new Map();
@@ -75,11 +40,8 @@ The core section where fundamental concepts are explained:
 - **Embedding & Multi-head Attention**: How words become vectors, what "heads" really mean
 - **Backpropagation**: Chain rule, how models actually learn from errors
 
-### AI 学习路线图 (AI Learning Roadmap)
-A structured roadmap from basics to production.
-
-### 思考录 (Thoughts) | Artifacts | Projects
-Personal essays, deployment reports, and project documentation.
+### AI 学习路线图 (AI Learning Roadmap) | 思考录 | Artifacts | Projects
+More sections covering learning roadmaps, personal essays, and deployment docs.
 
 ## Your role
 - Help readers understand the concepts in these notes
@@ -98,7 +60,7 @@ Personal essays, deployment reports, and project documentation.
 export async function onRequest(context) {
   const { request, env } = context;
 
-  // CORS headers — 同域名下不需要严格 origin 检查，但保留 CORS
+  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -134,11 +96,11 @@ export async function onRequest(context) {
       });
     }
 
-    // Decrypt API key (cached globally)
-    if (!globalThis.__cachedKey) {
-      globalThis.__cachedKey = await decryptKey(
-        env.ENCRYPTED_KEY, env.KEY_SALT, env.KEY_PASSWORD
-      );
+    if (!env.DEEPSEEK_KEY) {
+      return new Response(JSON.stringify({ error: 'API key not configured' }), {
+        status: 500,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
     }
 
     const recentMessages = messages.slice(-20);
@@ -151,11 +113,12 @@ export async function onRequest(context) {
     }
     fullMessages.push(...recentMessages);
 
-    const dsResp = await fetch(env.DEEPSEEK_API_URL, {
+    const apiUrl = env.DEEPSEEK_API_URL || 'https://api.deepseek.com/v1/chat/completions';
+    const dsResp = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${globalThis.__cachedKey}`,
+        'Authorization': `Bearer ${env.DEEPSEEK_KEY}`,
       },
       body: JSON.stringify({
         model: 'deepseek-chat',
@@ -168,8 +131,11 @@ export async function onRequest(context) {
     const dsData = await dsResp.json();
 
     if (!dsResp.ok) {
-      console.error('DeepSeek error:', JSON.stringify(dsData).substring(0, 200));
-      return new Response(JSON.stringify({ error: 'AI service error' }), {
+      console.error('DeepSeek error:', JSON.stringify(dsData).substring(0, 300));
+      return new Response(JSON.stringify({
+        error: 'AI service error',
+        detail: dsData.error?.message || dsResp.status,
+      }), {
         status: 502,
         headers: { ...headers, 'Content-Type': 'application/json' },
       });
@@ -180,7 +146,11 @@ export async function onRequest(context) {
       headers: { ...headers, 'Content-Type': 'application/json' },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: 'Internal error' }), {
+    console.error('Pages Function error:', err.message);
+    return new Response(JSON.stringify({
+      error: 'Internal error',
+      detail: err.message,
+    }), {
       status: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
     });

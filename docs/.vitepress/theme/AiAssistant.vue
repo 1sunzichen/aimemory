@@ -51,7 +51,7 @@ import { useData } from 'vitepress'
 
 const { page, frontmatter, isDark } = useData()
 
-const API = 'https://ai.oldphoto.site/api/chat'
+const API = '/api/chat'
 
 const isOpen = ref(false)
 const msgs = ref([])
