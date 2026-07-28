@@ -7,8 +7,8 @@
 <style>
   :root {
     --bg: #0f0f1a; --card: #1a1a2e; --accent: #4a9eff;
-    --green: #2ecc71; --red: #e74c3c; --yellow: #f39c12;
-    --text: #e0e0e0; --sub: #888; --border: #2a2a3e; --purple: #a855f7;
+    --green: #2ecc71; --red: #e74c3c; --yellow: #f39c12; --purple: #a855f7;
+    --text: #e0e0e0; --sub: #888; --border: #2a2a3e;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -48,7 +48,7 @@
   }
   .chat { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
   .msg {
-    display: flex; gap: 10px; max-width: 85%; animation: fadeUp .3s;
+    display: flex; gap: 10px; max-width: 90%; animation: fadeUp .3s;
   }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } }
   .msg.them { align-self: flex-start; }
@@ -59,6 +59,7 @@
   }
   .msg.them .avatar { background: var(--border); }
   .msg.me .avatar { background: var(--accent); }
+  .msg .bubble-wrap { max-width: 100%; }
   .msg .bubble {
     padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.6;
   }
@@ -66,9 +67,26 @@
   .msg.me .bubble { background: rgba(74,158,255,.2); border-top-right-radius: 4px; }
   .msg .name { font-size: 12px; color: var(--accent); margin-bottom: 4px; font-weight: 600; }
   .msg .time { font-size: 11px; color: var(--sub); margin-top: 4px; }
-  .msg-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 
-  /* Buttons */
+  /* Coworker translation */
+  .trans-cn {
+    font-size: 12px; color: var(--sub); margin-top: 6px; padding-top: 6px;
+    border-top: 1px solid var(--border); line-height: 1.5;
+  }
+  .word-row {
+    display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px;
+  }
+  .word-chip {
+    padding: 3px 8px; border-radius: 12px; font-size: 11px;
+    background: rgba(74,158,255,.1); color: var(--accent);
+    cursor: pointer; transition: .15s; display: inline-flex; gap: 2px;
+  }
+  .word-chip:hover { background: rgba(74,158,255,.25); }
+  .word-chip .en { font-weight: 600; }
+  .word-chip .zh { color: var(--sub); }
+
+  /* Actions */
+  .msg-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
   .btn-sm {
     padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
     background: rgba(0,0,0,.2); color: var(--text); font-size: 12px;
@@ -79,59 +97,51 @@
     background: var(--red); color: #fff; border-color: var(--red);
     animation: pulse 1s infinite;
   }
-  .btn-practice {
-    border-color: var(--purple); color: var(--purple);
-    background: rgba(168,85,247,.1);
-  }
-  .btn-practice:hover { background: rgba(168,85,247,.2); }
-
   @keyframes pulse {
     0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,.4); }
     50% { box-shadow: 0 0 0 8px rgba(231,76,60,0); }
   }
 
-  /* Practice panel */
-  .practice-panel {
-    margin-top: 12px; padding: 16px; border-radius: 12px;
-    background: rgba(168,85,247,.08); border: 1px solid rgba(168,85,247,.25);
+  /* Input area with reply panel */
+  .reply-panel {
+    margin: 0 24px; padding: 14px 18px; border-radius: 12px;
+    background: rgba(168,85,247,.08); border: 1px solid rgba(168,85,247,.2);
     display: none;
   }
-  .practice-panel.show { display: block; }
-  .practice-panel h4 { font-size: 13px; color: var(--purple); margin-bottom: 8px; }
-  .practice-text {
-    font-size: 15px; color: #fff; margin-bottom: 12px; line-height: 1.7;
-    padding: 10px 14px; background: rgba(0,0,0,.2); border-radius: 8px;
+  .reply-panel.show { display: block; }
+  .reply-panel .label {
+    font-size: 11px; color: var(--purple); margin-bottom: 6px;
+    font-weight: 600; letter-spacing: .5px;
   }
-  .word-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-  .word-chip {
-    padding: 4px 10px; border-radius: 16px; font-size: 12px;
-    background: rgba(168,85,247,.15); color: var(--purple);
-    cursor: pointer; transition: .15s;
+  .reply-panel .en-text {
+    font-size: 15px; color: #fff; line-height: 1.7;
+    padding: 8px 12px; background: rgba(0,0,0,.2); border-radius: 8px;
+    margin-bottom: 6px; word-break: break-word;
   }
-  .word-chip:hover { background: rgba(168,85,247,.3); }
-  .word-chip .phonetic { color: var(--yellow); font-size: 11px; margin-left: 4px; }
-  .practice-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .practice-result { margin-top: 10px; font-size: 13px; display: none; }
-  .practice-result.show { display: block; }
+  .reply-panel .cn-text {
+    font-size: 12px; color: var(--sub); margin-bottom: 10px; line-height: 1.5;
+  }
+  .reply-panel .pho-row {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+  }
+  .pho-chip {
+    padding: 3px 8px; border-radius: 10px; font-size: 11px;
+    background: rgba(245,158,11,.1); color: var(--yellow);
+  }
+  .pho-chip span { font-weight: 600; }
+  .reply-actions {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .score-badge {
+    padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 600;
+  }
+  .score-badge.good { background: rgba(46,204,113,.15); color: var(--green); }
+  .score-badge.ok { background: rgba(243,156,18,.15); color: var(--yellow); }
+  .score-badge.bad { background: rgba(231,76,60,.15); color: var(--red); }
+  .score-badge.none { background: rgba(255,255,255,.05); color: var(--sub); }
 
-  .feedback-inline {
-    margin-top: 6px; padding: 8px 12px; border-radius: 8px;
-    background: rgba(0,0,0,.3); font-size: 13px; line-height: 1.6;
-    display: none;
-  }
-  .feedback-inline.show { display: block; }
-  .feedback-inline .ok { color: var(--green); }
-  .feedback-inline .warn { color: var(--yellow); }
-  .feedback-inline .bad { color: var(--red); }
-  .hint-bar {
-    padding: 8px 24px; background: rgba(243,156,18,.1);
-    border-top: 1px solid rgba(243,156,18,.3); font-size: 13px;
-    text-align: center; color: var(--yellow); display: none;
-  }
-  .hint-bar.show { display: block; }
   .input-area {
-    padding: 16px 24px; border-top: 1px solid var(--border);
-    display: flex; gap: 10px; align-items: flex-end;
+    padding: 12px 24px 16px; display: flex; gap: 10px; align-items: flex-end;
   }
   .input-area textarea {
     flex: 1; border: 1px solid var(--border); border-radius: 10px;
@@ -146,6 +156,14 @@
     cursor: pointer; flex-shrink: 0;
   }
   .btn-send:disabled { opacity: .4; cursor: default; }
+
+  .hint-bar {
+    padding: 8px 24px; background: rgba(243,156,18,.1);
+    border-top: 1px solid rgba(243,156,18,.3); font-size: 13px;
+    text-align: center; color: var(--yellow); display: none;
+  }
+  .hint-bar.show { display: block; }
+
   .mic-status {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: 12px; padding: 4px 10px; border-radius: 12px;
@@ -155,6 +173,7 @@
   .mic-dot { width: 8px; height: 8px; border-radius: 50%; }
   .mic-status.on .mic-dot { background: var(--green); }
   .mic-status.off .mic-dot { background: var(--red); }
+
   .start-hint {
     text-align: center; padding: 60px 20px; color: var(--sub); font-size: 15px; line-height: 2;
   }
@@ -163,6 +182,15 @@
     border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer;
   }
   .start-hint button:hover { opacity: .9; }
+
+  .feedback-bar {
+    margin: 0 24px 4px; padding: 8px 14px; border-radius: 8px;
+    font-size: 13px; display: none;
+  }
+  .feedback-bar.show { display: block; }
+  .feedback-bar .ok { color: var(--green); }
+  .feedback-bar .warn { color: var(--yellow); }
+  .feedback-bar .bad { color: var(--red); }
 </style>
 </head>
 <body>
@@ -173,7 +201,7 @@
   <div class="scene-list" id="sceneList"></div>
   <div class="sidebar-footer">
     <div class="mic-status off" id="micStatus"><span class="mic-dot"></span> 点击下方按钮授权</div>
-    <div style="margin-top:6px">💡 点场景切换<br>🔊 听同事说话<br>📝 先练习再录音</div>
+    <div style="margin-top:6px">💡 点场景切换<br>🔊 听同事说话<br>🎤 跟读练习发音</div>
   </div>
 </div>
 
@@ -192,11 +220,31 @@
       <div style="font-size:12px;margin-top:8px">只需授权一次 · 全程不弹窗</div>
     </div>
   </div>
+
+  <!-- Suggested reply panel -->
+  <div class="reply-panel" id="replyPanel">
+    <div class="label">📝 建议回复 — 先跟读练发音，再正式回复</div>
+    <div class="en-text" id="replyEn"></div>
+    <div class="cn-text" id="replyCn"></div>
+    <div class="pho-row" id="replyPho"></div>
+    <div class="reply-actions">
+      <button class="btn-sm" id="btnPractice" onclick="practiceReply()">🎤 跟读这句话</button>
+      <button class="btn-sm" onclick="playTTS(null, document.getElementById('replyEn').textContent)">🔊 听标准发音</button>
+      <span class="score-badge none" id="scoreBadge">—</span>
+      <span style="font-size:12px;color:var(--sub)" id="scoreDetail"></span>
+    </div>
+  </div>
+
+  <!-- Feedback bar -->
+  <div class="feedback-bar" id="feedbackBar"></div>
+
   <div class="input-area">
-    <textarea id="textInput" placeholder="打字回复（或按 🎤 录音）..." rows="1"></textarea>
+    <textarea id="textInput" placeholder="编辑上方英文回复，或直接打字..." rows="1"></textarea>
     <button class="btn-send" onclick="sendText()" id="sendBtn" disabled>→</button>
   </div>
 </div>
+
+<audio id="ttsAudio" style="display:none"></audio>
 
 <script>
 // ── Profile ────────────────────────────────────────────────────────
@@ -204,68 +252,161 @@ var P = {
   name: 'Patrick',
   role: 'AI Full-Stack Engineer',
   skills: 'Go, React, Python, LLM/RAG, K8s, Docker, Gin, Kitex, Kratos, gRPC, Redis, MySQL',
-  exp: '10yr full-stack. Robotics AI company (Go+React robot cloud). Previously TAL Education (Go microservices), Shansong (frontend). GPU monitoring, Feishu bots, multi-cloud orchestration.'
+  exp: '10yr full-stack. Robotics AI company (Go+React robot cloud). Previously TAL Education (Go microservices), Shansong (frontend).'
 };
 
-var audioStream = null;
-var mediaRecorder = null;
-var audioChunks = [];
-var currentScene = null;
-var isRecording = false;
-var practiceMode = false; // true when recording practice, false for real reply
+var audioStream = null, mediaRecorder = null, audioChunks = [];
+var currentScene = null, isRecording = false;
 
-// ── Scenes ─────────────────────────────────────────────────────────
+// ── Scene data ─────────────────────────────────────────────────────
+// Each scene: coworker text + translation + word chips + suggested reply
 function buildScenes() {
   var n = P.name;
   return [
-    { id:'intro', time:'9:00 AM', icon:'☕', title:'Morning Coffee Chat', coworker:'Sarah', role:'Senior Robotics Engineer',
+    {
+      id:'intro', time:'9:00 AM', icon:'☕', title:'Morning Coffee Chat', coworker:'Sarah', role:'Senior Robotics Engineer',
       text: "Morning "+n+"! So you came from a robotics AI company too? I saw your resume — you worked on a robot cloud management platform. That is exactly what we are building here. Tell me about the GPU monitoring system you built.",
+      cn: "早上好"+n+"！你之前也是机器人AI公司的？我看了你的简历——你做过机器人云管理平台，我们这儿做的正好一样。跟我说说你做的GPU监控系统吧。",
+      words: [
+        {en:'robotics',zh:'机器人技术'},{en:'resume',zh:'简历'},{en:'platform',zh:'平台'},
+        {en:'exactly',zh:'恰好'},{en:'monitoring',zh:'监控'},{en:'system',zh:'系统'}
+      ],
       reply: "Yeah! We built a Go+React platform for robot config management and multi-cloud GPU monitoring. We used Feishu bots for alerts — it saved the team hours every week.",
-      words: [{w:'robot',p:'ROW-bot'},{w:'platform',p:'PLAT-form'},{w:'monitoring',p:'MON-i-ter-ing'},{w:'alerts',p:'a-LERTS'},{w:'config',p:'CON-fig'}] },
-    { id:'standup', time:'9:30 AM', icon:'📋', title:'Daily Standup', coworker:'Mike', role:'Tech Lead',
+      replyCn: "是的！我们用Go+React做了个机器人配置管理和多云GPU监控平台。用飞书机器人推送告警——每周给团队省了好多时间。",
+      pho: [{w:'robot',p:'ROW-bot'},{w:'platform',p:'PLAT-form'},{w:'monitoring',p:'MON-i-ter-ing'},{w:'alerts',p:'a-LERTS'},{w:'config',p:'CON-fig'}]
+    },
+    {
+      id:'standup', time:'9:30 AM', icon:'📋', title:'Daily Standup', coworker:'Mike', role:'Tech Lead',
       text: "Alright team, standup time. "+n+", you are working on the new LLM agent service today, right? How is the RAG pipeline coming along?",
+      cn: "好了大家，站会时间。"+n+"，你今天在做新的LLM agent服务对吧？RAG pipeline进展怎么样？",
+      words: [
+        {en:'standup',zh:'站会'},{en:'agent',zh:'智能体'},{en:'service',zh:'服务'},
+        {en:'pipeline',zh:'流水线'},{en:'coming along',zh:'进展'}
+      ],
       reply: "Making good progress. I set up the vector database with ChromaDB yesterday and integrated the DeepSeek API. Today I am working on the retrieval pipeline — should have a demo by end of day.",
-      words: [{w:'progress',p:'PRO-gress'},{w:'vector',p:'VEC-tor'},{w:'database',p:'DAY-ta-base'},{w:'integrated',p:'IN-te-gray-ted'},{w:'retrieval',p:'re-TREE-val'},{w:'pipeline',p:'PIPE-line'}] },
-    { id:'onboarding', time:'10:00 AM', icon:'📖', title:'HR Benefits Chat', coworker:'Lisa', role:'HR/People Ops',
+      replyCn: "进展不错。昨天用ChromaDB搭好了向量数据库，集成了DeepSeek API。今天在做检索pipeline——下班前应该能出demo。",
+      pho: [{w:'progress',p:'PRO-gress'},{w:'vector',p:'VEC-tor'},{w:'database',p:'DAY-ta-base'},{w:'integrated',p:'IN-te-gray-ted'},{w:'retrieval',p:'re-TREE-val'},{w:'pipeline',p:'PIPE-line'}]
+    },
+    {
+      id:'onboarding', time:'10:00 AM', icon:'📖', title:'HR Benefits Chat', coworker:'Lisa', role:'HR/People Ops',
       text: "Hi "+n+"! Let me walk you through our benefits. One thing I noticed — you have 10 years of experience across different tech stacks. That is quite impressive. Do you have questions about our learning and development budget?",
+      cn: "嗨"+n+"！我给你介绍一下我们的福利。我注意到你有10年的经验，跨越不同技术栈，相当厉害。对我们的学习和进修预算有什么问题吗？",
+      words: [
+        {en:'benefits',zh:'福利'},{en:'experience',zh:'经验'},{en:'impressive',zh:'令人印象深刻'},
+        {en:'development',zh:'发展'},{en:'budget',zh:'预算'}
+      ],
       reply: "Yes! Do you cover conference tickets or online courses? I am planning to dive deeper into distributed systems this year.",
-      words: [{w:'benefits',p:'BEN-e-fits'},{w:'experience',p:'ex-PEER-ee-ence'},{w:'development',p:'de-VEL-op-ment'},{w:'conference',p:'CON-fer-ence'},{w:'distributed',p:'dis-TRIB-u-ted'}] },
-    { id:'codebase', time:'11:00 AM', icon:'💻', title:'Architecture Deep Dive', coworker:'Alex', role:'Staff Engineer',
+      replyCn: "有的！你们报销会议门票或者网课吗？我今年打算深入学分布式系统。",
+      pho: [{w:'conference',p:'CON-fer-ence'},{w:'courses',p:'KOR-ses'},{w:'distributed',p:'dis-TRIB-u-ted'},{w:'systems',p:'SIS-tems'}]
+    },
+    {
+      id:'codebase', time:'11:00 AM', icon:'💻', title:'Architecture Deep Dive', coworker:'Alex', role:'Staff Engineer',
       text: "Since you have worked with Kitex and Kratos at TAL, you will feel right at home. We use a similar Go microservice stack. Our robot fleet communicates via gRPC — have you worked with gRPC streaming before?",
+      cn: "你在好未来用过Kitex和Kratos，来这儿应该很顺手。我们用类似的Go微服务技术栈。我们机器人集群用gRPC通信——你之前用过gRPC streaming吗？",
+      words: [
+        {en:'microservice',zh:'微服务'},{en:'fleet',zh:'集群'},{en:'communicates',zh:'通信'},
+        {en:'streaming',zh:'流式传输'}
+      ],
       reply: "I used gRPC for service-to-service communication with Protobuf. I have not done streaming yet, but I am familiar with the concepts. What is the typical message size from the robots?",
-      words: [{w:'microservice',p:'MY-cro-ser-vice'},{w:'communicates',p:'com-MU-ni-cates'},{w:'streaming',p:'STREE-ming'},{w:'Protobuf',p:'PRO-to-buf'},{w:'typical',p:'TI-pi-cal'}] },
-    { id:'lunch', time:'12:30 PM', icon:'🍕', title:'Team Lunch Chat', coworker:'Jessica', role:'Product Manager',
+      replyCn: "我用过gRPC做服务间通信，用Protobuf定义协议。streaming还没做过，但了解概念。机器人那边典型的消息大小是多少？",
+      pho: [{w:'communication',p:'com-MU-ni-ca-tion'},{w:'Protobuf',p:'PRO-to-buf'},{w:'concepts',p:'CON-cepts'},{w:'typical',p:'TI-pi-cal'}]
+    },
+    {
+      id:'lunch', time:'12:30 PM', icon:'🍕', title:'Team Lunch Chat', coworker:'Jessica', role:'Product Manager',
       text: "Hey "+n+"! A bunch of us are going to that hotpot place. So I heard you built a whole AI knowledge base and learning roadmap for yourself? That is pretty dedicated — what made you go deep into AI?",
+      cn: "嘿"+n+"！我们几个要去那家火锅店。听说你给自己搭了一整套AI知识库和学习路线图？太投入了——什么让你深入学AI的？",
+      words: [
+        {en:'bunch',zh:'一群'},{en:'knowledge base',zh:'知识库'},{en:'roadmap',zh:'路线图'},
+        {en:'dedicated',zh:'专注的'},{en:'deep into',zh:'深入'}
+      ],
       reply: "I started by watching 3Blue1Brown and reading papers. Built a personal knowledge base with VitePress, documented everything from CNN to Transformers. It just clicked for me — I wanted to understand how these models actually work.",
-      words: [{w:'knowledge',p:'NOL-edge'},{w:'dedicated',p:'DED-i-cay-ted'},{w:'documented',p:'DOC-u-men-ted'},{w:'Transformers',p:'trans-FOR-mers'},{w:'actually',p:'AC-chu-a-lly'}] },
-    { id:'pr', time:'2:00 PM', icon:'🔍', title:'Code Review Session', coworker:'David', role:'Senior Engineer',
+      replyCn: "我从看3Blue1Brown和读论文开始的。用VitePress搭建了个人知识库，从CNN到Transformer都做了笔记。就是突然开窍了——我想搞懂这些模型到底怎么工作的。",
+      pho: [{w:'knowledge',p:'NOL-edge'},{w:'documented',p:'DOC-u-men-ted'},{w:'Transformers',p:'trans-FOR-mers'},{w:'actually',p:'AC-chu-a-lly'},{w:'models',p:'MOD-els'}]
+    },
+    {
+      id:'pr', time:'2:00 PM', icon:'🔍', title:'Code Review Session', coworker:'David', role:'Senior Engineer',
       text: "Hey, I just opened a PR for the robot config management module. Since you built something similar at your last company, could you take a look? I would love to hear how you handled version management for robot firmware.",
+      cn: "嘿，我刚给机器人配置管理模块提了个PR。你上家公司做过类似的，能帮忙看看吗？我想听听你们怎么做机器人固件的版本管理。",
+      words: [
+        {en:'module',zh:'模块'},{en:'similar',zh:'类似的'},{en:'version',zh:'版本'},
+        {en:'firmware',zh:'固件'},{en:'handled',zh:'处理'}
+      ],
       reply: "Sure! At my last job we used a versioned config system — each robot firmware version had its own config snapshot. Let me check your approach and I will leave some comments.",
-      words: [{w:'module',p:'MOD-ule'},{w:'similar',p:'SI-mi-lar'},{w:'firmware',p:'FIRM-ware'},{w:'versioned',p:'VER-zhund'},{w:'approach',p:'a-PROACH'}] },
-    { id:'oneonone', time:'3:30 PM', icon:'🤝', title:'1:1 with Tech Lead', coworker:'Mike', role:'Tech Lead',
+      replyCn: "没问题！上家公司我们用版本化配置系统——每个固件版本有自己的配置快照。让我看看你的方案，我会留些评论。",
+      pho: [{w:'versioned',p:'VER-zhund'},{w:'firmware',p:'FIRM-ware'},{w:'snapshot',p:'SNAP-shot'},{w:'approach',p:'a-PROACH'},{w:'comments',p:'COM-ments'}]
+    },
+    {
+      id:'oneonone', time:'3:30 PM', icon:'🤝', title:'1:1 with Tech Lead', coworker:'Mike', role:'Tech Lead',
       text: "How is everything going? I noticed you have been pushing commits on the LLM service already. I want to make sure you are not feeling overwhelmed — also, what area do you want to grow in over the next 6 months?",
+      cn: "一切都顺利吗？我注意到你已经在LLM服务上提交代码了。我想确认你没有压力太大——另外，接下来6个月你想在哪个方向成长？",
+      words: [
+        {en:'commits',zh:'代码提交'},{en:'overwhelmed',zh:'压力过大'},
+        {en:'grow',zh:'成长'},{en:'area',zh:'领域'}
+      ],
       reply: "It is going well! I am excited about the LLM work. In the next 6 months I want to get deeper into distributed systems and model serving infrastructure. Maybe take on the inference optimization work.",
-      words: [{w:'overwhelmed',p:'o-ver-WELMD'},{w:'distributed',p:'dis-TRIB-u-ted'},{w:'infrastructure',p:'IN-fra-struc-ture'},{w:'inference',p:'IN-fer-ence'},{w:'optimization',p:'op-ti-mi-ZAY-shun'}] },
-    { id:'wrapup', time:'4:30 PM', icon:'📝', title:'Day Wrap-up', coworker:'Sarah', role:'Senior Robotics Engineer',
+      replyCn: "挺顺利的！LLM的工作很让我兴奋。接下来6个月我想更深入分布式系统和模型推理基础设施。也许可以接手推理优化的工作。",
+      pho: [{w:'excited',p:'ex-SI-ted'},{w:'distributed',p:'dis-TRIB-u-ted'},{w:'infrastructure',p:'IN-fra-struc-ture'},{w:'inference',p:'IN-fer-ence'},{w:'optimization',p:'op-ti-mi-ZAY-shun'}]
+    },
+    {
+      id:'wrapup', time:'4:30 PM', icon:'📝', title:'Day Wrap-up', coworker:'Sarah', role:'Senior Robotics Engineer',
       text: "Hey "+n+", heading out? Great first day! By the way, I saw the GPU dashboard you built at your last company on GitHub. Would you be interested in presenting it at our next engineering all-hands?",
+      cn: "嘿"+n+"，准备走了？第一天太棒了！对了，我在GitHub上看到你上家公司做的GPU仪表盘。有兴趣在下一次全员技术分享会上讲讲吗？",
+      words: [
+        {en:'heading out',zh:'准备走'},{en:'dashboard',zh:'仪表盘'},{en:'presenting',zh:'展示'},
+        {en:'all-hands',zh:'全员大会'}
+      ],
       reply: "Oh, that would be awesome! I can walk through the architecture — how we aggregated GPU metrics across Alibaba Cloud, Baidu Cloud, and Volcano Cloud, then pushed alerts through Feishu. Give me a few days to prepare.",
-      words: [{w:'dashboard',p:'DASH-bord'},{w:'presenting',p:'pre-ZEN-ting'},{w:'architecture',p:'AR-ki-tec-ture'},{w:'aggregated',p:'AG-gre-gay-ted'},{w:'metrics',p:'MET-rics'},{w:'prepare',p:'pre-PAIR'}] },
-    { id:'day2_standup', time:'Day 2 · 9:30 AM', icon:'📋', title:'Day 2 Standup', coworker:'Mike', role:'Tech Lead',
+      replyCn: "那太好了！我可以讲架构——我们怎么汇总阿里云、百度云、火山云的GPU指标，然后通过飞书推送告警。给我几天准备。",
+      pho: [{w:'awesome',p:'AW-some'},{w:'architecture',p:'AR-ki-tec-ture'},{w:'aggregated',p:'AG-gre-gay-ted'},{w:'metrics',p:'MET-rics'},{w:'prepare',p:'pre-PAIR'}]
+    },
+    {
+      id:'day2_standup', time:'Day 2 · 9:30 AM', icon:'📋', title:'Day 2 Standup', coworker:'Mike', role:'Tech Lead',
       text: n+", how is the RAG pipeline? I saw you pushed the vector store integration last night. Did you run into any issues with the embedding dimensions?",
+      cn: n+"，RAG pipeline怎么样了？我看到你昨晚提交了向量库集成。embedding维度上碰到什么问题了吗？",
+      words: [
+        {en:'integration',zh:'集成'},{en:'embedding',zh:'嵌入向量'},
+        {en:'dimensions',zh:'维度'},{en:'issues',zh:'问题'}
+      ],
       reply: "Good progress! The ChromaDB integration is done. I did hit one issue — the DeepSeek embedding model outputs 4096 dimensions but we had 1536 in our schema. Fixed it this morning. Should have the retrieval endpoint ready by noon.",
-      words: [{w:'integration',p:'in-te-GRAY-shun'},{w:'embedding',p:'em-BED-ing'},{w:'dimensions',p:'di-MEN-shuns'},{w:'schema',p:'SKEE-ma'},{w:'endpoint',p:'END-point'}] },
-    { id:'debug', time:'Day 2 · 2:00 PM', icon:'🐛', title:'Production Issue', coworker:'Alex', role:'Staff Engineer',
+      replyCn: "进展不错！ChromaDB集成完成了。确实碰到一个问题——DeepSeek的embedding模型输出4096维，但我们schema里是1536。今天早上修好了。检索端点中午前能好。",
+      pho: [{w:'integration',p:'in-te-GRAY-shun'},{w:'embedding',p:'em-BED-ing'},{w:'dimensions',p:'di-MEN-shuns'},{w:'schema',p:'SKEE-ma'},{w:'endpoint',p:'END-point'},{w:'retrieval',p:'re-TREE-val'}]
+    },
+    {
+      id:'debug', time:'Day 2 · 2:00 PM', icon:'🐛', title:'Production Issue', coworker:'Alex', role:'Staff Engineer',
       text: "We are seeing latency spikes on the robot telemetry API — p99 went from 200ms to 2 seconds. You have dealt with production incidents before, right? Can you help me dig into the logs?",
+      cn: "我们发现机器人遥测API延迟飙升——p99从200ms涨到2秒。你之前处理过线上事故对吧？能帮我查下日志吗？",
+      words: [
+        {en:'latency',zh:'延迟'},{en:'spikes',zh:'飙升'},{en:'telemetry',zh:'遥测'},
+        {en:'incidents',zh:'事故'},{en:'logs',zh:'日志'}
+      ],
       reply: "On it. Let me pull up the Grafana dashboard and check which service is the bottleneck. Is this affecting all robots or just a specific fleet? I will trace the gRPC calls.",
-      words: [{w:'latency',p:'LAY-ten-see'},{w:'telemetry',p:'te-LEM-e-try'},{w:'incidents',p:'IN-si-dents'},{w:'bottleneck',p:'BOT-tle-neck'},{w:'specific',p:'spe-SI-fic'},{w:'trace',p:'TRAYCE'}] },
-    { id:'design', time:'Day 3 · 10:00 AM', icon:'🎨', title:'Design Review', coworker:'Jessica', role:'Product Manager',
+      replyCn: "马上。我打开Grafana仪表盘看下哪个服务是瓶颈。是所有机器人都受影响还是某个集群？我来追踪gRPC调用。",
+      pho: [{w:'latency',p:'LAY-ten-see'},{w:'Grafana',p:'gra-FAH-na'},{w:'bottleneck',p:'BOT-tle-neck'},{w:'specific',p:'spe-SI-fic'},{w:'trace',p:'TRAYCE'}]
+    },
+    {
+      id:'design', time:'Day 3 · 10:00 AM', icon:'🎨', title:'Design Review', coworker:'Jessica', role:'Product Manager',
       text: n+", we are planning the next iteration of the robot AI assistant. You mentioned you have built AI agents before. What would you suggest for the conversation flow? Should we go with a state machine or let the LLM handle it?",
+      cn: n+"，我们在规划机器人AI助手的下一个迭代。你提过之前做过AI agent。对话流程你有什么建议？用状态机还是让LLM自己处理？",
+      words: [
+        {en:'iteration',zh:'迭代'},{en:'assistant',zh:'助手'},{en:'suggest',zh:'建议'},
+        {en:'state machine',zh:'状态机'},{en:'handle',zh:'处理'}
+      ],
       reply: "I would recommend a hybrid approach. Use a state machine for the critical paths — like emergency stop and safety checks — but let the LLM handle the conversational parts. At my last job I used a similar pattern.",
-      words: [{w:'iteration',p:'i-ter-AY-shun'},{w:'suggest',p:'sug-JEST'},{w:'hybrid',p:'HIGH-brid'},{w:'emergency',p:'e-MER-gen-cy'},{w:'conversational',p:'con-ver-SAY-shun-al'}] },
-    { id:'demo', time:'Day 3 · 3:00 PM', icon:'🚀', title:'Demo to VP', coworker:'Mike', role:'Tech Lead',
+      replyCn: "我建议混合方案。关键路径用状态机——比如急停和安全检查——但对话部分让LLM自己处理。上家公司我们用过类似模式。",
+      pho: [{w:'recommend',p:'re-com-MEND'},{w:'hybrid',p:'HIGH-brid'},{w:'critical',p:'CRI-ti-cal'},{w:'emergency',p:'e-MER-gen-cy'},{w:'conversational',p:'con-ver-SAY-shun-al'},{w:'pattern',p:'PAT-tern'}]
+    },
+    {
+      id:'demo', time:'Day 3 · 3:00 PM', icon:'🚀', title:'Demo to VP', coworker:'Mike', role:'Tech Lead',
       text: n+", the VP of Engineering wants a quick demo of the LLM agent service tomorrow. Just 5 minutes — show the RAG pipeline, the robot Q and A, and the GPU monitoring dashboard. You up for it?",
+      cn: n+"，工程VP明天想看LLM agent服务的快速demo。就5分钟——展示RAG pipeline、机器人问答、GPU监控仪表盘。你能上吗？",
+      words: [
+        {en:'quick demo',zh:'快速演示'},{en:'Q and A',zh:'问答'},
+        {en:'dashboard',zh:'仪表盘'}
+      ],
       reply: "Absolutely. I will prep a 5-minute walkthrough: RAG retrieval to LLM response to robot command. I will have a backup local demo in case the API has issues. Anything specific the VP cares about?",
-      words: [{w:'absolutely',p:'ab-so-LUTE-ly'},{w:'walkthrough',p:'WALK-through'},{w:'retrieval',p:'re-TREE-val'},{w:'backup',p:'BACK-up'},{w:'specific',p:'spe-SI-fic'}] }
+      replyCn: "没问题。我准备5分钟的走查：RAG检索→LLM回复→机器人指令。我会有个本地备份demo防止API出问题。VP有什么特别关注的点吗？",
+      pho: [{w:'absolutely',p:'ab-so-LUTE-ly'},{w:'walkthrough',p:'WALK-through'},{w:'retrieval',p:'re-TREE-val'},{w:'backup',p:'BACK-up'},{w:'specific',p:'spe-SI-fic'}]
+    }
   ];
 }
 
@@ -279,7 +420,6 @@ async function initApp() {
     document.getElementById('micStatus').className = 'mic-status off';
     document.getElementById('micStatus').innerHTML = '<span class="mic-dot"></span> 仅文字模式';
   }
-  initialized = true;
   renderScenes();
   loadScene('intro');
 }
@@ -290,7 +430,7 @@ function renderScenes() {
     var s = scenes[i];
     html += '<div class="scene-item" id="scene-'+s.id+'" onclick="loadScene(\''+s.id+'\')">' +
       '<span class="icon">'+s.icon+'</span>' +
-      '<div><div>'+s.title+'</div><div class="scene-time">'+s.time+' · '+s.coworker+'</div></div></div>';
+      '<div><div>'+escHtml(s.title)+'</div><div class="scene-time">'+escHtml(s.time)+' · '+escHtml(s.coworker)+'</div></div></div>';
   }
   document.getElementById('sceneList').innerHTML = html;
 }
@@ -301,59 +441,73 @@ function loadScene(id) {
   if (!scene) return;
   currentScene = scene;
 
+  // Update sidebar
   var items = document.querySelectorAll('.scene-item');
   for (var i = 0; i < items.length; i++) items[i].classList.remove('active');
   var el = document.getElementById('scene-'+id);
   if (el) el.classList.add('active');
-
   document.getElementById('topDay').textContent = scene.time + ' · ' + scene.coworker + ' (' + scene.role + ')';
 
-  var chat = document.getElementById('chatArea');
-  var wordsHTML = '';
+  // Build word chips
+  var chipsHTML = '';
   for (var i = 0; i < scene.words.length; i++) {
     var w = scene.words[i];
-    wordsHTML += '<span class="word-chip" onclick="playWord(\''+esc(w.w)+'\')">'+esc(w.w)+'<span class="phonetic"> '+esc(w.p)+'</span></span>';
+    chipsHTML += '<span class="word-chip" onclick="playWord(\''+escAttr(w.en)+'\')"><span class="en">'+escHtml(w.en)+'</span> <span class="zh">'+escHtml(w.zh)+'</span></span>';
   }
 
+  // Coworker message
+  var chat = document.getElementById('chatArea');
   chat.innerHTML =
     '<div class="msg them">' +
     '<div class="avatar">'+scene.icon+'</div>' +
-    '<div>' +
-      '<div class="name">'+scene.coworker+' · '+scene.role+'</div>' +
-      '<div class="bubble">'+esc(scene.text)+'</div>' +
+    '<div class="bubble-wrap">' +
+      '<div class="name">'+escHtml(scene.coworker)+' · '+escHtml(scene.role)+'</div>' +
+      '<div class="bubble">'+escHtml(scene.text)+'</div>' +
+      '<div class="trans-cn">🇨🇳 '+escHtml(scene.cn)+'</div>' +
+      '<div class="word-row">'+chipsHTML+'</div>' +
       '<div class="msg-actions">' +
-        '<button class="btn-sm" onclick="playTTS(this,\''+esc(scene.text)+'\')">🔊 听TA说的</button>' +
-        '<button class="btn-sm btn-practice" onclick="togglePractice(\''+esc(scene.id)+'\')">📝 先练习</button>' +
+        '<button class="btn-sm" onclick="playTTS(this,\''+escAttr(scene.text)+'\')">🔊 听TA说的</button>' +
       '</div>' +
-      '<div class="practice-panel" id="practice-'+scene.id+'">' +
-        '<h4>📝 预备练习 — 先练好再正式回复</h4>' +
-        '<div class="practice-text">'+esc(scene.reply)+'</div>' +
-        '<div style="font-size:12px;color:var(--sub);margin-bottom:6px">🔤 点单词听发音：</div>' +
-        '<div class="word-grid">'+wordsHTML+'</div>' +
-        '<div class="practice-actions">' +
-          '<button class="btn-sm" id="pracBtn-'+scene.id+'" onclick="startPractice(\''+scene.id+'\')">🎤 跟读这句话</button>' +
-          '<button class="btn-sm btn-practice" onclick="playTTS(null,\''+esc(scene.reply)+'\')">🔊 听标准发音</button>' +
-        '</div>' +
-        '<div class="practice-result" id="pracResult-'+scene.id+'"></div>' +
-      '</div>' +
-      '<div class="feedback-inline" id="feedback-'+scene.id+'"></div>' +
     '</div></div>';
 
   chat.scrollTop = chat.scrollHeight;
-  showHint('💡 建议先点「📝 先练习」练熟发音，再正式录音');
 
-  setTimeout(function(){ playTTS(null, scene.text); }, 500);
+  // Update reply panel
+  showReplyPanel(scene);
+  showHint('💡 看下面「建议回复」→ 点 🎤 跟读 → 系统检查你的发音 → 满意后点 → 发送');
 }
 
-function togglePractice(id) {
-  var panel = document.getElementById('practice-'+id);
-  if (!panel) return;
-  if (panel.classList.contains('show')) {
-    panel.classList.remove('show');
-  } else {
-    panel.classList.add('show');
-    document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+function showReplyPanel(scene) {
+  var panel = document.getElementById('replyPanel');
+  panel.classList.add('show');
+
+  document.getElementById('replyEn').textContent = scene.reply;
+  document.getElementById('replyCn').textContent = '🇨🇳 ' + scene.replyCn;
+
+  // Phonetic chips
+  var phoHTML = '';
+  for (var i = 0; i < scene.pho.length; i++) {
+    var p = scene.pho[i];
+    phoHTML += '<span class="pho-chip"><span>'+escHtml(p.w)+'</span> /'+escHtml(p.p)+'/</span>';
   }
+  document.getElementById('replyPho').innerHTML = phoHTML;
+
+  // Reset score
+  document.getElementById('scoreBadge').className = 'score-badge none';
+  document.getElementById('scoreBadge').textContent = '—';
+  document.getElementById('scoreDetail').textContent = '';
+
+  // Put reply text into input
+  document.getElementById('textInput').value = scene.reply;
+  document.getElementById('sendBtn').disabled = false;
+
+  // Reset practice button
+  var b = document.getElementById('btnPractice');
+  b.textContent = '🎤 跟读这句话';
+  b.classList.remove('recording');
+
+  // Hide feedback
+  document.getElementById('feedbackBar').classList.remove('show');
 }
 
 function addMyMsg(text) {
@@ -363,8 +517,8 @@ function addMyMsg(text) {
   var div = document.createElement('div');
   div.className = 'msg me';
   div.innerHTML = '<div class="avatar">😎</div>' +
-    '<div><div class="name" style="text-align:right">You</div>' +
-    '<div class="bubble">'+esc(text)+'</div>' +
+    '<div class="bubble-wrap"><div class="name" style="text-align:right">You</div>' +
+    '<div class="bubble">'+escHtml(text)+'</div>' +
     '<div class="time" style="text-align:right">'+t+'</div></div>';
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
@@ -377,7 +531,8 @@ loadVoices();
 speechSynthesis.onvoiceschanged = loadVoices;
 
 function playTTS(btn, text) {
-  var audio = new Audio(), loaded = false, fbTimer = null;
+  var audio = document.getElementById('ttsAudio');
+  var loaded = false, fbTimer = null;
   audio.src = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=' + encodeURIComponent(text);
   if (btn) { btn.textContent = '🔊 加载中...'; btn.style.color = 'var(--yellow)'; }
   audio.oncanplaythrough = function() { loaded = true; if (fbTimer) clearTimeout(fbTimer); if (btn) { btn.textContent = '🔊 播放中...'; btn.style.color = 'var(--green)'; } };
@@ -402,163 +557,110 @@ function playTTS(btn, text) {
   }, 2500);
 }
 
-function playWord(word) {
-  playTTS(null, word);
-}
+function playWord(word) { playTTS(null, word); }
 
-// ── Practice Mode ──────────────────────────────────────────────────
-function startPractice(id) {
-  if (!audioStream) { alert('麦克风不可用，请刷新页面重新授权'); return; }
-  if (isRecording) return;
+// ── Practice: record & check pronunciation ─────────────────────────
+function practiceReply() {
+  if (!audioStream) { alert('麦克风不可用'); return; }
+  if (isRecording) { stopPractice(); return; }
 
-  var scene = currentScene;
-  if (!scene || scene.id !== id) {
-    var scenes = buildScenes();
-    for (var i = 0; i < scenes.length; i++) { if (scenes[i].id === id) { scene = scenes[i]; break; } }
-  }
-  if (!scene) return;
-
-  isRecording = true; practiceMode = true; audioChunks = [];
-  var btn = document.getElementById('pracBtn-'+id);
-  if (btn) { btn.textContent = '⏹ 停止跟读'; btn.classList.add('recording'); }
+  isRecording = true; audioChunks = [];
+  var btn = document.getElementById('btnPractice');
+  if (btn) { btn.textContent = '⏹ 停止'; btn.classList.add('recording'); }
   showHint('🔴 跟读中... 读完点停止');
 
   mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
   mediaRecorder.ondataavailable = function(e) { audioChunks.push(e.data); };
-  mediaRecorder.onstop = function() { processPractice(id, scene); };
+  mediaRecorder.onstop = function() { analyzePractice(); };
   mediaRecorder.start();
-  setTimeout(function() { if (isRecording && mediaRecorder.state === 'recording') stopPractice(id); }, 10000);
+  setTimeout(function() { if (isRecording && mediaRecorder.state === 'recording') stopPractice(); }, 10000);
 }
 
-function stopPractice(id) {
+function stopPractice() {
   if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
-  isRecording = false; practiceMode = false;
-  mediaRecorder.stop();
-  var btn = document.getElementById('pracBtn-'+id);
+  isRecording = false; mediaRecorder.stop();
+  var btn = document.getElementById('btnPractice');
   if (btn) { btn.textContent = '🎤 跟读这句话'; btn.classList.remove('recording'); }
   hideHint();
 }
 
-function processPractice(id, scene) {
+function analyzePractice() {
   var blob = new Blob(audioChunks, { type: 'audio/webm' });
   var url = URL.createObjectURL(blob);
   window._pracRec = url;
 
-  var result = document.getElementById('pracResult-'+id);
-  if (!result) return;
-  result.innerHTML = '🔍 分析中...';
-  result.classList.add('show');
+  var fb = document.getElementById('feedbackBar');
+  fb.innerHTML = '🔍 分析中...';
+  fb.classList.add('show');
 
   doSpeech().then(function(alts) {
     var best = alts[0] ? alts[0].text.toLowerCase().replace(/[.,!?]/g, '') : '';
     var conf = alts[0] ? alts[0].confidence : 0;
-    var expected = scene.reply.toLowerCase().replace(/[.,!?]/g, '');
+    var expected = (currentScene.reply || '').toLowerCase().replace(/[.,!?]/g, '');
     var expWords = expected.split(/\s+/);
     var gotWords = best.split(/\s+/);
 
-    // Word-by-word match
     var matchCount = 0;
     for (var i = 0; i < Math.min(expWords.length, gotWords.length); i++) {
       if (gotWords[i] === expWords[i]) matchCount++;
     }
     var score = expWords.length > 0 ? Math.round(matchCount / expWords.length * 100) : 0;
-    var emoji = score >= 80 ? '✅' : score >= 50 ? '⚠️' : '❌';
-    var cc = conf > 0.7 ? 'ok' : conf > 0.4 ? 'warn' : 'bad';
 
-    // Find mispronounced words
+    // Find mispronounced
     var issues = [];
     for (var i = 0; i < expWords.length; i++) {
-      if (i >= gotWords.length) { issues.push({w:expWords[i], r:'(没说)'}); }
-      else if (gotWords[i] !== expWords[i]) { issues.push({w:expWords[i], r:gotWords[i]}); }
-    }
-
-    var issueHTML = '';
-    if (issues.length > 0) {
-      issueHTML = '<div style="margin-top:6px;color:var(--yellow)">⚠️ 需改进的单词：';
-      for (var i = 0; i < issues.length; i++) {
-        var w = findWord(scene.words, issues[i].w);
-        issueHTML += '<br>• <b>'+issues[i].w+'</b> → 你读成 "'+issues[i].r+'"' + (w ? ' (正确: '+w.p+')' : '');
+      if (i >= gotWords.length) { issues.push('<b>'+escHtml(expWords[i])+'</b> <span class="bad">(没说)</span>'); }
+      else if (gotWords[i] !== expWords[i] && levenshtein(expWords[i], gotWords[i]) > 1) {
+        // Find phonetic hint
+        var hint = '';
+        if (currentScene.pho) {
+          for (var j = 0; j < currentScene.pho.length; j++) {
+            if (currentScene.pho[j].w === expWords[i]) { hint = ' /'+currentScene.pho[j].p+'/'; break; }
+          }
+        }
+        issues.push('<b>'+escHtml(expWords[i])+'</b> → 读成 "<span class="bad">'+escHtml(gotWords[i])+'</span>"'+hint);
       }
-      issueHTML += '</div>';
     }
 
-    result.innerHTML =
-      '<div style="font-size:15px;margin-bottom:4px">'+emoji+' 练习得分: <span class="'+cc+'">'+score+'%</span> (置信度 '+Math.round(conf*100)+'%)</div>' +
-      '<div style="color:var(--sub);font-size:13px">你说: "'+esc(best||'(未识别)')+'"</div>' +
+    var sb = document.getElementById('scoreBadge');
+    var sd = document.getElementById('scoreDetail');
+    if (score >= 80) {
+      sb.className = 'score-badge good'; sb.textContent = '✅ '+score+'%';
+      sd.textContent = '发音不错！点击 → 发送回复';
+    } else if (score >= 50) {
+      sb.className = 'score-badge ok'; sb.textContent = '⚠️ '+score+'%';
+      sd.textContent = '还行，再练几次';
+    } else {
+      sb.className = 'score-badge bad'; sb.textContent = '❌ '+score+'%';
+      sd.textContent = '需要多练，点击单词听标准发音';
+    }
+
+    var issueHTML = issues.length > 0 ? '<br>⚠️ 需改进: '+issues.join(' · ') : '<br><span class="ok">✅ 所有单词识别正确</span>';
+    fb.innerHTML =
+      '<span class="'+(score>=80?'ok':score>=50?'warn':'bad')+'">你说: "'+escHtml(best||'(未识别)')+'" (置信度 '+Math.round(conf*100)+'%)</span>' +
       issueHTML +
-      '<div style="margin-top:8px">' +
-        '<button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的</button> ' +
-        '<button class="btn-sm" onclick="playTTS(null,\''+esc(scene.reply)+'\')">🔊 听标准</button> ' +
-        '<button class="btn-sm btn-practice" onclick="startPractice(\''+id+'\')">🔄 再练一次</button>' +
-      '</div>';
-
-    if (score >= 70) {
-      result.innerHTML += '<div style="margin-top:6px;color:var(--green)">✅ 练得不错！可以正式录音了 →</div>';
-    }
+      ' <button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的</button>' +
+      ' <button class="btn-sm" onclick="practiceReply()">🔄 再练</button>';
   }).catch(function(err) {
-    result.innerHTML = '<span class="bad">⚠️ '+err.message+'</span> · 请大声清晰朗读';
+    var fb = document.getElementById('feedbackBar');
+    fb.innerHTML = '<span class="bad">⚠️ 识别失败: '+err.message+'</span> · 请大声清晰朗读';
+    fb.classList.add('show');
+    document.getElementById('scoreBadge').className = 'score-badge bad';
+    document.getElementById('scoreBadge').textContent = '❌';
+    document.getElementById('scoreDetail').textContent = '未识别到语音';
   });
 }
 
-function findWord(list, w) {
-  for (var i = 0; i < list.length; i++) { if (list[i].w === w) return list[i]; }
-  return null;
+function levenshtein(a, b) {
+  if (!a || !b) return Math.max(a.length||0, b.length||0);
+  var m = [], i, j;
+  for (i = 0; i <= a.length; i++) { m[i] = [i]; }
+  for (j = 0; j <= b.length; j++) { m[0][j] = j; }
+  for (i = 1; i <= a.length; i++)
+    for (j = 1; j <= b.length; j++)
+      m[i][j] = a[i-1] === b[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j], m[i][j-1], m[i-1][j-1]) + 1;
+  return m[a.length][b.length];
 }
-
-// ── Record (real reply) ────────────────────────────────────────────
-function startRecord(sceneId) {
-  if (!audioStream) { alert('麦克风不可用'); return; }
-  if (isRecording) return;
-  isRecording = true; audioChunks = [];
-
-  var btn = document.getElementById('recordBtn-'+sceneId);
-  if (btn) { btn.textContent = '⏹ 停止录音'; btn.classList.add('recording'); }
-  showHint('🔴 录音中... 说完后点「停止」');
-
-  mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
-  mediaRecorder.ondataavailable = function(e) { audioChunks.push(e.data); };
-  mediaRecorder.onstop = function() { processRecord(sceneId); };
-  mediaRecorder.start();
-  setTimeout(function() { if (isRecording && mediaRecorder.state === 'recording') stopRecord(sceneId); }, 8000);
-}
-
-function stopRecord(sceneId) {
-  if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
-  isRecording = false; mediaRecorder.stop();
-  var btn = document.getElementById('recordBtn-'+sceneId);
-  if (btn) { btn.textContent = '🎤 录音回复'; btn.classList.remove('recording'); }
-  hideHint();
-}
-
-function processRecord(sceneId) {
-  var blob = new Blob(audioChunks, { type: 'audio/webm' });
-  var url = URL.createObjectURL(blob);
-  window._lastRec = url;
-  var fb = document.getElementById('feedback-'+sceneId);
-  if (!fb) return;
-  fb.innerHTML = '🔍 正在分析...'; fb.classList.add('show');
-
-  doSpeech().then(function(alts) {
-    var best = alts[0] ? alts[0].text : '(未识别)';
-    var conf = alts[0] ? alts[0].confidence : 0;
-    addMyMsg(best || '(你说的话)');
-    var words = best.split(/\s+/).length;
-    var cc = conf > 0.7 ? 'ok' : conf > 0.4 ? 'warn' : 'bad';
-    fb.innerHTML = '<span class="'+cc+'">识别: "'+esc(best)+'" (置信度 '+Math.round(conf*100)+'%)</span><br>' +
-      '🎯 词汇: '+words+' 词 · ' +
-      (conf < 0.5 ? '<span class="warn">发音可能不太清晰</span>' : '<span class="ok">发音清晰度 OK</span>') +
-      '<br><button class="btn-sm" onclick="playLast()" style="margin-top:4px">🔁 听我的</button>' +
-      '<button class="btn-sm" onclick="startRecord(\''+sceneId+'\')" style="margin-top:4px">🎤 重录</button>';
-    var el = document.getElementById('scene-'+sceneId);
-    if (el) el.classList.add('done');
-  }).catch(function(err) {
-    fb.innerHTML = '<span class="bad">⚠️ '+err.message+'</span><br>请大声清晰朗读。';
-    addMyMsg('... (语音未识别)');
-  });
-  document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
-}
-
-function playLast() { if (window._lastRec) new Audio(window._lastRec).play(); }
 
 // ── Speech Recognition ─────────────────────────────────────────────
 function doSpeech() {
@@ -578,20 +680,36 @@ function doSpeech() {
   });
 }
 
-// ── Text input ─────────────────────────────────────────────────────
+// ── Send text ──────────────────────────────────────────────────────
 function sendText() {
   var input = document.getElementById('textInput');
   var text = input.value.trim();
   if (!text) return;
-  addMyMsg(text); input.value = '';
+  addMyMsg(text);
+  input.value = '';
+
+  // Mark scene done
+  if (currentScene) {
+    var el = document.getElementById('scene-'+currentScene.id);
+    if (el) el.classList.add('done');
+  }
+
+  // Clear feedback
+  document.getElementById('feedbackBar').classList.remove('show');
+  document.getElementById('scoreBadge').className = 'score-badge none';
+  document.getElementById('scoreBadge').textContent = '—';
+  document.getElementById('scoreDetail').textContent = '';
+
   document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
 }
+
 document.getElementById('textInput').addEventListener('input', function() {
   document.getElementById('sendBtn').disabled = !this.value.trim();
 });
 
 // ── Helpers ────────────────────────────────────────────────────────
-function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\\/g,'\\\\'); }
 function showHint(m) { var b = document.getElementById('hintBar'); b.textContent = m; b.classList.add('show'); }
 function hideHint() { document.getElementById('hintBar').classList.remove('show'); }
 </script>
