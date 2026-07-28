@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>念张师 音高分析</title>
+<style>
+  body { background:#0f0f1a; color:#e0e0e0; font-family:monospace; padding:20px; }
+  h1 { font-size:18px; color:#4a9eff; }
+  .note { display:inline-block; padding:4px 8px; margin:2px; border-radius:4px; background:rgba(74,158,255,.15); font-size:14px; }
+  .section { margin:10px 0; color:#888; font-size:12px; }
+  button { padding:10px 20px; border-radius:8px; border:none; background:#4a9eff; color:#fff; cursor:pointer; font-size:14px; margin:4px; }
+  button:disabled { opacity:.4; }
+  #output { margin-top:16px; line-height:1.8; }
+  .freq { color:#2ecc71; }
+  .midi { color:#f39c12; }
+  .key { color:#4a9eff; font-size:18px; font-weight:bold; }
+  #status { margin:10px 0; color:#888; }
+</style></head><body>
+
+<h1>🎵 念张师 音高自动检测</h1>
+<p id="status">加载 MP3 中...</p>
+<div>
+  <button id="btnPlay" onclick="startAnalysis()" disabled>▶ 播放并分析</button>
+  <button onclick="copyKeys()">📋 复制按键序列</button>
+</div>
+<div id="output"></div>
+
+<script>
+var audioCtx = null;
+var allKeys = [];
+var noteNames = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+async function startAnalysis() {
+  document.getElementById('btnPlay').disabled = true;
+  document.getElementById('status').textContent = '分析中...点击页面任意位置开始（浏览器要求用户交互后才能播放音频）';
+  
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  // Load MP3
+  var resp = await fetch('NianZhangShi.mp3');
+  var buffer = await resp.arrayBuffer();
+  var audioData = await audioCtx.decodeAudioData(buffer);
+  
+  document.getElementById('status').textContent = 'MP3 已加载 · 正在捕捉音高...';
+  
+  // Create offline context for analysis
+  var offlineCtx = new OfflineAudioContext(1, audioData.length, audioData.sampleRate);
+  var source = offlineCtx.createBufferSource();
+  source.buffer = audioData;
+  
+  // Analyser
+  var analyser = offlineCtx.createAnalyser();
+  analyser.fftSize = 8192;
+  analyser.smoothingTimeConstant = 0;
+  source.connect(analyser);
+  analyser.connect(offlineCtx.destination);
+  source.start(0);
+  
+  // Process in chunks
+  var rendered = await offlineCtx.startRendering();
+  var sampleRate = audioData.sampleRate;
+  var fftSize = 8192;
+  var totalSamples = rendered.length;
+  var chunkSize = Math.floor(sampleRate * 0.05); // 50ms chunks
+  var hopSize = Math.floor(chunkSize / 2);
+  
+  var keys = [];
+  var lastKey = -1;
+  
+  for (var offset = 0; offset + chunkSize < totalSamples; offset += hopSize) {
+    var chunk = rendered.getChannelData(0).slice(offset, offset + chunkSize);
+    
+    // Check if there's significant audio
+    var rms = 0;
+    for (var i = 0; i < chunk.length; i++) rms += chunk[i] * chunk[i];
+    rms = Math.sqrt(rms / chunk.length);
+    if (rms < 0.01) { lastKey = -1; continue; }
+    
+    // Simple zero-crossing for rough frequency
+    var crossings = 0;
+    for (var i = 1; i < chunk.length; i++) {
+      if (chunk[i-1] >= 0 && chunk[i] < 0) crossings++;
+      else if (chunk[i-1] < 0 && chunk[i] >= 0) crossings++;
+    }
+    var freq = (crossings / 2) / (chunk.length / sampleRate);
+    
+    if (freq > 150 && freq < 800) {
+      var midi = Math.round(12 * Math.log2(freq / 440) + 69);
+      if (midi >= 60 && midi <= 90 && midi !== lastKey) {
+        keys.push(midi);
+        lastKey = midi;
+      }
+    }
+  }
+  
+  // Deduplicate rapid repeats
+  var cleanKeys = [];
+  for (var i = 0; i < keys.length; i++) {
+    if (i === 0 || keys[i] !== keys[i-1]) {
+      cleanKeys.push(keys[i]);
+    }
+  }
+  
+  // Map to 0-9: identify key and transpose
+  // Find key by looking at most common notes
+  var midiToKey = {};
+  for (var i = 0; i < cleanKeys.length; i++) {
+    var m = cleanKeys[i];
+    // Map to 0-9 based on scale position
+    // Try F major: F=0, G=1, A=2, Bb=3, C=4, D=5, E=6
+    var note = m % 12;
+    var oct = Math.floor(m / 12);
+    var fMap = {5:0, 7:1, 9:2, 10:3, 0:4, 2:5, 4:6};
+    var deg = fMap[note];
+    if (deg !== undefined) {
+      var k = deg + (m - 65) * 3 / 7;
+      k = Math.round(Math.max(0, Math.min(9, k)));
+      allKeys.push(k);
+    }
+  }
+  
+  // Display
+  var out = document.getElementById('output');
+  var html = '<div class="section">检测到 ' + cleanKeys.length + ' 个音</div>';
+  html += '<div>';
+  for (var i = 0; i < Math.min(cleanKeys.length, 60); i++) {
+    var m = cleanKeys[i];
+    html += '<span class="note"><span class="freq">' + noteNames[m%12] + (Math.floor(m/12)-1) + '</span> ';
+  }
+  html += '</div>';
+  html += '<div style="margin-top:14px"><b>按键序列（复制到 piano.html）：</b></div>';
+  html += '<div style="font-size:18px;word-break:break-all" id="keySeq">' + allKeys.join(' ') + '</div>';
+  out.innerHTML = html;
+  
+  document.getElementById('status').textContent = '✅ 完成！复制上面序列到钢琴页面试试';
+  document.getElementById('btnPlay').disabled = false;
+}
+
+function copyKeys() {
+  var seq = document.getElementById('keySeq');
+  if (seq) {
+    navigator.clipboard.writeText(seq.textContent);
+    alert('已复制！粘贴到 piano.html 输入框');
+  }
+}
+
+// Enable button after user interaction
+document.addEventListener('click', function() {
+  document.getElementById('btnPlay').disabled = false;
+}, {once: true});
+</script>
+</body></html>
