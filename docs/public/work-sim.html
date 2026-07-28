@@ -687,78 +687,48 @@ function analyzePractice() {
   window._pracRec = url;
 
   var fb = document.getElementById('feedbackBar');
-  fb.innerHTML = '🔍 AI 分析中...';
   fb.classList.add('show');
-  fb.style.background = '';
+  fb.style.background = 'rgba(74,158,255,.08)';
 
-  doSpeech().then(function(alts) {
-    var best = alts[0] ? alts[0].text.toLowerCase().replace(/[.,!?]/g, '') : '';
-    var conf = alts[0] ? alts[0].confidence : 0;
-    var expected = (currentScene.reply || '').toLowerCase().replace(/[.,!?]/g, '');
-    var expWords = expected.split(/\s+/);
-    var gotWords = best.split(/\s+/);
+  // Self-assessment: no Google API needed (blocked in China)
+  fb.innerHTML =
+    '<span style="color:var(--accent)">🎧 录音完成 — 对照标准发音自评</span><br>' +
+    '<button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()" style="margin-top:6px;font-weight:600">🔁 听我的录音</button> ' +
+    '<button class="btn-sm" onclick="playTTS(null,\''+escAttr(currentScene.reply)+'\')" style="margin-top:6px;font-weight:600">🔊 听标准发音</button> ' +
+    '<button class="btn-sm" onclick="practiceReply()" style="margin-top:6px">🔄 再录一次</button>' +
+    '<div style="margin-top:10px;font-size:13px;color:var(--sub)">👆 先听自己的录音，再听标准 — 对比后自己打分：</div>' +
+    '<div style="display:flex;gap:6px;margin-top:6px">' +
+      '<button class="btn-sm" onclick="selfScore(90)" style="background:rgba(46,204,113,.15);color:var(--green);border-color:var(--green)">✅ 很像 (90%)</button>' +
+      '<button class="btn-sm" onclick="selfScore(65)" style="background:rgba(243,156,18,.15);color:var(--yellow);border-color:var(--yellow)">⚠️ 还行 (65%)</button>' +
+      '<button class="btn-sm" onclick="selfScore(30)" style="background:rgba(231,76,60,.15);color:var(--red);border-color:var(--red)">❌ 差很多 (30%)</button>' +
+    '</div>';
 
-    var matchCount = 0;
-    for (var i = 0; i < Math.min(expWords.length, gotWords.length); i++) {
-      if (gotWords[i] === expWords[i]) matchCount++;
-    }
-    var score = expWords.length > 0 ? Math.round(matchCount / expWords.length * 100) : 0;
+  document.getElementById('scoreBadge').className = 'score-badge none';
+  document.getElementById('scoreBadge').textContent = '👂';
+  document.getElementById('scoreDetail').textContent = '自评中...';
+}
 
-    // Find mispronounced
-    var issues = [];
-    for (var i = 0; i < expWords.length; i++) {
-      if (i >= gotWords.length) { issues.push('<b>'+escHtml(expWords[i])+'</b> <span class="bad">(没说)</span>'); }
-      else if (gotWords[i] !== expWords[i] && levenshtein(expWords[i], gotWords[i]) > 1) {
-        var hint = '';
-        if (currentScene.pho) {
-          for (var j = 0; j < currentScene.pho.length; j++) {
-            if (currentScene.pho[j].w === expWords[i]) { hint = ' /'+currentScene.pho[j].p+'/'; break; }
-          }
-        }
-        issues.push('<b>'+escHtml(expWords[i])+'</b> → "<span class="bad">'+escHtml(gotWords[i])+'</span>"'+hint);
-      }
-    }
+function selfScore(score) {
+  var sb = document.getElementById('scoreBadge');
+  var sd = document.getElementById('scoreDetail');
+  var fb = document.getElementById('feedbackBar');
 
-    var sb = document.getElementById('scoreBadge');
-    var sd = document.getElementById('scoreDetail');
-    if (score >= 80) {
-      sb.className = 'score-badge good'; sb.textContent = '✅ '+score+'%';
-      sd.textContent = '发音不错！点击 → 发送';
-      fb.style.background = 'rgba(46,204,113,.1)';
-    } else if (score >= 50) {
-      sb.className = 'score-badge ok'; sb.textContent = '⚠️ '+score+'%';
-      sd.textContent = '还行，再练几次';
-      fb.style.background = 'rgba(243,156,18,.1)';
-    } else {
-      sb.className = 'score-badge bad'; sb.textContent = '❌ '+score+'%';
-      sd.textContent = '需要多练，点击单词听标准发音';
-      fb.style.background = 'rgba(231,76,60,.08)';
-    }
-
-    var spokenLine = best ? '你说: "<b>'+escHtml(best)+'</b>"' : '<span class="bad">未识别到语音</span>';
-    var confLine = best ? ' (置信度 '+Math.round(conf*100)+'%)' : '';
-    var issueHTML = issues.length > 0 ? '<br>⚠️ 需改进: '+issues.join(' · ') : (best ? '<br><span class="ok">✅ 所有单词识别正确</span>' : '');
-
-    fb.innerHTML =
-      '<span class="'+(score>=80?'ok':score>=50?'warn':'bad')+'">'+spokenLine+confLine+'</span>' +
-      issueHTML +
-      ' <button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的录音</button>' +
-      ' <button class="btn-sm" onclick="playTTS(null,\''+escAttr(currentScene.reply)+'\')">🔊 听标准</button>' +
-      ' <button class="btn-sm" onclick="practiceReply()">🔄 再练</button>' +
-      (best ? '' : '<br><span style="font-size:12px;color:var(--sub)">💡 提示：请离麦克风近一些，用正常语速朗读，中间不要停顿太久</span>');
-  }).catch(function(err) {
-    var fb = document.getElementById('feedbackBar');
-    fb.innerHTML =
-      '<span class="bad">⚠️ 识别失败: '+err.message+'</span>' +
-      ' <button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的录音</button>' +
-      ' <button class="btn-sm" onclick="practiceReply()">🔄 再练</button>' +
-      '<br><span style="font-size:12px;color:var(--sub)">💡 可能原因：① 网络不通（语音识别需要联网）② 背景噪音大 ③ 语速太快</span>';
-    fb.classList.add('show');
+  if (score >= 80) {
+    sb.className = 'score-badge good'; sb.textContent = '✅ '+score+'%';
+    sd.textContent = '很好！点 → 发送';
+    fb.style.background = 'rgba(46,204,113,.1)';
+    fb.innerHTML = '<span class="ok">✅ 自评 '+score+'% — 发音不错！可以正式回复了</span>';
+  } else if (score >= 50) {
+    sb.className = 'score-badge ok'; sb.textContent = '⚠️ '+score+'%';
+    sd.textContent = '再练练';
+    fb.style.background = 'rgba(243,156,18,.1)';
+    fb.innerHTML = '<span class="warn">⚠️ 自评 '+score+'% — 建议再练一次，重点听单词发音</span>';
+  } else {
+    sb.className = 'score-badge bad'; sb.textContent = '❌ '+score+'%';
+    sd.textContent = '多练';
     fb.style.background = 'rgba(231,76,60,.08)';
-    document.getElementById('scoreBadge').className = 'score-badge bad';
-    document.getElementById('scoreBadge').textContent = '❌';
-    document.getElementById('scoreDetail').textContent = err.message;
-  });
+    fb.innerHTML = '<span class="bad">❌ 自评 '+score+'% — 先逐个单词跟读，点下面单词标签听单个发音</span>';
+  }
 }
 
 function levenshtein(a, b) {
@@ -770,24 +740,6 @@ function levenshtein(a, b) {
     for (j = 1; j <= b.length; j++)
       m[i][j] = a[i-1] === b[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j], m[i][j-1], m[i-1][j-1]) + 1;
   return m[a.length][b.length];
-}
-
-// ── Speech Recognition ─────────────────────────────────────────────
-function doSpeech() {
-  return new Promise(function(resolve, reject) {
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { reject(new Error('请用 Chrome 或 Edge')); return; }
-    var r = new SR(); r.lang = 'en-US'; r.maxAlternatives = 3;
-    r.onresult = function(e) {
-      var alts = [];
-      for (var i = 0; i < e.results[0].length; i++)
-        alts.push({ text: e.results[0][i].transcript.trim(), confidence: e.results[0][i].confidence });
-      resolve(alts);
-    };
-    r.onerror = function(e) { reject(new Error(e.error)); };
-    r.onnomatch = function() { reject(new Error('未识别到语音')); };
-    r.start();
-  });
 }
 
 // ── Send text ──────────────────────────────────────────────────────
