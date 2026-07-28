@@ -401,7 +401,16 @@ async function startSim() {
     document.getElementById('micStatus').className = 'mic-status on';
     document.getElementById('micStatus').innerHTML = '<span class="mic-dot"></span> 麦克风已就绪';
   } catch (err) {
-    alert('麦克风权限被拒绝。录音功能不可用，但可以打字参与对话。');
+    // file:// protocol blocks getUserMedia in Chrome
+    const isFileProtocol = window.location.protocol === 'file:';
+    const msg = isFileProtocol
+      ? '⚠️ file:// 协议不支持麦克风。请用 http://localhost:8080/work-sim.html 打开，录音功能需要 HTTP。\n\n你也可以只打字参与对话（录音按钮不可用）。'
+      : '麦克风权限被拒绝: ' + err.message + '\n\n你可以只打字参与对话。';
+    alert(msg);
+    document.getElementById('micStatus').className = 'mic-status off';
+    document.getElementById('micStatus').innerHTML = '<span class="mic-dot"></span> 麦克风不可用（仅文字模式）';
+    // Hide record buttons
+    document.querySelectorAll('[id^="recordBtn-"]').forEach(b => b.style.display = 'none');
   }
 
   document.getElementById('setupOverlay').style.display = 'none';
