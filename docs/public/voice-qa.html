@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Q&A · 语音问答</title>
+<style>
+  :root {
+    --bg: #0f0f1a; --card: #1a1a2e; --accent: #4a9eff;
+    --green: #2ecc71; --red: #e74c3c; --yellow: #f39c12;
+    --text: #e0e0e0; --sub: #888; --border: #2a2a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 20px;
+  }
+  .container { width: 100%; max-width: 700px; }
+
+  header { text-align: center; padding: 30px 0 20px; }
+  header h1 { font-size: 24px; color: #fff; margin-bottom: 6px; }
+  header p { font-size: 14px; color: var(--sub); }
+
+  /* Voice button */
+  .voice-area { text-align: center; padding: 30px 0; }
+  .btn-voice {
+    width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent);
+    background: rgba(74,158,255,.1); color: #fff; font-size: 40px;
+    cursor: pointer; transition: all .2s;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .btn-voice:hover { background: rgba(74,158,255,.2); transform: scale(1.05); }
+  .btn-voice.listening {
+    border-color: var(--red); background: rgba(231,76,60,.2);
+    animation: pulse 1.2s infinite;
+  }
+  .btn-voice.thinking {
+    border-color: var(--yellow); background: rgba(243,156,18,.15);
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,.4); }
+    50% { box-shadow: 0 0 0 20px rgba(231,76,60,0); }
+  }
+  .voice-status { margin-top: 14px; font-size: 14px; color: var(--sub); min-height: 20px; }
+
+  /* Chat messages */
+  .chat-area {
+    display: flex; flex-direction: column; gap: 14px; padding: 10px 0;
+  }
+  .msg {
+    padding: 16px 20px; border-radius: 14px; max-width: 90%; animation: fadeUp .3s;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } }
+  .msg.q {
+    align-self: flex-end; background: rgba(74,158,255,.15);
+    border: 1px solid rgba(74,158,255,.3); border-bottom-right-radius: 4px;
+  }
+  .msg.a {
+    align-self: flex-start; background: var(--card);
+    border: 1px solid var(--border); border-bottom-left-radius: 4px;
+  }
+  .msg .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .msg.q .label { color: var(--accent); }
+  .msg.a .label { color: var(--green); }
+  .msg .content { font-size: 15px; line-height: 1.7; }
+  .msg.a .content { white-space: pre-wrap; }
+  .msg .actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-sm {
+    padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: rgba(0,0,0,.2); color: var(--text); font-size: 12px;
+    cursor: pointer; transition: .15s;
+  }
+  .btn-sm:hover { border-color: var(--accent); }
+
+  /* Settings */
+  .settings {
+    margin-top: 30px; padding: 16px; border-radius: 12px;
+    background: var(--card); border: 1px solid var(--border);
+    font-size: 13px; color: var(--sub); line-height: 1.8;
+    display: none;
+  }
+  .settings.show { display: block; }
+  .settings input {
+    width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: rgba(0,0,0,.3); color: var(--text); font-size: 13px; margin: 6px 0;
+  }
+  .settings summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🎙️ Voice Q&A</h1>
+  <p>说出问题 → AI 生成英文回答 → 跟读练习</p>
+</header>
+
+<div class="voice-area">
+  <button class="btn-voice" id="btnVoice" onclick="toggleVoice()">🎤</button>
+  <div class="voice-status" id="voiceStatus">点击麦克风开始提问</div>
+</div>
+
+<div class="chat-area" id="chatArea">
+  <div style="text-align:center;color:var(--sub);padding:20px;font-size:14px;line-height:1.8">
+    💡 试试说：<br>
+    "How do I explain my robot cloud platform in an interview?"<br>
+    "What is the best way to describe my 10 years of experience?"<br>
+    "Give me an example of a standup update for an AI engineer"
+  </div>
+</div>
+
+<details class="settings" id="settingsPanel">
+  <summary>⚙️ API 设置</summary>
+  <label>DeepSeek API Key</label>
+  <input type="password" id="apiKey" placeholder="sk-...">
+  <label>API URL</label>
+  <input type="text" id="apiUrl" value="https://api.deepseek.com/v1/chat/completions">
+  <div style="margin-top:8px;font-size:12px">
+    支持 DeepSeek / OpenAI 兼容 API。Key 只存在浏览器本地。
+  </div>
+</details>
+
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────
+var audioStream = null;
+var isActive = false;
+var conversation = [];
+
+// Load saved API key
+var savedKey = localStorage.getItem('voiceqa_apikey') || '';
+var savedUrl = localStorage.getItem('voiceqa_apiurl') || 'https://api.deepseek.com/v1/chat/completions';
+document.getElementById('apiKey').value = savedKey;
+document.getElementById('apiUrl').value = savedUrl;
+
+document.getElementById('apiKey').addEventListener('change', function() {
+  localStorage.setItem('voiceqa_apikey', this.value);
+});
+document.getElementById('apiUrl').addEventListener('change', function() {
+  localStorage.setItem('voiceqa_apiurl', this.value);
+});
+
+// ── TTS ────────────────────────────────────────────────────────────
+function speakText(text) {
+  speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US'; utter.rate = 0.9; utter.volume = 1;
+  var voices = speechSynthesis.getVoices();
+  var best = ['Samantha','Alex','Daniel','Karen'];
+  for (var j = 0; j < best.length; j++)
+    for (var i = 0; i < voices.length; i++)
+      if (voices[i].lang === 'en-US' && voices[i].name.indexOf(best[j]) !== -1)
+        { utter.voice = voices[i]; break; }
+  speechSynthesis.speak(utter);
+  var rid = setInterval(function() { if (speechSynthesis.speaking) { speechSynthesis.pause(); speechSynthesis.resume(); } else clearInterval(rid); }, 4000);
+  setTimeout(function(){ clearInterval(rid); }, 60000);
+}
+
+// ── Voice ──────────────────────────────────────────────────────────
+async function toggleVoice() {
+  if (isActive) return;
+
+  var btn = document.getElementById('btnVoice');
+  var status = document.getElementById('voiceStatus');
+
+  // Get mic
+  if (!audioStream) {
+    try {
+      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch(e) {
+      status.textContent = '❌ 麦克风不可用: ' + e.message;
+      return;
+    }
+  }
+
+  isActive = true;
+  btn.classList.add('listening');
+  status.textContent = '🔴 正在听... 说出你的问题';
+  status.style.color = 'var(--red)';
+
+  // Speech recognition
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    status.textContent = '❌ 浏览器不支持语音识别，请用 Chrome';
+    isActive = false; btn.classList.remove('listening'); return;
+  }
+
+  var rec = new SR();
+  rec.lang = 'en-US'; rec.interimResults = true; rec.maxAlternatives = 1;
+
+  var finalText = '';
+
+  rec.onresult = function(e) {
+    var t = '';
+    for (var i = e.resultIndex; i < e.results.length; i++) {
+      t += e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalText += e.results[i][0].transcript + ' ';
+    }
+    status.textContent = '🔴 ' + (t || '...');
+  };
+
+  rec.onerror = function(e) {
+    if (e.error === 'no-speech') {
+      status.textContent = '⚠️ 没听到声音，请大声说';
+      status.style.color = 'var(--yellow)';
+    } else if (e.error === 'aborted') {
+      // Normal — we stopped it
+    } else {
+      status.textContent = '❌ ' + e.error;
+      status.style.color = 'var(--red)';
+    }
+    isActive = false;
+    btn.classList.remove('listening');
+  };
+
+  rec.onend = function() {
+    isActive = false;
+    btn.classList.remove('listening');
+    status.style.color = '';
+
+    var q = finalText.trim();
+    if (!q) {
+      status.textContent = '没识别到问题，再试一次';
+      return;
+    }
+
+    // Show question
+    addMessage('q', q);
+    status.textContent = '🤔 AI 思考中...';
+    btn.classList.add('thinking');
+
+    askAI(q).then(function(answer) {
+      addMessage('a', answer);
+      status.textContent = '✅ 已回答 · 点击 🎤 继续提问';
+      btn.classList.remove('thinking');
+      // Auto-speak answer
+      speakText(answer);
+    }).catch(function(err) {
+      status.textContent = '❌ ' + err.message;
+      btn.classList.remove('thinking');
+    });
+  };
+
+  rec.start();
+
+  // Auto-stop after 8s silence
+  setTimeout(function() {
+    if (isActive) { rec.stop(); }
+  }, 8000);
+}
+
+function addMessage(type, text) {
+  var chat = document.getElementById('chatArea');
+  var div = document.createElement('div');
+  div.className = 'msg ' + type;
+  div.innerHTML =
+    '<div class="label">' + (type === 'q' ? '🗣️ YOU ASKED' : '🤖 AI ANSWER') + '</div>' +
+    '<div class="content">' + escHtml(text) + '</div>' +
+    (type === 'a' ?
+      '<div class="actions">' +
+        '<button class="btn-sm" onclick="speakText(\''+escAttr(text)+'\')">🔊 朗读</button>' +
+      '</div>' : '');
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  conversation.push({ role: type === 'q' ? 'user' : 'assistant', content: text });
+}
+
+// ── AI ─────────────────────────────────────────────────────────────
+async function askAI(question) {
+  var apiKey = document.getElementById('apiKey').value.trim();
+  var apiUrl = document.getElementById('apiUrl').value.trim();
+
+  if (!apiKey) {
+    document.getElementById('settingsPanel').classList.add('show');
+    throw new Error('请先设置 DeepSeek API Key（点 ⚙️ API 设置）');
+  }
+
+  // Build context from conversation + system prompt
+  var systemPrompt = 'You are an English speaking practice partner for a Chinese software engineer named Patrick (孙家奇).\n\n' +
+    'Patrick\'s background:\n' +
+    '- AI Full-Stack Engineer, 10 years experience\n' +
+    '- Skills: Go, React, Python, LLM/RAG, K8s, Docker, Gin, Kitex, Kratos, gRPC, Redis, MySQL\n' +
+    '- Currently at a robotics AI company building robot cloud platform with Go+React\n' +
+    '- Previous: TAL Education (Go microservices), Shansong (frontend)\n' +
+    '- Built GPU monitoring dashboards, Feishu bot integrations, multi-cloud management\n' +
+    '- Self-taught AI: learned from 3Blue1Brown, papers, built personal knowledge base\n' +
+    '- Job hunting / career: targeting AI infrastructure roles, interested in distributed systems and model serving\n\n' +
+    'Rules:\n' +
+    '- Answer in ENGLISH only, natural conversational tone\n' +
+    '- Keep answers under 150 words\n' +
+    '- If Patrick asks for interview practice, give model answers he can use\n' +
+    '- If he asks to explain something, explain clearly with examples\n' +
+    '- If he asks for daily work English, give realistic phrases\n' +
+    '- Use contractions (I\'m, you\'re, it\'s) to sound natural';
+
+  var messages = [{ role: 'system', content: systemPrompt }];
+  // Add last few exchanges for context
+  for (var i = Math.max(0, conversation.length - 6); i < conversation.length; i++) {
+    messages.push(conversation[i]);
+  }
+  messages.push({ role: 'user', content: question });
+
+  var resp = await fetch(apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+    body: JSON.stringify({ model: 'deepseek-chat', messages: messages, max_tokens: 400, temperature: 0.7 })
+  });
+
+  var data = await resp.json();
+  if (!resp.ok) throw new Error(data.error?.message || 'API error ' + resp.status);
+  return data.choices[0].message.content;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+// Preload voices
+speechSynthesis.getVoices();
+speechSynthesis.onvoiceschanged = function() { speechSynthesis.getVoices(); };
+</script>
+</body>
+</html>
