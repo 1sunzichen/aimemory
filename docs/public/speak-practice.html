@@ -71,6 +71,7 @@
     background: rgba(74,158,255,.15); color: var(--accent);
   }
   .btn-ref:hover { background: rgba(74,158,255,.25); }
+  .btn-ref.playing { background: rgba(46,204,113,.2); color: #2ecc71; }
   .btn-record {
     background: var(--red); color: #fff; font-size: 16px; padding: 12px 28px;
     border-radius: 50px;
@@ -126,15 +127,6 @@
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 20px; font-size: 14px; color: var(--sub);
   }
-
-  .volume-meter {
-    height: 3px; background: var(--border); border-radius: 2px;
-    width: 100px; overflow: hidden; display: inline-block; vertical-align: middle;
-  }
-  .volume-fill {
-    height: 100%; background: var(--red); border-radius: 2px;
-    transition: width .1s; width: 0%;
-  }
 </style>
 </head>
 <body>
@@ -142,7 +134,7 @@
 
 <header>
   <h1>🗣️ Chapter 1 · 发音基础纠正</h1>
-  <p>先听示范 → 自己录音 → AI 对比纠错</p>
+  <p>先听示范（MP3）→ 自己录音 → AI 逐词对比纠错</p>
   <div class="focus-badges">
     <span class="badge">θ/s 区分</span>
     <span class="badge">v/w 区分</span>
@@ -168,75 +160,75 @@ const sentences = [
   {
     id: 1, text: "I think this is the best thing.",
     focus: "θ 音 (think/thing) — 舌尖轻触上齿，不要发成 s",
-    tips: ["'think' 的 th 舌尖要碰到上牙", "'thing' 结尾的 ng 要发出来不要吞"],
+    tips: ["'think' 的 th 舌尖要碰到上牙","'thing' 结尾的 ng 要发出来不要吞"],
     keywords: ["think","thing","this"]
   },
   {
     id: 2, text: "She sells seashells by the seashore.",
     focus: "s / ʃ 区分 — sells(sh) vs seashells(s)",
-    tips: ["'she' 和 'seashells' 的 sh 要嘟嘴", "'sells' 的 s 是清辅音，声带不震"],
+    tips: ["'she' 和 'seashells' 的 sh 要嘟嘴","'sells' 的 s 是清辅音，声带不震"],
     keywords: ["she","sells","seashells","seashore"]
   },
   {
     id: 3, text: "Very well, I will visit the village.",
     focus: "v / w 区分 — very vs well, visit vs village",
-    tips: ["'very' 的 v 上牙咬下唇", "'well' 的 w 双唇收圆但不咬"],
+    tips: ["'very' 的 v 上牙咬下唇","'well' 的 w 双唇收圆但不咬"],
     keywords: ["very","well","visit","village"]
   },
   {
     id: 4, text: "The cat sat on the mat with a hat.",
     focus: "æ 音 (cat/sat/mat/hat) — 嘴巴张大，像「哎」但更开",
-    tips: ["æ 嘴巴要比 e 大", "四个 æ 单词节奏要均匀"],
+    tips: ["æ 嘴巴要比 e 大","四个 æ 单词节奏要均匀"],
     keywords: ["cat","sat","mat","hat"]
   },
   {
     id: 5, text: "I have lived here for five years.",
     focus: "尾音不吞 — lived(d), years(s) 都要发出来",
-    tips: ["'lived' 结尾的 d 舌尖点一下上颚", "'years' 的 s 是浊辅音/z/"],
+    tips: ["'lived' 结尾的 d 舌尖点一下上颚","'years' 的 s 是浊辅音/z/"],
     keywords: ["have","lived","five","years"]
   },
   {
     id: 6, text: "They went there together.",
     focus: "ð 音 (they/there/together) — 和 θ 一样舌位，但声带要震",
-    tips: ["ð 是浊音，摸喉咙要有震动", "'together' 的 to-ge-ther 三个音节"],
+    tips: ["ð 是浊音，摸喉咙要有震动","'together' 的 to-ge-ther 三个音节"],
     keywords: ["they","there","together"]
   },
   {
     id: 7, text: "Peter Piper picked a peck of pickled peppers.",
     focus: "p 爆破音 + 节奏感 — 每个 p 都要有气流冲出",
-    tips: ["p 是送气音，手掌放嘴前能感到气流", "保持句子节奏像 rap"],
+    tips: ["p 是送气音，手掌放嘴前能感到气流","保持句子节奏像 rap"],
     keywords: ["peter","piper","picked","peck","pickled","peppers"]
   },
   {
     id: 8, text: "Red lorry, yellow lorry.",
     focus: "r / l 区分 — 中国学习者最大难点之一",
-    tips: ["r: 舌尖卷起不碰任何地方", "l: 舌尖顶上颚", "反复切换 r→l→r→l"],
+    tips: ["r: 舌尖卷起不碰任何地方","l: 舌尖顶上颚","反复切换 r→l→r→l"],
     keywords: ["red","lorry","yellow"]
   },
   {
     id: 9, text: "I'd like a bottle of water.",
     focus: "英式腔调 — bottle 的 t 是喉塞音(ʔ), water 的 t 是闪音",
-    tips: ["英式：bo'l (t 几乎消失)", "'water' 的 t → 轻弹 d 音"],
+    tips: ["英式：bo'l (t 几乎消失)","'water' 的 t → 轻弹 d 音"],
     keywords: ["bottle","water"]
   },
   {
     id: 10, text: "How much wood would a woodchuck chuck?",
     focus: "w / oo / u 音 — wood, would, woodchuck, chuck",
-    tips: ["'wood' 的 oo 是短元音/ʊ/，不是「乌」", "'would' 和 'wood' 发音一样", "整句节奏：哒-哒 哒 哒-哒 哒 哒-哒 哒"],
+    tips: ["'wood' 的 oo 是短元音/ʊ/，不是「乌」","'would' 和 'wood' 发音一样"],
     keywords: ["wood","would","woodchuck","chuck"]
   }
 ];
 
 // ── State ──────────────────────────────────────────────────────────
-let results = {}; // { id: { transcribed, score } }
+let results = {};
 let mediaRecorder = null;
 let audioChunks = [];
 let currentSentenceId = null;
-let audioContext = null;
 let analyser = null;
+let audioContext = null;
 let recordingTimer = null;
 
-// ── Init ───────────────────────────────────────────────────────────
+// ── Render ─────────────────────────────────────────────────────────
 function renderAll() {
   const el = document.getElementById('sentences');
   el.innerHTML = sentences.map(s => `
@@ -245,8 +237,9 @@ function renderAll() {
       <div class="sentence-text">${s.text}</div>
       <div class="sentence-hint">🎯 ${s.focus} <span>(${s.tips[0]})</span></div>
       <div class="ref-row">
-        <button class="btn btn-ref" onclick="playRef(${s.id})">🔊 听示范</button>
-        <span style="font-size:13px;color:var(--sub)">先听再录</span>
+        <audio id="ref-audio-${s.id}" preload="auto"></audio>
+        <button class="btn btn-ref" id="ref-btn-${s.id}" onclick="playRef(${s.id})">🔊 听示范</button>
+        <span style="font-size:12px;color:var(--sub)">Google TTS · MP3</span>
       </div>
       <div class="actions">
         <button class="btn btn-record" id="btn-${s.id}" onclick="toggleRecord(${s.id})">🎤 录音</button>
@@ -256,6 +249,14 @@ function renderAll() {
       <div class="result-box" id="result-${s.id}"></div>
     </div>
   `).join('');
+
+  // Preload all reference audios
+  sentences.forEach(s => {
+    const audio = document.getElementById(`ref-audio-${s.id}`);
+    const url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=' + encodeURIComponent(s.text);
+    audio.src = url;
+  });
+
   updateProgress();
 }
 
@@ -265,75 +266,30 @@ function updateProgress() {
   document.getElementById('progressFill').style.width = `${(done/sentences.length)*100}%`;
 }
 
-// ── TTS (Reference) ────────────────────────────────────────────────
-let _voicesReady = false;
-let _englishVoices = [];
-
-// Preload voices — Chrome loads them async
-function loadVoices() {
-  const voices = speechSynthesis.getVoices();
-  if (voices.length > 0) {
-    _englishVoices = voices.filter(v => v.lang.startsWith('en'));
-    _voicesReady = true;
-  }
-}
-loadVoices();
-speechSynthesis.onvoiceschanged = () => {
-  loadVoices();
-};
-
+// ── TTS: Google Translate MP3 (reliable, no browser TTS needed) ──
 function playRef(id) {
-  const s = sentences.find(x => x.id === id);
-  if (!s) return;
+  const audio = document.getElementById(`ref-audio-${id}`);
+  const btn = document.getElementById(`ref-btn-${id}`);
+  if (!audio) return;
 
-  // Cancel any ongoing speech
-  speechSynthesis.cancel();
+  // Stop all other playback
+  document.querySelectorAll('audio').forEach(a => { if (a !== audio) { a.pause(); a.currentTime = 0; } });
+  document.querySelectorAll('.btn-ref.playing').forEach(b => b.classList.remove('playing'));
 
-  const utter = new SpeechSynthesisUtterance(s.text);
-  utter.lang = 'en-US';
-  utter.rate = 0.85;
-  utter.volume = 1;
-
-  // Pick best available English voice
-  if (_englishVoices.length === 0) loadVoices();
-
-  const pref = _englishVoices.find(v => v.name.includes('Google')) ||
-               _englishVoices.find(v => v.name.includes('Samantha')) ||
-               _englishVoices.find(v => v.name.includes('Daniel')) ||
-               _englishVoices.find(v => v.lang === 'en-US') ||
-               _englishVoices[0];
-
-  if (pref) utter.voice = pref;
-
-  // Visual feedback
-  const btn = document.querySelector(`#card-${id} .btn-ref`);
-  if (btn) {
+  audio.currentTime = 0;
+  audio.play().then(() => {
+    btn.classList.add('playing');
     btn.textContent = '🔊 播放中...';
-    btn.style.background = 'rgba(46,204,113,.2)';
-    btn.style.color = '#2ecc71';
-  }
+  }).catch(err => {
+    btn.textContent = '⚠️ 加载失败，重试';
+    btn.style.color = 'var(--red)';
+    setTimeout(() => { btn.textContent = '🔊 听示范'; btn.style.color = 'var(--accent)'; }, 2000);
+  });
 
-  utter.onend = utter.onerror = () => {
-    if (btn) {
-      btn.textContent = '🔊 听示范';
-      btn.style.background = 'rgba(74,158,255,.15)';
-      btn.style.color = 'var(--accent)';
-    }
+  audio.onended = audio.onerror = () => {
+    btn.classList.remove('playing');
+    btn.textContent = '🔊 听示范';
   };
-
-  // Force speak with a small delay to ensure context
-  setTimeout(() => speechSynthesis.speak(utter), 50);
-
-  // Chrome bug workaround: if speech stops after ~15s, restart
-  const resumeTimer = setInterval(() => {
-    if (speechSynthesis.speaking) {
-      speechSynthesis.pause();
-      speechSynthesis.resume();
-    } else {
-      clearInterval(resumeTimer);
-    }
-  }, 5000);
-  setTimeout(() => clearInterval(resumeTimer), 30000);
 }
 
 // ── Record ─────────────────────────────────────────────────────────
@@ -343,7 +299,6 @@ async function toggleRecord(id) {
     return;
   }
 
-  // Stop any other recording
   if (mediaRecorder && mediaRecorder.state === 'recording') {
     mediaRecorder.stop();
   }
@@ -354,7 +309,6 @@ async function toggleRecord(id) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    // Set up audio analysis
     audioContext = new AudioContext();
     const source = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
@@ -374,24 +328,22 @@ async function toggleRecord(id) {
     document.getElementById(`status-${id}`).classList.add('show');
     document.getElementById(`card-${id}`).classList.add('active');
 
-    // Volume meter update
     recordingTimer = setInterval(() => {
       if (!analyser) return;
       const data = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(data);
       const avg = data.reduce((a,b) => a+b, 0) / data.length;
-      const pct = Math.min(100, avg * 1.5);
-      const meterEl = document.getElementById(`status-${id}`);
-      if (meterEl && avg < 3) {
-        meterEl.innerHTML = '🔴 录音中... (⚠️ 没检测到声音，请靠近麦克风大声读)';
-        meterEl.style.color = 'var(--yellow)';
-      } else if (meterEl) {
-        meterEl.innerHTML = `🔴 录音中... 大声朗读上面句子 ▁▂▃${'▄'.repeat(Math.floor(pct/15))}`;
-        meterEl.style.color = 'var(--red)';
+      const statusEl = document.getElementById(`status-${id}`);
+      if (statusEl && avg < 3) {
+        statusEl.innerHTML = '🔴 录音中... (⚠️ 没检测到声音，请靠近麦克风大声读)';
+        statusEl.style.color = 'var(--yellow)';
+      } else if (statusEl) {
+        const bars = Math.floor(avg / 10);
+        statusEl.innerHTML = `🔴 录音中... 大声朗读 ▁▂▃${'▄'.repeat(Math.min(bars, 12))}`;
+        statusEl.style.color = 'var(--red)';
       }
     }, 200);
 
-    // Auto-stop after 10s
     setTimeout(() => {
       if (mediaRecorder && mediaRecorder.state === 'recording') stopRecord(id);
     }, 10000);
@@ -403,10 +355,8 @@ async function toggleRecord(id) {
 
 function stopRecord(id) {
   if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
-
   clearInterval(recordingTimer);
   mediaRecorder.stop();
-
   document.getElementById(`btn-${id}`).textContent = '🎤 重录';
   document.getElementById(`btn-${id}`).classList.remove('recording');
   document.getElementById(`status-${id}`).classList.remove('show');
@@ -415,42 +365,35 @@ function stopRecord(id) {
 
 // ── Process ────────────────────────────────────────────────────────
 async function processRecording(id) {
-  const s = sentences.find(x => x.id === id);
   const blob = new Blob(audioChunks, { type: 'audio/webm' });
   const url = URL.createObjectURL(blob);
-
-  // Store for replay
   if (!window._recordings) window._recordings = {};
   window._recordings[id] = url;
 
-  // Show replay button
   const replayBtn = document.getElementById(`replay-${id}`);
   replayBtn.style.display = 'inline-flex';
-  replayBtn.onclick = () => {
-    const a = new Audio(window._recordings[id]);
-    a.play();
-  };
 
-  // Speech recognition
   const resultBox = document.getElementById(`result-${id}`);
   resultBox.innerHTML = '<span style="color:var(--sub)">🔍 AI 正在分析你的发音...</span>';
   resultBox.classList.add('show');
 
   try {
-    const transcribed = await doSpeechRecognition(s);
+    const s = sentences.find(x => x.id === id);
+    const transcribed = await doSpeechRecognition();
     const analysis = analyzeText(s.text, transcribed);
     results[id] = { transcribed, ...analysis };
     showResult(id, analysis, transcribed);
     document.getElementById(`card-${id}`).classList.add('done');
     updateProgress();
   } catch (err) {
-    resultBox.innerHTML = `<div style="color:var(--red)">⚠️ 语音识别失败: ${err.message}</div>
+    resultBox.innerHTML = `
+      <div style="color:var(--red)">⚠️ 语音识别失败: ${err.message}</div>
       <div style="margin-top:8px;font-size:13px;color:var(--sub)">
-      请确保: ① 周围安静 ② 大声清晰朗读 ③ 允许麦克风权限
+        请确保: ① Chrome/Edge 浏览器 ② 网络通畅 ③ 周围安静 ④ 大声清晰朗读
       </div>
-      <div style="margin-top:8px">
-        <button class="btn btn-replay" onclick="playMyVoice(${id})" style="display:inline-flex">🔁 听我的录音</button>
-        <button class="btn btn-ref" onclick="playRef(${id})" style="display:inline-flex">🔊 听示范对比</button>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn btn-replay" onclick="playMyVoice(${id})">🔁 听我的录音</button>
+        <button class="btn btn-ref" onclick="playRef(${id})">🔊 听示范对比</button>
       </div>`;
   }
 }
@@ -463,14 +406,13 @@ function playMyVoice(id) {
 }
 
 // ── Speech Recognition ─────────────────────────────────────────────
-function doSpeechRecognition(sentence) {
+function doSpeechRecognition() {
   return new Promise((resolve, reject) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       reject(new Error('浏览器不支持语音识别（请用 Chrome 或 Edge）'));
       return;
     }
-
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
@@ -478,7 +420,6 @@ function doSpeechRecognition(sentence) {
     recognition.continuous = false;
 
     recognition.onresult = (event) => {
-      // Get all alternatives
       const alts = [];
       for (let i = 0; i < event.results[0].length; i++) {
         alts.push({
@@ -488,15 +429,8 @@ function doSpeechRecognition(sentence) {
       }
       resolve(alts);
     };
-
-    recognition.onerror = (event) => {
-      reject(new Error(event.error));
-    };
-
-    recognition.onnomatch = () => {
-      reject(new Error('未识别到语音内容'));
-    };
-
+    recognition.onerror = (event) => reject(new Error(event.error));
+    recognition.onnomatch = () => reject(new Error('未识别到语音'));
     recognition.start();
   });
 }
@@ -505,30 +439,22 @@ function doSpeechRecognition(sentence) {
 function analyzeText(expected, alternatives) {
   const best = alternatives[0]?.text || '';
   const conf = alternatives[0]?.confidence || 0;
-  const expectedLower = expected.toLowerCase();
-  const bestLower = best.toLowerCase();
-
-  // Word-level comparison
+  const expectedLower = expected.toLowerCase().replace(/[.,!?]/g, '');
+  const bestLower = best.toLowerCase().replace(/[.,!?]/g, '');
   const expWords = expectedLower.split(/\s+/);
   const gotWords = bestLower.split(/\s+/);
 
-  // Build word comparison
   const wordResults = expWords.map((ew, i) => {
     const gw = gotWords[i];
     if (!gw) return { word: ew, status: 'missing' };
     if (gw === ew) return { word: ew, status: 'match' };
-    // Check if close (edit distance)
     if (levenshtein(ew, gw) <= 1) return { word: ew, recognized: gw, status: 'close' };
     return { word: ew, recognized: gw, status: 'mismatch' };
   });
 
-  // Extra words the user said
   const extra = gotWords.slice(expWords.length);
-
   const matchCount = wordResults.filter(w => w.status === 'match').length;
   const accuracy = expWords.length > 0 ? matchCount / expWords.length : 0;
-
-  // Specific tips based on mismatches
   const tips = generateTips(wordResults);
 
   return {
@@ -578,7 +504,7 @@ function generateTips(wordResults) {
       if (hint) {
         tips.push({ word: wr.word, recognized: wr.recognized, hint: hint[0] });
       } else if (wr.status === 'mismatch') {
-        tips.push({ word: wr.word, recognized: wr.recognized, hint: `发音偏差较大，请仔细听示范模仿` });
+        tips.push({ word: wr.word, recognized: wr.recognized, hint: '发音偏差较大，请仔细听示范模仿' });
       }
     }
   }
@@ -595,7 +521,6 @@ function showResult(id, analysis, transcribed) {
   const box = document.getElementById(`result-${id}`);
   const confColor = analysis.conf > 0.7 ? 'var(--green)' : analysis.conf > 0.4 ? 'var(--yellow)' : 'var(--red)';
 
-  // Build word-by-word display
   const wordHTML = analysis.wordResults.map(w => {
     switch (w.status) {
       case 'match': return `<span class="match">${w.word}</span>`;
@@ -619,14 +544,11 @@ function showResult(id, analysis, transcribed) {
     ${tipsHTML ? `<div class="feedback" style="margin-top:12px"><b>🔍 需要改进:</b>${tipsHTML}</div>` : ''}
     ${analysis.extra.length > 0 ? `<div style="margin-top:8px;font-size:13px;color:var(--yellow)">⚠️ 多余词汇: ${analysis.extra.join(', ')}</div>` : ''}
     <div style="margin-top:14px;display:flex;gap:8px">
-      <button class="btn btn-replay" onclick="playMyVoice(${id})" style="display:inline-flex">🔁 听我读的</button>
-      <button class="btn btn-ref" onclick="playRef(${id})" style="display:inline-flex">🔊 听示范对比</button>
+      <button class="btn btn-replay" onclick="playMyVoice(${id})">🔁 听我读的</button>
+      <button class="btn btn-ref" onclick="playRef(${id})">🔊 听示范对比</button>
     </div>
   `;
 }
-
-// ── Load voices ────────────────────────────────────────────────────
-speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 
 // ── Start ──────────────────────────────────────────────────────────
 renderAll();
