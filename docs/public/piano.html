@@ -130,21 +130,32 @@
 <script>
 // ── Piano notes ────────────────────────────────────────────────────
 var notes = [
-  { key:'0', note:'C4',  freq:261.63 },
-  { key:'1', note:'D4',  freq:293.66 },
-  { key:'2', note:'E4',  freq:329.63 },
-  { key:'3', note:'F4',  freq:349.23 },
-  { key:'4', note:'G4',  freq:392.00 },
-  { key:'5', note:'A4',  freq:440.00 },
-  { key:'6', note:'B4',  freq:493.88 },
-  { key:'7', note:'C5',  freq:523.25 },
-  { key:'8', note:'D5',  freq:587.33 },
-  { key:'9', note:'E5',  freq:659.25 },
-  { key:'/', note:'F5',  freq:698.46 },
-  { key:'*', note:'G5',  freq:783.99 },
-  { key:'-', note:'A5',  freq:880.00 },
-  { key:'+', note:'B5',  freq:987.77 },
-  { key:'.', note:'C6',  freq:1046.50 },
+  { key:'0', code:'Digit0', note:'C4',  freq:261.63 },
+  { key:'1', code:'Digit1', note:'D4',  freq:293.66 },
+  { key:'2', code:'Digit2', note:'E4',  freq:329.63 },
+  { key:'3', code:'Digit3', note:'F4',  freq:349.23 },
+  { key:'4', code:'Digit4', note:'G4',  freq:392.00 },
+  { key:'5', code:'Digit5', note:'A4',  freq:440.00 },
+  { key:'6', code:'Digit6', note:'B4',  freq:493.88 },
+  { key:'7', code:'Digit7', note:'C5',  freq:523.25 },
+  { key:'8', code:'Digit8', note:'D5',  freq:587.33 },
+  { key:'9', code:'Digit9', note:'E5',  freq:659.25 },
+  { key:'/', code:'NumpadDivide', note:'F5',  freq:698.46 },
+  { key:'*', code:'NumpadMultiply', note:'G5',  freq:783.99 },
+  { key:'-', code:'NumpadSubtract', note:'A5',  freq:880.00 },
+  { key:'+', code:'NumpadAdd', note:'B5',  freq:987.77 },
+  { key:'.', code:'NumpadDecimal', note:'C6',  freq:1046.50 },
+  // Also accept regular keyboard digits
+  { key:'0', code:'Numpad0', note:'C4',  freq:261.63 },
+  { key:'1', code:'Numpad1', note:'D4',  freq:293.66 },
+  { key:'2', code:'Numpad2', note:'E4',  freq:329.63 },
+  { key:'3', code:'Numpad3', note:'F4',  freq:349.23 },
+  { key:'4', code:'Numpad4', note:'G4',  freq:392.00 },
+  { key:'5', code:'Numpad5', note:'A4',  freq:440.00 },
+  { key:'6', code:'Numpad6', note:'B4',  freq:493.88 },
+  { key:'7', code:'Numpad7', note:'C5',  freq:523.25 },
+  { key:'8', code:'Numpad8', note:'D5',  freq:587.33 },
+  { key:'9', code:'Numpad9', note:'E5',  freq:659.25 },
 ];
 var audioCtx = null;
 var isPlaying = false;
@@ -154,16 +165,25 @@ var isRec = false;
 
 // ── Render keys ────────────────────────────────────────────────────
 var piano = document.getElementById('piano');
+var seen = {};
 for (var i = 0; i < notes.length; i++) {
+  var n = notes[i];
+  if (seen[n.key]) continue;
+  seen[n.key] = true;
   (function(n){
     var div = document.createElement('div');
     div.className = 'key';
     div.id = 'key-'+n.key.replace(/[^a-zA-Z0-9]/g,'_');
-    var label = n.key === '/' ? '/' : n.key === '*' ? '*' : n.key === '-' ? '−' : n.key === '+' ? '+' : n.key === '.' ? '·' : n.key;
+    var label = n.key;
+    if (label === '/') label = '/';
+    else if (label === '*') label = '*';
+    else if (label === '-') label = '−';
+    else if (label === '+') label = '+';
+    else if (label === '.') label = '·';
     div.innerHTML = '<span class="num">'+label+'</span><span class="note">'+n.note+'</span>';
     div.onmousedown = function(e){ e.preventDefault(); hit(n.key); };
     piano.appendChild(div);
-  })(notes[i]);
+  })(n);
 }
 
 // ── Play single note ──────────────────────────────────────────────
@@ -189,17 +209,9 @@ function hit(k) {
 // ── Keyboard ──────────────────────────────────────────────────────
 document.addEventListener('keydown', function(e){
   if (e.repeat || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  // Map keypad keys: numpad / * - + . all become their characters
-  var k = e.key;
-  // Normalize numpad keys
-  if (e.code === 'NumpadDivide') k = '/';
-  if (e.code === 'NumpadMultiply') k = '*';
-  if (e.code === 'NumpadSubtract') k = '-';
-  if (e.code === 'NumpadAdd') k = '+';
-  if (e.code === 'NumpadDecimal') k = '.';
-  // Also accept regular keyboard versions
+  var code = e.code;
   for (var i = 0; i < notes.length; i++) {
-    if (k === notes[i].key) { e.preventDefault(); hit(notes[i].key); return; }
+    if (code === notes[i].code) { e.preventDefault(); hit(notes[i].key); return; }
   }
 });
 
