@@ -559,24 +559,63 @@ function playTTS(btn, text) {
 
 function playWord(word) { playTTS(null, word); }
 
-// ── Practice: record & check pronunciation ─────────────────────────
+// ── Practice: auto-record & check pronunciation (silence auto-stop) ─
+var _silenceTimer = null;
+var _audioCtx = null;
+var _analyser = null;
+
 function practiceReply() {
   if (!audioStream) { alert('麦克风不可用'); return; }
-  if (isRecording) { stopPractice(); return; }
+  if (isRecording) return;
 
   isRecording = true; audioChunks = [];
   var btn = document.getElementById('btnPractice');
-  if (btn) { btn.textContent = '⏹ 停止'; btn.classList.add('recording'); }
-  showHint('🔴 跟读中... 读完点停止');
+  if (btn) { btn.textContent = '🔴 说话中...'; btn.classList.add('recording'); }
+  showHint('🎤 正在听你说...读完自动分析');
+
+  // Set up analyser for silence detection
+  _audioCtx = new AudioContext();
+  var source = _audioCtx.createMediaStreamSource(audioStream);
+  _analyser = _audioCtx.createAnalyser();
+  _analyser.fftSize = 256;
+  source.connect(_analyser);
 
   mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
   mediaRecorder.ondataavailable = function(e) { audioChunks.push(e.data); };
-  mediaRecorder.onstop = function() { analyzePractice(); };
+  mediaRecorder.onstop = function() {
+    if (_audioCtx) { _audioCtx.close(); _audioCtx = null; _analyser = null; }
+    analyzePractice();
+  };
   mediaRecorder.start();
-  setTimeout(function() { if (isRecording && mediaRecorder.state === 'recording') stopPractice(); }, 10000);
+
+  // Silence detection: auto-stop after 1.8s of silence, max 12s
+  var silenceStart = 0;
+  var maxTime = 0;
+  _silenceTimer = setInterval(function() {
+    if (!_analyser) return;
+    var data = new Uint8Array(_analyser.frequencyBinCount);
+    _analyser.getByteFrequencyData(data);
+    var avg = data.reduce(function(a,b){return a+b;},0) / data.length;
+
+    if (avg < 5) {
+      if (silenceStart === 0) silenceStart = Date.now();
+      else if (Date.now() - silenceStart > 1800) {
+        clearInterval(_silenceTimer);
+        stopPracticeAuto();
+      }
+    } else {
+      silenceStart = 0;
+    }
+
+    maxTime += 200;
+    if (maxTime > 12000) {
+      clearInterval(_silenceTimer);
+      stopPracticeAuto();
+    }
+  }, 200);
 }
 
-function stopPractice() {
+function stopPracticeAuto() {
   if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
   isRecording = false; mediaRecorder.stop();
   var btn = document.getElementById('btnPractice');
