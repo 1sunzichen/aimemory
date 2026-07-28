@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Native 面试备战 · 2天冲刺</title>
+<style>
+  :root {
+    --bg: #0f0f1a; --card: #1a1a2e; --accent: #4a9eff;
+    --green: #2ecc71; --red: #e74c3c; --yellow: #f39c12;
+    --text: #e0e0e0; --sub: #888; --border: #2a2a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; padding: 24px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+
+  header { text-align: center; padding: 30px 0 20px; }
+  header h1 { font-size: 24px; color: #fff; margin-bottom: 4px; }
+  header p { font-size: 14px; color: var(--sub); }
+  .company-badge {
+    display: inline-block; padding: 4px 14px; border-radius: 12px;
+    background: rgba(74,158,255,.15); color: var(--accent); font-size: 13px;
+    margin-top: 8px;
+  }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+  .tab {
+    flex: 1; padding: 12px; text-align: center; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border);
+    cursor: pointer; font-size: 14px; font-weight: 600; transition: .15s;
+  }
+  .tab:hover { border-color: var(--accent); }
+  .tab.active { background: rgba(74,158,255,.15); color: var(--accent); border-color: var(--accent); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* Plan */
+  .day-block {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 16px;
+  }
+  .day-block h3 { font-size: 16px; color: var(--accent); margin-bottom: 16px; }
+  .task-row {
+    display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border);
+    align-items: flex-start; font-size: 14px; line-height: 1.6;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-time {
+    min-width: 70px; font-size: 12px; color: var(--yellow); font-weight: 600; padding-top: 2px;
+  }
+  .task-prio {
+    padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .prio-high { background: rgba(231,76,60,.15); color: var(--red); }
+  .prio-mid { background: rgba(243,156,18,.15); color: var(--yellow); }
+
+  /* Quiz */
+  .quiz-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px; margin-bottom: 16px;
+  }
+  .quiz-num { font-size: 12px; color: var(--sub); margin-bottom: 8px; }
+  .quiz-q { font-size: 16px; color: #fff; margin-bottom: 16px; line-height: 1.6; font-weight: 600; }
+  .quiz-cat {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    font-size: 11px; margin-bottom: 10px;
+  }
+  .cat-agent { background: rgba(168,85,247,.15); color: #a855f7; }
+  .cat-stack { background: rgba(74,158,255,.15); color: var(--accent); }
+  .cat-eng { background: rgba(46,204,113,.15); color: var(--green); }
+  .cat-product { background: rgba(243,156,18,.15); color: var(--yellow); }
+
+  .answer-area { margin-top: 16px; }
+  .answer-area textarea {
+    width: 100%; min-height: 100px; padding: 12px 16px; border-radius: 10px;
+    border: 1px solid var(--border); background: rgba(0,0,0,.3);
+    color: var(--text); font-size: 14px; line-height: 1.6;
+    font-family: inherit; resize: vertical;
+  }
+  .answer-area textarea:focus { outline: none; border-color: var(--accent); }
+
+  .ref-answer {
+    margin-top: 12px; padding: 14px 18px; border-radius: 10px;
+    background: rgba(0,0,0,.2); border: 1px solid var(--border);
+    font-size: 14px; line-height: 1.8; display: none;
+  }
+  .ref-answer.show { display: block; }
+  .ref-answer b { color: var(--accent); }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn {
+    padding: 10px 20px; border-radius: 10px; border: none;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: .15s;
+  }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { opacity: .9; }
+  .btn-outline {
+    background: transparent; border: 1px solid var(--border); color: var(--text);
+  }
+  .btn-outline:hover { border-color: var(--accent); }
+  .btn-green { background: var(--green); color: #fff; }
+  .btn-green:hover { opacity: .9; }
+  .btn-yellow { background: rgba(243,156,18,.15); color: var(--yellow); border: 1px solid rgba(243,156,18,.3); }
+  .btn-yellow:hover { background: rgba(243,156,18,.25); }
+
+  .quiz-nav { display: flex; gap: 10px; align-items: center; margin-top: 20px; }
+  .quiz-nav span { font-size: 14px; color: var(--sub); }
+
+  /* English */
+  .en-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px; margin-bottom: 12px;
+  }
+  .en-card .scenario { font-size: 14px; color: var(--accent); margin-bottom: 6px; font-weight: 600; }
+  .en-card .en-text { font-size: 15px; color: #fff; line-height: 1.7; margin-bottom: 8px; }
+  .en-card .cn-text { font-size: 13px; color: var(--sub); }
+
+  /* Stats */
+  .stats {
+    display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;
+  }
+  .stat {
+    flex: 1; min-width: 100px; padding: 14px; border-radius: 10px;
+    background: var(--card); border: 1px solid var(--border); text-align: center;
+  }
+  .stat .num { font-size: 28px; font-weight: 700; }
+  .stat .label { font-size: 12px; color: var(--sub); margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🚀 AI Native 全栈 · 面试备战</h1>
+  <p>麦炽科技 · Multi-Agent 产品 · 北京线下</p>
+  <span class="company-badge">2 天冲刺计划 + 循环面试题</span>
+</header>
+
+<div class="stats">
+  <div class="stat"><div class="num" style="color:var(--accent)" id="statQ">15</div><div class="label">面试题</div></div>
+  <div class="stat"><div class="num" style="color:var(--green)" id="statDone">0</div><div class="label">已练习</div></div>
+  <div class="stat"><div class="num" style="color:var(--yellow)" id="statEN">7</div><div class="label">英语场景</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('plan')">📋 Day 1+2 计划</div>
+  <div class="tab" onclick="switchTab('quiz')">🎯 面试题（循环）</div>
+  <div class="tab" onclick="switchTab('english')">🇬🇧 英语面试</div>
+  <div class="tab" onclick="switchTab('checklist')">✅ 自检清单</div>
+</div>
+
+<!-- Plan Panel -->
+<div class="panel active" id="panel-plan">
+  <div class="day-block">
+    <h3>📅 Day 1 — Agent 架构 + 全栈基础（12h）</h3>
+
+    <div class="task-row"><span class="task-time">09:00-10:30</span><span>手画 Multi-Agent 架构图：任务编排器 → 工具调用 → 上下文管理 → 记忆系统 → 人机协同确认。画出数据流和控制流。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">10:30-12:00</span><span>用你熟悉的 Go + Gin 搭一个 Agent API 骨架：POST /agent/run 接收 task，返回 {"plan": [...], "next_action": "..."}。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">13:00-14:30</span><span>实现 Function Calling 模拟：定义 3 个工具（查天气、发邮件、搜文档），Agent 根据用户输入自动选工具。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">14:30-16:00</span><span>搭建 SSE 流式响应：Agent 执行过程逐步骤推给前端，模拟 ChatGPT 打字效果。<span class="task-prio prio-mid">加分</span></span></div>
+
+    <div class="task-row"><span class="task-time">16:00-18:00</span><span>用 React 搭一个 Agent 对话界面：左侧聊天、右侧显示当前任务步骤和工具调用状态。<span class="task-prio prio-mid">加分</span></span></div>
+
+    <div class="task-row"><span class="task-time">19:00-21:00</span><span>刷 MCP 协议：读 Anthropic 的 MCP spec，理解 Server/Client 模型，注册 1 个 MCP Server。<span class="task-prio prio-mid">加分</span></span></div>
+
+    <div class="task-row"><span class="task-time">21:00-22:00</span><span>英语准备：自我介绍 + "Why Multi-Agent?" + "Describe your robot platform" 三个段落写出来背熟。<span class="task-prio prio-high">核心</span></span></div>
+  </div>
+
+  <div class="day-block">
+    <h3>📅 Day 2 — 深度打磨 + 模拟面试（12h）</h3>
+
+    <div class="task-row"><span class="task-time">09:00-11:00</span><span>给昨天的 Agent 加记忆系统：用 Redis 存对话历史，实现上下文压缩（保留最近 N 轮 + 摘要前文）。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">11:00-12:00</span><span>权限控制：实现工具调用的「人类确认」环节——Agent 执行敏感操作前暂停，等用户批准。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">13:00-15:00</span><span>完整流程串联：用户说一句话 → Agent 规划 → 调工具 → SSE 推流 → 前端展示。录个 3 分钟 demo 视频。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">15:00-16:30</span><span>GitHub 整理：把 Agent 项目推到 GitHub，写好 README（英文），架构图、API 文档、Quick Start。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">16:30-18:00</span><span>模拟面试：下面「面试题」tab 全部过一遍，每道题自己说 2-3 分钟。不会的查、查完再答。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">19:00-20:00</span><span>英语面试模拟：用「英语面试」tab 的 7 个场景，每个对着镜子说 3 遍。<span class="task-prio prio-high">核心</span></span></div>
+
+    <div class="task-row"><span class="task-time">20:00-21:00</span><span>查漏补缺：过一遍自检清单，标黄的补上。<span class="task-prio prio-mid">加分</span></span></div>
+  </div>
+</div>
+
+<!-- Quiz Panel -->
+<div class="panel" id="panel-quiz">
+  <div id="quizContainer"></div>
+</div>
+
+<!-- English Panel -->
+<div class="panel" id="panel-english">
+  <div class="en-card">
+    <div class="scenario">1. Self-Introduction (1 min)</div>
+    <div class="en-text">Hi, I'm Patrick. I've been a full-stack engineer for 10 years, currently working at a robotics AI company. I built a robot cloud management platform with Go and React — config management, GPU monitoring across three cloud vendors, the whole thing. Before that, I built Go microservices at TAL Education. I'm self-taught in AI — I went from watching 3Blue1Brown to building RAG pipelines with ChromaDB and DeepSeek. I'm looking to go deeper into AI Native products, especially Multi-Agent systems.</div>
+    <div class="cn-text">10年全栈 → 机器人AI公司 → Go+React云平台 → 好未来微服务 → 自学AI → 想做Multi-Agent</div>
+  </div>
+  <div class="en-card">
+    <div class="scenario">2. Why Multi-Agent? Why this company?</div>
+    <div class="en-text">I think Multi-Agent is the next big leap. Single agents are great for simple tasks, but real work involves multiple specialized agents collaborating — planning, executing, reviewing. I built a basic version of this at my current job: one agent monitors GPU metrics, another pushes alerts, a third generates reports. Your company is building this as a product, which is exactly where I want to be.</div>
+    <div class="cn-text">Multi-Agent是下一步 → 我在现公司做过雏形：监控agent + 告警agent + 报表agent → 你们把这做成产品正是我想做的</div>
+  </div>
+  <div class="en-card">
+    <div class="scenario">3. Describe your robot cloud platform</div>
+    <div class="en-text">We built a Go backend with Gin framework and a React frontend. The platform manages robot configurations across multiple robot models — firmware versions, SSH keys, deployment states. For GPU monitoring, we aggregated metrics from Alibaba Cloud, Baidu Cloud, and Volcano Cloud APIs. We used Feishu bots to push alerts when thresholds were breached. I owned the full stack — from database schema design to frontend deployment.</div>
+    <div class="cn-text">Go+Gin后端 + React前端 → 机器人配置管理 → 多云GPU监控聚合 → 飞书告警 → 全栈负责</div>
+  </div>
+  <div class="en-card">
+    <div class="scenario">4. How do you use AI Coding tools?</div>
+    <div class="en-text">I use Claude Code and Codex daily. For new features, I describe the requirements and let AI scaffold the boilerplate, then I review and refine. For debugging, I paste error logs and stack traces — AI helps me trace root causes much faster. I also use AI to write tests and documentation. I'd say AI tools save me 30-40% of coding time, especially for repetitive tasks like CRUD endpoints and config files.</div>
+    <div class="cn-text">每天用Claude Code/Codex → 新功能用AI搭骨架 → 调试用AI分析日志 → 省30-40%时间</div>
+  </div>
+  <div class="en-card">
+    <div class="scenario">5. Agent Architecture — Memory & Context</div>
+    <div class="en-text">I think of agent memory in three layers: short-term is the current conversation window, medium-term is Redis-backed session state with TTL, and long-term is a vector database storing summarized embeddings of past interactions. Context management is about deciding what to keep and what to compress. I use a sliding window for recent messages plus a running summary of older context, generated periodically.</div>
+    <div class="cn-text">三层记忆：短期(对话窗口) + 中期(Redis会话) + 长期(向量库摘要) → 上下文用滑动窗口+定期摘要</div>
+  </div>
+  <div class="en-card">
+    <div class="scenario">6. Production incident response</div>
+    <div class="en-text">My approach: first, check the blast radius — which services, how many users affected. Then I pull up Grafana dashboards and trace logs to identify the bottleneck. I've dealt with API latency spikes before — at my current job, we had telemetry APIs spike from 200ms to 2 seconds. Turned out to be a gRPC connection leak. We patched it, added connection pooling limits, and set up alerts for the next time.</div>
+    <div class="cn-text">先看影响面 → Grafana+日志定位 → 经历：遥测API 200ms→2s, gRPC连接泄漏 → 修+加连接池限制+告警</div>
+  </div>
+  <div class="en-card">
+    <div class="scenario">7. Why should we hire you?</div>
+    <div class="en-text">Three reasons. One: I've done 0-to-1 — I built a robot cloud platform from scratch, owning backend, frontend, and deployment. Two: I understand the full AI stack — not just calling APIs, but vector databases, RAG pipelines, agent orchestration. Three: I'm used to moving fast with AI tools. I can prototype an agent in a day and have it deployed by the end of the week. For a startup building a Multi-Agent product, that speed matters.</div>
+    <div class="cn-text">三个理由：① 0到1经验 ② 理解全AI技术栈 ③ AI工具加持下手快</div>
+  </div>
+</div>
+
+<!-- Checklist Panel -->
+<div class="panel" id="panel-checklist">
+  <div class="day-block">
+    <h3>✅ 面试前自检清单</h3>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 能手画 Multi-Agent 架构图并解释每个模块</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 能用 Go 搭一个带 Function Calling 的 Agent API</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 能实现 SSE 流式响应</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 理解 MCP 协议 Server/Client 模型</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 理解 Agent 记忆系统三层架构</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 能用 Redis 做会话状态管理</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 理解工具调用的权限控制和人机确认</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 能用 React 搭 Agent 对话界面</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> GitHub 有可展示的 Agent 项目 + 英文 README</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 英语自我介绍流畅（< 1 min）</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 能用英语讲清楚你做过的项目</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 能用英语解释 Multi-Agent 架构</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 了解 CI/CD + Docker + 云部署基础</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 了解日志/监控/告警体系</div>
+    <div class="task-row"><input type="checkbox" onchange="checkItem(this)"> 了解基础安全：鉴权、密钥管理、接口防护</div>
+    <div style="margin-top:16px;font-size:14px;color:var(--sub)">
+      进度: <span id="checkCount" style="color:var(--accent);font-weight:600">0</span> / 15
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ── Quiz bank ──────────────────────────────────────────────────────
+var quizzes = [
+  {
+    cat: 'agent', catClass: 'cat-agent',
+    q: '请解释 Multi-Agent 系统的核心架构。任务编排、工具调用、上下文管理、记忆系统、人机协同分别是什么？它们之间怎么协作？',
+    ref: '任务编排器(Orchestrator)接收用户意图 → 分解为子任务 → 分配给专门的 Agent → Agent 通过工具调用(Function Calling)执行 → 上下文管理器维护当前任务状态和对话历史 → 记忆系统(三层：短期对话窗口 + 中期Redis会话 + 长期向量库摘要)提供背景知识 → 关键操作触发人机确认(Human-in-the-loop) → 结果汇总返回用户。类似微服务编排，但 Agent 是 LLM 驱动的、动态决策的。'
+  },
+  {
+    cat: 'agent', catClass: 'cat-agent',
+    q: 'MCP (Model Context Protocol) 是什么？Server 和 Client 分别做什么？你能举一个实际的 MCP 应用场景吗？',
+    ref: 'MCP 是 Anthropic 提出的开放协议，让 LLM 通过标准化接口连接外部工具和数据源。Server 暴露资源(文件/数据库)和工具(API调用)，Client(如 Claude Desktop)发现并调用。场景：MCP Server 连接公司内部 Wiki，Agent 通过 MCP 实时检索文档回答问题。类似 USB-C 统一外设，MCP 统一 AI 工具接入。'
+  },
+  {
+    cat: 'stack', catClass: 'cat-stack',
+    q: '你要设计一个支持流式输出的 Agent API。前端怎么接收 Agent 逐步执行的状态？请描述技术方案。',
+    ref: '用 SSE (Server-Sent Events)。后端 Go 用 gin-contrib/sse 或自己写 http.Flusher，每完成一个步骤就 write + flush 一条 event。前端用 EventSource 或 fetch + ReadableStream 接收。消息格式：{type: "step", step: "planning", content: "..."} → {type: "tool_call", tool: "search", status: "running"} → {type: "tool_result", ...} → {type: "done"}。关键：设置正确的 Content-Type: text/event-stream，禁用缓冲。'
+  },
+  {
+    cat: 'stack', catClass: 'cat-stack',
+    q: 'Agent 的记忆系统怎么设计？短期、中期、长期记忆分别用什么技术实现？上下文窗口不够怎么办？',
+    ref: '短期：当前对话的原始消息列表（内存）。中期：Redis 存储会话状态，带 TTL，存用户偏好、当前任务进度。长期：向量数据库(ChromaDB/Milvus/PGVector)存储历史对话的嵌入向量+摘要，语义检索相关记忆。上下文不够时：①滑动窗口保留最近 N 轮 ②用 LLM 定期生成旧对话摘要替代原始内容 ③检索增强(RAG)从长期记忆注入相关内容。关键决策：压缩时机(每N轮/每次)、保留策略(核心信息 vs 细节)。'
+  },
+  {
+    cat: 'agent', catClass: 'cat-agent',
+    q: 'Tool Calling / Function Calling 是怎么工作的？Agent 怎么知道该调哪个工具？参数怎么传？',
+    ref: '流程：①定义工具 schema（JSON Schema 描述函数名、参数、描述）②用户输入 + 工具列表 → LLM ③LLM 返回 function_call：{name: "search_docs", arguments: {query: "robot firmware"}} 而不是普通文本 ④Agent 解析并执行工具调用 ⑤工具结果追加到对话历史 ⑥LLM 基于结果生成最终回复。关键：工具描述写得好坏直接影响选择准确率。参数验证要做，防止幻觉参数。'
+  },
+  {
+    cat: 'product', catClass: 'cat-product',
+    q: '你怎么理解 AI Native 产品？它和「传统产品 + AI 功能」有什么区别？举一个你认为是 AI Native 的产品例子。',
+    ref: 'AI Native 是从产品定义第一天就以 AI 为核心，去掉 AI 产品就不成立。传统+AI 是产品本身上了再加个 chatbot。例子：Cursor(去掉 AI 就是个空编辑器) vs VS Code + Copilot 插件。AI Native 的交互模式、数据流、错误处理都围绕 AI 设计，不是套壳。对工程师来说，意味着需要理解 Agent 失败恢复、流式响应用户体验、幻觉处理——这些不是后加的功能。'
+  },
+  {
+    cat: 'product', catClass: 'cat-product',
+    q: '如果你负责一个 Multi-Agent 核心产品的 0-1 开发，你会怎么着手？从哪里开始，优先做什么？',
+    ref: '第一周：定义最小闭环——一个能跑通的 Agent 调用链。用户输入 → 规划 → 执行 1 个工具 → 返回结果。技术选型：Go(你熟悉)+React+Redis+PostgreSQL。不搞复杂的 Multi-Agent 协作，先做 Single Agent。第二周：加 Function Calling + SSE 流式。第三周：加第二个 Agent + 任务编排。第四周：加记忆系统和人类确认。每一步都部署上线，让团队能用上给反馈。0-1 的核心是快速闭环，不是完美架构。'
+  },
+  {
+    cat: 'stack', catClass: 'cat-stack',
+    q: '你怎么用 AI Coding 工具（Claude Code/Codex）提升效率？具体工作流是什么样的？有什么坑？',
+    ref: '我的工作流：①用自然语言描述功能需求 → AI 生成初版代码 ②人工 Review 逻辑正确性和安全性 ③用 AI 生成测试用例 ④用 AI 写英文注释和文档。坑：①AI 可能生成过时代码(旧版 API) ②复杂业务逻辑 AI 理解会偏差 ③安全相关代码(鉴权/加密)不能盲信 AI ④长对话会丢失上下文。原则：AI 负责「写」，我负责「审」。AI Coding 不能替代架构设计能力。'
+  },
+  {
+    cat: 'stack', catClass: 'cat-stack',
+    q: 'SSE 和 WebSocket 有什么区别？Agent 产品该用哪个？为什么？',
+    ref: 'SSE：单向(服务器→客户端)，基于HTTP，浏览器原生 EventSource 支持，自动重连。WebSocket：双向，独立协议，需要额外库。Agent 产品优先 SSE：因为 Agent 执行是服务器推给客户端展示，客户端只需要发送一次请求。除非需要客户端中途打断 Agent 执行（双向通信），才用 WebSocket。简单场景 SSE 就够了，部署也简单（无状态 HTTP）。'
+  },
+  {
+    cat: 'agent', catClass: 'cat-agent',
+    q: 'Agent 执行过程中失败了怎么办？你怎么设计错误恢复和重试机制？',
+    ref: '分层处理：①工具调用失败→重试3次(指数退避) ②LLM返回格式错误→重试并加强 prompt 约束 ③某步骤多次失败→降级策略(跳过此步骤/用默认值/人工介入) ④整个任务失败→保存中间状态，用户可从断点恢复。关键：每个步骤的状态要持久化(Redis)，失败恢复不是从头来。人类确认机制(Human-in-the-loop)作为最后兜底。'
+  },
+  {
+    cat: 'stack', catClass: 'cat-stack',
+    q: 'RAG (检索增强生成) 的核心流程是什么？你在项目里怎么用的？有哪些优化技巧？',
+    ref: '流程：①文档切片(Chunking) → ②向量化(Embedding) → ③存入向量库(ChromaDB/Milvus) → ④用户提问时向量检索 top-K 相关片段 → ⑤拼接为上下文注入 LLM → ⑥LLM 生成回答。我的实践：在 aimemory 知识库里用 ChromaDB + DeepSeek Embedding。优化：①chunk size 要合理(500-1000 tokens) ②重叠(overlap)保留上下文 ③混合检索(向量+关键词)提升召回 ④rerank 精排 ⑤缓存常见查询。'
+  },
+  {
+    cat: 'eng', catClass: 'cat-eng',
+    q: 'ENGLISH: Describe the most complex system you built from scratch. What were the key technical decisions?',
+    ref: '"The robot cloud management platform. Key decisions: ① Go + Gin for the backend — Go\'s concurrency model was perfect for handling multiple robot connections. ② React + TypeScript for the admin panel — fast iteration with a small team. ③ Multi-cloud GPU aggregation was the trickiest part — each cloud vendor had different API formats, so I built an abstraction layer with adapters for Alibaba, Baidu, and Volcano Cloud. ④ SSE for real-time monitoring updates instead of polling. The system managed 10+ robots with config versioning and SSH key management."'
+  },
+  {
+    cat: 'eng', catClass: 'cat-eng',
+    q: 'ENGLISH: How do you handle disagreements with product managers about technical trade-offs?',
+    ref: '"I focus on framing it in terms of user impact and timeline, not just technical preference. For example, when our PM wanted a complex workflow builder in two weeks, I broke it down: a minimal version we could ship in 2 weeks, and the full version that would take 6. I showed what each version could and couldn\'t do. We agreed to ship the minimal version first and iterate. The key is: don\'t say no — say \'here\'s what we can do in that timeline, and here\'s what we\'d need more time for.\'"'
+  },
+  {
+    cat: 'stack', catClass: 'cat-stack',
+    q: '你怎么评估一个 Agent 框架（LangChain / AutoGen / CrewAI / Dify）是否适合项目？选型标准是什么？',
+    ref: '标准：①学习曲线 vs 项目时间 ②社区活跃度(GitHub stars/issue 响应) ③是否过度抽象——框架帮你省了多少代码 vs 限制了多少灵活性 ④和现有技术栈的兼容性 ⑤License。我的判断：如果是快速验证用 Dify/n8n 低代码；如果需要精细控制用 LangChain 或直接调 API；Multi-Agent 协作用 AutoGen/CrewAI。但核心原则：不要被框架绑架，理解底层原理后，很多时候直接调 API 更灵活。'
+  },
+  {
+    cat: 'product', catClass: 'cat-product',
+    q: '你觉得一个好的 AI Native 开发流程应该是什么样的？和传统开发流程有什么不同？',
+    ref: '传统流程：需求→设计→开发→测试→上线。AI Native：①Prompt 先行——先用 prompt 验证可行性，再写代码 ②原型即产品——AI 让原型成本极低，直接给用户试 ③持续微调——prompt 和模型行为需要持续监控和调优，不像代码部署完就固定 ④评估体系——需要建 benchmark / eval set 来量化 Agent 表现，传统测试不适用 ⑤人机协同——开发流程本身也用 AI(Copilot/Codex)，但人工 Review 不可少。核心差异：不确定性管理——LLM 输出不可预测，需要不同的质量保障手段。'
+  }
+];
+
+// ── State ──────────────────────────────────────────────────────────
+var currentQuiz = 0;
+var quizDone = new Set();
+
+// ── Tabs ───────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('panel-'+name).classList.add('active');
+  event.target.classList.add('active');
+
+  if (name === 'quiz') renderQuiz();
+}
+
+// ── Quiz ───────────────────────────────────────────────────────────
+function renderQuiz() {
+  var q = quizzes[currentQuiz];
+  var container = document.getElementById('quizContainer');
+  container.innerHTML =
+    '<div class="quiz-card">' +
+      '<div class="quiz-num">#'+(currentQuiz+1)+' / '+quizzes.length+' · <span class="quiz-cat '+q.catClass+'">'+q.cat.toUpperCase()+'</span>'+(quizDone.has(currentQuiz)?' ✅':+'')'</div>' +
+      '<div class="quiz-q">'+escHtml(q.q)+'</div>' +
+      '<div class="answer-area">' +
+        '<textarea id="userAnswer" placeholder="在这里写你的回答... 如果不会，直接点「看参考答案」"></textarea>' +
+        '<div class="btn-row">' +
+          '<button class="btn btn-outline" id="btnRef" onclick="showRef()">💡 看参考答案</button>' +
+          '<button class="btn btn-green" onclick="markDone()">✅ 已掌握，下一题</button>' +
+          '<button class="btn btn-yellow" onclick="markAgain()">🔄 不太会，再问一次</button>' +
+        '</div>' +
+        '<div class="ref-answer" id="refAnswer">' +
+          '<b>参考答案：</b><br><br>' + escHtml(q.ref) +
+          '<div class="btn-row">' +
+            '<button class="btn btn-accent" onclick="markDone()">✅ 已掌握</button>' +
+            '<button class="btn btn-yellow" onclick="markAgain()">🔄 再问一次</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="quiz-nav">' +
+      '<button class="btn btn-outline" onclick="prevQuiz()" '+(currentQuiz===0?'disabled':'')+'>← 上一题</button>' +
+      '<span>'+(currentQuiz+1)+' / '+quizzes.length+'</span>' +
+      '<button class="btn btn-outline" onclick="nextQuiz()" '+(currentQuiz===quizzes.length-1?'disabled':'')+'>下一题 →</button>' +
+    '</div>';
+
+  document.getElementById('statDone').textContent = quizDone.size;
+  document.getElementById('statQ').textContent = quizzes.length;
+}
+
+function showRef() {
+  document.getElementById('refAnswer').classList.add('show');
+  document.getElementById('btnRef').style.display = 'none';
+  quizDone.add(currentQuiz);
+  document.getElementById('statDone').textContent = quizDone.size;
+}
+
+function markDone() {
+  quizDone.add(currentQuiz);
+  document.getElementById('statDone').textContent = quizDone.size;
+  if (currentQuiz < quizzes.length - 1) {
+    currentQuiz++;
+    renderQuiz();
+  } else {
+    document.getElementById('quizContainer').innerHTML =
+      '<div class="quiz-card" style="text-align:center;padding:40px">' +
+        '<div style="font-size:48px;margin-bottom:16px">🏆</div>' +
+        '<h2 style="color:var(--green)">所有题目已过完！</h2>' +
+        '<p style="color:var(--sub);margin:12px 0">掌握了 '+quizDone.size+' / '+quizzes.length+' 题</p>' +
+        '<button class="btn btn-accent" onclick="currentQuiz=0;quizDone.clear();renderQuiz();document.getElementById(\'statDone\').textContent=\'0\'">🔄 重新开始</button>' +
+      '</div>';
+  }
+}
+
+function markAgain() {
+  quizDone.delete(currentQuiz);
+  document.getElementById('statDone').textContent = quizDone.size;
+  // Stay on same question, re-render
+  renderQuiz();
+}
+
+function prevQuiz() {
+  if (currentQuiz > 0) { currentQuiz--; renderQuiz(); }
+}
+function nextQuiz() {
+  if (currentQuiz < quizzes.length - 1) { currentQuiz++; renderQuiz(); }
+}
+
+// ── Checklist ──────────────────────────────────────────────────────
+function checkItem(cb) {
+  var count = document.querySelectorAll('#panel-checklist input:checked').length;
+  document.getElementById('checkCount').textContent = count;
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ── Init ───────────────────────────────────────────────────────────
+switchTab('plan');
+</script>
+</body>
+</html>
