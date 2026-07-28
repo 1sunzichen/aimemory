@@ -316,15 +316,80 @@ function addMyMsg(text) {
 }
 
 // ── TTS ────────────────────────────────────────────────────────────
+var _ttsVoices = [];
+function loadVoices() {
+  var v = speechSynthesis.getVoices();
+  if (v.length > 0) _ttsVoices = v;
+}
+loadVoices();
+speechSynthesis.onvoiceschanged = loadVoices;
+
 function playTTS(btn, text) {
-  var audio = new Audio('https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=' + encodeURIComponent(text));
-  if (btn) { btn.textContent = '🔊 播放中...'; btn.style.color = 'var(--green)'; }
+  // Try Google TTS MP3 first
+  var audio = new Audio();
+  var loaded = false;
+  var fallbackTimer = null;
+
+  audio.src = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=' + encodeURIComponent(text);
+
+  if (btn) { btn.textContent = '🔊 加载中...'; btn.style.color = 'var(--yellow)'; }
+
+  audio.oncanplaythrough = function() {
+    loaded = true;
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (btn) { btn.textContent = '🔊 播放中...'; btn.style.color = 'var(--green)'; }
+  };
+
   audio.onended = audio.onerror = function() {
     if (btn) { btn.textContent = '🔊 听TA说的'; btn.style.color = ''; }
   };
-  audio.play().catch(function() {
-    if (btn) { btn.textContent = '⚠️ 重试'; setTimeout(function(){ btn.textContent = '🔊 听TA说的'; btn.style.color = ''; }, 1500); }
-  });
+
+  audio.play().catch(function() {});
+
+  // Fallback: if Google TTS doesn't load in 2.5s, use browser speechSynthesis
+  fallbackTimer = setTimeout(function() {
+    if (loaded) return;
+    // Google TTS blocked — use browser TTS
+    if (btn) { btn.textContent = '🔊 系统语音...'; btn.style.color = 'var(--accent)'; }
+    audio.pause();
+    audio.src = '';
+
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 0.85;
+    utter.volume = 1;
+
+    if (_ttsVoices.length === 0) loadVoices();
+    var pref = null;
+    for (var i = 0; i < _ttsVoices.length; i++) {
+      var v = _ttsVoices[i];
+      if (v.lang === 'en-US' && v.name.indexOf('Google') !== -1) { pref = v; break; }
+    }
+    if (!pref) {
+      for (var i = 0; i < _ttsVoices.length; i++) {
+        if (_ttsVoices[i].lang === 'en-US') { pref = _ttsVoices[i]; break; }
+      }
+    }
+    if (pref) utter.voice = pref;
+
+    utter.onend = utter.onerror = function() {
+      if (btn) { btn.textContent = '🔊 听TA说的'; btn.style.color = ''; }
+    };
+
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+
+    // Chrome bug workaround: prevent speech from stopping mid-sentence
+    var resumeId = setInterval(function() {
+      if (speechSynthesis.speaking) {
+        speechSynthesis.pause();
+        speechSynthesis.resume();
+      } else {
+        clearInterval(resumeId);
+      }
+    }, 4000);
+    setTimeout(function() { clearInterval(resumeId); }, 30000);
+  }, 2500);
 }
 
 // ── Record ─────────────────────────────────────────────────────────
