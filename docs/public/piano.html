@@ -140,6 +140,11 @@ var notes = [
   { key:'7', note:'C5',  freq:523.25 },
   { key:'8', note:'D5',  freq:587.33 },
   { key:'9', note:'E5',  freq:659.25 },
+  { key:'/', note:'F5',  freq:698.46 },
+  { key:'*', note:'G5',  freq:783.99 },
+  { key:'-', note:'A5',  freq:880.00 },
+  { key:'+', note:'B5',  freq:987.77 },
+  { key:'.', note:'C6',  freq:1046.50 },
 ];
 var audioCtx = null;
 var isPlaying = false;
@@ -153,8 +158,9 @@ for (var i = 0; i < notes.length; i++) {
   (function(n){
     var div = document.createElement('div');
     div.className = 'key';
-    div.id = 'key-'+n.key;
-    div.innerHTML = '<span class="num">'+n.key+'</span><span class="note">'+n.note+'</span>';
+    div.id = 'key-'+n.key.replace(/[^a-zA-Z0-9]/g,'_');
+    var label = n.key === '/' ? '/' : n.key === '*' ? '*' : n.key === '-' ? '−' : n.key === '+' ? '+' : n.key === '.' ? '·' : n.key;
+    div.innerHTML = '<span class="num">'+label+'</span><span class="note">'+n.note+'</span>';
     div.onmousedown = function(e){ e.preventDefault(); hit(n.key); };
     piano.appendChild(div);
   })(notes[i]);
@@ -174,16 +180,26 @@ function hit(k) {
   gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.start(now); osc.stop(now + 0.3);
-  var el = document.getElementById('key-'+note.key);
+  var elId = 'key-'+note.key.replace(/[^a-zA-Z0-9]/g,'_');
+  var el = document.getElementById(elId);
   if (el) { el.classList.add('pressed'); setTimeout(function(){ el.classList.remove('pressed'); }, 120); }
   if (isRec) { recorded.push(note.key); updateRecDisplay(); }
 }
 
 // ── Keyboard ──────────────────────────────────────────────────────
 document.addEventListener('keydown', function(e){
-  if (e.repeat || e.target.tagName === 'INPUT') return;
+  if (e.repeat || e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  // Map keypad keys: numpad / * - + . all become their characters
+  var k = e.key;
+  // Normalize numpad keys
+  if (e.code === 'NumpadDivide') k = '/';
+  if (e.code === 'NumpadMultiply') k = '*';
+  if (e.code === 'NumpadSubtract') k = '-';
+  if (e.code === 'NumpadAdd') k = '+';
+  if (e.code === 'NumpadDecimal') k = '.';
+  // Also accept regular keyboard versions
   for (var i = 0; i < notes.length; i++) {
-    if (e.key === notes[i].key) { hit(notes[i].key); return; }
+    if (k === notes[i].key) { e.preventDefault(); hit(notes[i].key); return; }
   }
 });
 
@@ -193,10 +209,17 @@ function parseSeq(str) {
   var seq = [];
   for (var i = 0; i < parts.length; i++) {
     var p = parts[i];
-    if (p === '-' || p === '—') {
+    if (p === '—') {
       if (seq.length > 0) seq[seq.length-1].dur += 200;
-    } else if (/^[0-9]$/.test(p)) {
+    } else if (/^[0-9]$/.test(p) || p === '/' || p === '*' || p === '+' || p === '.') {
       seq.push({ key: p, dur: 200 });
+    } else if (p === '-') {
+      // '-' is ambiguous: rest OR A5 key. If it follows a digit, it's A5 key
+      if (seq.length > 0 && /^[0-9]$/.test(parts[i-1])) {
+        seq.push({ key: '-', dur: 200 });
+      } else {
+        if (seq.length > 0) seq[seq.length-1].dur += 200;
+      }
     }
   }
   return seq;
