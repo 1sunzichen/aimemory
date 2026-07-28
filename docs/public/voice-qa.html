@@ -98,6 +98,10 @@
 </header>
 
 <div class="voice-area">
+  <div style="margin-bottom:12px">
+    <button class="btn-sm" id="langEn" onclick="setLang('en-US')" style="background:rgba(74,158,255,.2);color:var(--accent);border-color:var(--accent)">🇬🇧 English</button>
+    <button class="btn-sm" id="langZh" onclick="setLang('zh-CN')">🇨🇳 中文</button>
+  </div>
   <button class="btn-voice" id="btnVoice" onclick="toggleVoice()">🎤</button>
   <div class="voice-status" id="voiceStatus">点击麦克风开始提问</div>
 </div>
@@ -129,6 +133,18 @@
 var audioStream = null;
 var isActive = false;
 var conversation = [];
+var currentLang = 'en-US';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('langEn').style.background = lang === 'en-US' ? 'rgba(74,158,255,.2)' : '';
+  document.getElementById('langEn').style.color = lang === 'en-US' ? 'var(--accent)' : '';
+  document.getElementById('langEn').style.borderColor = lang === 'en-US' ? 'var(--accent)' : '';
+  document.getElementById('langZh').style.background = lang === 'zh-CN' ? 'rgba(74,158,255,.2)' : '';
+  document.getElementById('langZh').style.color = lang === 'zh-CN' ? 'var(--accent)' : '';
+  document.getElementById('langZh').style.borderColor = lang === 'zh-CN' ? 'var(--accent)' : '';
+  document.getElementById('voiceStatus').textContent = lang === 'zh-CN' ? '可以说中文或英文' : 'Speak in English';
+}
 
 // Load saved API key
 var savedKey = localStorage.getItem('voiceqa_apikey') || '';
@@ -189,7 +205,7 @@ async function toggleVoice() {
   }
 
   var rec = new SR();
-  rec.lang = 'en-US'; rec.interimResults = true; rec.maxAlternatives = 1;
+  rec.lang = currentLang; rec.interimResults = true; rec.maxAlternatives = 1;
 
   var finalText = '';
 
@@ -279,22 +295,19 @@ async function askAI(question) {
   }
 
   // Build context from conversation + system prompt
-  var systemPrompt = 'You are an English speaking practice partner for a Chinese software engineer named Patrick (孙家奇).\n\n' +
+  var systemPrompt = 'You are a speaking practice partner for a Chinese software engineer named Patrick (孙家奇).\n\n' +
     'Patrick\'s background:\n' +
     '- AI Full-Stack Engineer, 10 years experience\n' +
     '- Skills: Go, React, Python, LLM/RAG, K8s, Docker, Gin, Kitex, Kratos, gRPC, Redis, MySQL\n' +
     '- Currently at a robotics AI company building robot cloud platform with Go+React\n' +
-    '- Previous: TAL Education (Go microservices), Shansong (frontend)\n' +
     '- Built GPU monitoring dashboards, Feishu bot integrations, multi-cloud management\n' +
-    '- Self-taught AI: learned from 3Blue1Brown, papers, built personal knowledge base\n' +
-    '- Job hunting / career: targeting AI infrastructure roles, interested in distributed systems and model serving\n\n' +
+    '- Self-taught AI: 3Blue1Brown, papers, personal knowledge base\n\n' +
     'Rules:\n' +
-    '- Answer in ENGLISH only, natural conversational tone\n' +
+    '- Answer in the SAME language as the question (English or Chinese)\n' +
     '- Keep answers under 150 words\n' +
-    '- If Patrick asks for interview practice, give model answers he can use\n' +
-    '- If he asks to explain something, explain clearly with examples\n' +
-    '- If he asks for daily work English, give realistic phrases\n' +
-    '- Use contractions (I\'m, you\'re, it\'s) to sound natural';
+    '- Natural conversational tone, use contractions in English\n' +
+    '- If practicing English: give model answers he can use directly\n' +
+    '- If Chinese question about English: explain in Chinese, provide English examples';
 
   var messages = [{ role: 'system', content: systemPrompt }];
   // Add last few exchanges for context
