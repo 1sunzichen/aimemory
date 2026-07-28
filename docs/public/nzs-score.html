@@ -49,26 +49,34 @@
 <div class="section">
   <h3>📖 主歌 A</h3>
   <div class="note-row" id="verse-a"></div>
-  <div class="lyric-row">0 - = 延长 1 拍，间距大致对节奏</div>
-  <div class="tips" style="margin-top:8px">
-    💡 原调 B♭ 大调，这里降调写成 C 大调方便键盘弹奏
-  </div>
 </div>
 
 <div class="section">
-  <h3>🎵 副歌（高潮）</h3>
+  <h3>📖 主歌 A'（变奏）</h3>
+  <div class="note-row" id="verse-a2"></div>
+</div>
+
+<div class="section">
+  <h3>🎵 副歌</h3>
   <div class="note-row" id="chorus"></div>
+</div>
+
+<div class="section">
+  <h3>🎵 副歌 B</h3>
+  <div class="note-row" id="chorus2"></div>
   <div class="lyric-row" style="margin-top:8px">
-    和弦走向：C → G/B → Am → F → C → G → Dm7 → Em
+    和弦走向：C → G/B → Am → F → C → G → Dm7 → Em (原调 B♭)
   </div>
 </div>
 
 <div class="section">
   <h3>📋 复制到钢琴</h3>
-  <div style="font-size:16px;word-break:break-all;font-family:monospace;margin-bottom:10px" id="copyVerse"></div>
-  <div style="font-size:16px;word-break:break-all;font-family:monospace;margin-bottom:10px" id="copyChorus"></div>
-  <button class="btn btn-green" onclick="openPiano()">🎹 打开钢琴页面粘贴弹奏</button>
-  <button class="btn btn-accent" onclick="playAll()">▶ 在这里试听</button>
+  <div style="font-size:14px;word-break:break-all;font-family:monospace;margin-bottom:6px"><b>主歌：</b><span id="copyVerse"></span></div>
+  <div style="font-size:14px;word-break:break-all;font-family:monospace;margin-bottom:6px"><b>主歌变奏：</b><span id="copyVerse2"></span></div>
+  <div style="font-size:14px;word-break:break-all;font-family:monospace;margin-bottom:6px"><b>副歌：</b><span id="copyChorus"></span></div>
+  <div style="font-size:14px;word-break:break-all;font-family:monospace;margin-bottom:10px"><b>副歌B：</b><span id="copyChorus2"></span></div>
+  <button class="btn btn-accent" onclick="playAll()">▶ 播全部</button>
+  <button class="btn btn-green" onclick="openPiano()">🎹 打开钢琴粘贴</button>
 </div>
 
 <div class="tips">
@@ -80,51 +88,62 @@
 </div>
 
 <script>
-// ── 念张师 in C major (approximate, verify against video) ──────────
-// 原调 B♭→这里移到 C 大调方便 0-9 键盘
+// ── 念张师 MIDI 扒谱 (from NianZhangShi.mid, Channel 0 main melody) ──
+// 原调 B♭ major → C major 0-9 键盘
 
-// 主歌 A (verse)
+// 主歌 A (Opening verse)
 var verseNotes = [
-  // 张雪峰老师 我还记得你...
-  '3','3','4','5','-','6','5','4','-',
-  '2','2','3','4','-','5','4','3','-',
-  '5','5','6','7','-','8','7','6','-',
-  '4','4','5','6','-','7','6','5','-',
+  '0','3','4','3','0','1','0','1','0','1','0','-',
+  '4','3','0','1','0','1','2','3','1','0','-',
+  '3','0','1','0','1','3','4','0','4','3','-',
+  '0','1','0','1','0','1','0','1','0','-','-',
 ];
 
-// 副歌 (chorus)
+// 主歌 A' (repeat with variation)
+var verseNotes2 = [
+  '4','3','0','1','0','1','2','3','1','0','-',
+  '3','0','1','0','3','2','0','1','-','-',
+  '0','1','3','4','0','4','3','0','1','-',
+  '0','1','0','1','0','1','0','-','-','-',
+];
+
+// 副歌 (Chorus — the famous hook)
 var chorusNotes = [
-  '3','5','6','5','3','2','1','-','2','3','5','-',
-  '6','5','3','2','1','-','-','-',
-  '3','5','6','5','3','2','1','2','3','5','6','-',
-  '5','3','2','1','-','-','-',
+  '4','3','0','1','0','1','2','3','1','0','3','-',
+  '2','1','2','3','2','1','0','-','-','-',
+  '1','0','1','0','1','0','1','-','3','-',
+  '2','3','5','4','5','3','0','1','3','-',
 ];
 
-// Render verse
-var va = document.getElementById('verse-a');
-for (var i = 0; i < verseNotes.length; i++) {
-  var n = verseNotes[i];
-  var span = document.createElement('span');
-  span.className = 'note-chip' + (n === '-' ? ' rest' : '');
-  span.textContent = n === '-' ? '—' : n;
-  span.onclick = function(k){ return function(){ playNote(k); }; }(n);
-  va.appendChild(span);
+// 副歌 B
+var chorusNotes2 = [
+  '1','3','5','4','5','0','5','4','-','-',
+  '9','3','8','0','7','0','1','-','-','-',
+  '0','1','0','1','3','4','3','4','0','5','-',
+  '0','5','4','6','4','5','9','3','5','-','-',
+];
+
+function renderRow(elId, notes) {
+  var el = document.getElementById(elId);
+  for (var i = 0; i < notes.length; i++) {
+    var n = notes[i];
+    var span = document.createElement('span');
+    span.className = 'note-chip' + (n === '-' ? ' rest' : '');
+    span.textContent = n === '-' ? '—' : n;
+    (function(k){ span.onclick = function(){ playNote(k); }; })(n);
+    el.appendChild(span);
+  }
 }
 
-// Render chorus
-var ch = document.getElementById('chorus');
-for (var i = 0; i < chorusNotes.length; i++) {
-  var n = chorusNotes[i];
-  var span = document.createElement('span');
-  span.className = 'note-chip' + (n === '-' ? ' rest' : '');
-  span.textContent = n === '-' ? '—' : n;
-  span.onclick = function(k){ return function(){ playNote(k); }; }(n);
-  ch.appendChild(span);
-}
+renderRow('verse-a', verseNotes);
+renderRow('verse-a2', verseNotes2);
+renderRow('chorus', chorusNotes);
+renderRow('chorus2', chorusNotes2);
 
-// Copy strings
 document.getElementById('copyVerse').textContent = verseNotes.join(' ');
+document.getElementById('copyVerse2').textContent = verseNotes2.join(' ');
 document.getElementById('copyChorus').textContent = chorusNotes.join(' ');
+document.getElementById('copyChorus2').textContent = chorusNotes2.join(' ');
 
 // ── Play ──────────────────────────────────────────────────────────
 var notes = [
@@ -154,13 +173,13 @@ function playNote(k) {
 
 function playAll() {
   if (playTimer) clearTimeout(playTimer);
-  var all = verseNotes.concat(['-','-'], chorusNotes);
+  var all = verseNotes.concat(['-','-'], verseNotes2, ['-','-'], chorusNotes, ['-','-'], chorusNotes2);
   var i = 0;
   function step() {
     if (i >= all.length) return;
     playNote(all[i]);
     i++;
-    playTimer = setTimeout(step, all[i-1] === '-' ? 400 : 280);
+    playTimer = setTimeout(step, all[i-1] === '-' ? 350 : 220);
   }
   step();
 }
