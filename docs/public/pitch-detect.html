@@ -125,8 +125,12 @@ async function startAnalysis() {
     html += '<span class="note"><span class="freq">' + noteNames[m%12] + (Math.floor(m/12)-1) + '</span> ';
   }
   html += '</div>';
+  var keyStr = '';
+  for (var r = 0; r < allKeys.length; r += 20) {
+    keyStr += allKeys.slice(r, r+20).join(' ') + '\n';
+  }
   html += '<div style="margin-top:14px"><b>按键序列（复制到 piano.html）：</b></div>';
-  html += '<div style="font-size:18px;word-break:break-all" id="keySeq">' + allKeys.join(' ') + '</div>';
+  html += '<pre style="font-size:18px;background:rgba(0,0,0,.3);padding:14px;border-radius:8px;overflow-x:auto;line-height:1.8" id="keySeq">' + keyStr + '</pre>';
   out.innerHTML = html;
   
   document.getElementById('status').textContent = '✅ 完成！复制上面序列到钢琴页面试试';
@@ -134,9 +138,9 @@ async function startAnalysis() {
 }
 
 function copyKeys() {
-  var seq = document.getElementById('keySeq');
-  if (seq) {
-    navigator.clipboard.writeText(seq.textContent);
+  var pre = document.getElementById('keySeq');
+  if (pre) {
+    navigator.clipboard.writeText(pre.textContent.trim());
     alert('已复制！粘贴到 piano.html 输入框');
   }
 }
