@@ -173,7 +173,8 @@ for (var i = 0; i < notes.length; i++) {
   (function(n){
     var div = document.createElement('div');
     div.className = 'key';
-    div.id = 'key-'+n.key.replace(/[^a-zA-Z0-9]/g,'_');
+    // Use note name as stable ID (e.g. key-C4, key-F5)
+    div.id = 'key-'+n.note;
     var label = n.key;
     if (label === '/') label = '/';
     else if (label === '*') label = '*';
@@ -200,8 +201,7 @@ function hit(k) {
   gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
   osc.connect(gain); gain.connect(audioCtx.destination);
   osc.start(now); osc.stop(now + 0.3);
-  var elId = 'key-'+note.key.replace(/[^a-zA-Z0-9]/g,'_');
-  var el = document.getElementById(elId);
+  var el = document.getElementById('key-'+note.note);
   if (el) { el.classList.add('pressed'); setTimeout(function(){ el.classList.remove('pressed'); }, 120); }
   if (isRec) { recorded.push(note.key); updateRecDisplay(); }
 }
