@@ -531,7 +531,43 @@ function loadVoices() { var v = speechSynthesis.getVoices(); if (v.length > 0) _
 loadVoices();
 speechSynthesis.onvoiceschanged = loadVoices;
 
+// macOS English voices sorted by quality
+var _bestVoiceOrder = ['Samantha', 'Alex', 'Daniel', 'Karen', 'Google'];
+
 function playTTS(btn, text) {
+  // Try browser speechSynthesis first (sounds more natural on macOS)
+  if (_ttsVoices.length === 0) loadVoices();
+
+  var picked = null;
+  for (var j = 0; j < _bestVoiceOrder.length; j++) {
+    for (var i = 0; i < _ttsVoices.length; i++) {
+      if (_ttsVoices[i].lang === 'en-US' && _ttsVoices[i].name.indexOf(_bestVoiceOrder[j]) !== -1) {
+        picked = _ttsVoices[i]; break;
+      }
+    }
+    if (picked) break;
+  }
+  if (!picked) {
+    for (var i = 0; i < _ttsVoices.length; i++) {
+      if (_ttsVoices[i].lang === 'en-US') { picked = _ttsVoices[i]; break; }
+    }
+  }
+
+  if (picked) {
+    // Use browser TTS (natural voice)
+    if (btn) { btn.textContent = '🔊 播放中...'; btn.style.color = 'var(--green)'; }
+    var utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US'; utter.rate = 0.9; utter.volume = 1; utter.voice = picked;
+    utter.onend = utter.onerror = function() { if (btn) { btn.textContent = '🔊 听TA说的'; btn.style.color = ''; } };
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+    // Chrome bug workaround
+    var rid = setInterval(function() { if (speechSynthesis.speaking) { speechSynthesis.pause(); speechSynthesis.resume(); } else clearInterval(rid); }, 4000);
+    setTimeout(function(){ clearInterval(rid); }, 30000);
+    return;
+  }
+
+  // Fallback: Google Translate MP3
   var audio = document.getElementById('ttsAudio');
   var loaded = false, fbTimer = null;
   audio.src = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=' + encodeURIComponent(text);
@@ -539,23 +575,12 @@ function playTTS(btn, text) {
   audio.oncanplaythrough = function() { loaded = true; if (fbTimer) clearTimeout(fbTimer); if (btn) { btn.textContent = '🔊 播放中...'; btn.style.color = 'var(--green)'; } };
   audio.onended = audio.onerror = function() { if (btn) { btn.textContent = '🔊 听TA说的'; btn.style.color = ''; } };
   audio.play().catch(function(){});
-
   fbTimer = setTimeout(function() {
     if (loaded) return;
-    if (btn) { btn.textContent = '🔊 系统语音...'; btn.style.color = 'var(--accent)'; }
+    if (btn) { btn.textContent = '⚠️ 无声音'; btn.style.color = 'var(--red)'; }
     audio.pause(); audio.src = '';
-    var utter = new SpeechSynthesisUtterance(text);
-    utter.lang = 'en-US'; utter.rate = 0.85; utter.volume = 1;
-    if (_ttsVoices.length === 0) loadVoices();
-    for (var i = 0; i < _ttsVoices.length; i++) {
-      if (_ttsVoices[i].lang === 'en-US' && _ttsVoices[i].name.indexOf('Google') !== -1) { utter.voice = _ttsVoices[i]; break; }
-    }
-    if (!utter.voice) { for (var i = 0; i < _ttsVoices.length; i++) { if (_ttsVoices[i].lang === 'en-US') { utter.voice = _ttsVoices[i]; break; } } }
-    utter.onend = utter.onerror = function() { if (btn) { btn.textContent = '🔊 听TA说的'; btn.style.color = ''; } };
-    speechSynthesis.cancel(); speechSynthesis.speak(utter);
-    var rid = setInterval(function() { if (speechSynthesis.speaking) { speechSynthesis.pause(); speechSynthesis.resume(); } else clearInterval(rid); }, 4000);
-    setTimeout(function(){ clearInterval(rid); }, 30000);
-  }, 2500);
+    setTimeout(function(){ if (btn) { btn.textContent = '🔊 听TA说的'; btn.style.color = ''; } }, 2000);
+  }, 3000);
 }
 
 function playWord(word) { playTTS(null, word); }
@@ -605,6 +630,14 @@ function practiceReply() {
     stopped = true;
     if (_pracTimer) clearTimeout(_pracTimer);
     cleanupVol();
+    // Only analyze if we have data (prevents analyzing empty recordings)
+    if (audioChunks.length === 0) {
+      isRecording = false;
+      if (btn) { btn.textContent = '🎤 跟读这句话'; btn.classList.remove('recording'); }
+      if (doneBtn) doneBtn.style.display = 'none';
+      hideHint();
+      return;
+    }
     analyzePractice();
   };
 
@@ -622,7 +655,7 @@ function practiceReply() {
     fb.classList.add('show');
   };
 
-  mediaRecorder.start(1000); // timeslice: fire ondataavailable every 1s
+  mediaRecorder.start(); // no timeslice — record until manual stop
 
   // Volume meter: create analyser to show real-time audio level
   var actx = new AudioContext();
@@ -655,10 +688,10 @@ function practiceReply() {
     if (fill) fill.style.width = '0%';
   };
 
-  // Safety: auto-stop after 15 seconds max
+  // Safety: auto-stop after 20 seconds max (prevents stuck recording)
   _pracTimer = setTimeout(function() {
     if (isRecording && !stopped) finishPractice();
-  }, 15000);
+  }, 20000);
 }
 
 function finishPractice() {
