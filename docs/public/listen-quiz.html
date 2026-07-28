@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工作听力练习 · Listening Quiz</title>
+<style>
+  :root {
+    --bg: #0f0f1a; --card: #1a1a2e; --accent: #4a9eff;
+    --green: #2ecc71; --red: #e74c3c; --yellow: #f39c12;
+    --text: #e0e0e0; --sub: #888; --border: #2a2a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; padding: 24px;
+  }
+  .container { max-width: 680px; margin: 0 auto; }
+  header { text-align: center; padding: 30px 0; }
+  header h1 { font-size: 26px; color: #fff; margin-bottom: 4px; }
+  header p { font-size: 14px; color: var(--sub); }
+
+  .progress-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; font-size: 14px; color: var(--sub);
+  }
+  .progress-bar {
+    height: 3px; background: var(--border); border-radius: 2px;
+    margin-bottom: 24px; overflow: hidden;
+  }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .3s; }
+
+  .quiz-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px; margin-bottom: 16px;
+  }
+  .quiz-card.correct { border-color: var(--green); background: rgba(46,204,113,.05); }
+  .quiz-card.wrong { border-color: var(--red); background: rgba(231,76,60,.05); }
+
+  .scene-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; background: rgba(74,158,255,.1); color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .question {
+    font-size: 16px; color: #fff; margin-bottom: 20px; line-height: 1.6;
+  }
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border);
+    background: rgba(0,0,0,.2); font-size: 15px; cursor: pointer;
+    transition: .15s; text-align: left; color: var(--text);
+  }
+  .option:hover:not(.disabled) { border-color: var(--accent); background: rgba(74,158,255,.08); }
+  .option.selected { border-color: var(--accent); background: rgba(74,158,255,.15); }
+  .option.correct { border-color: var(--green); background: rgba(46,204,113,.15); color: var(--green); }
+  .option.wrong { border-color: var(--red); background: rgba(231,76,60,.15); color: var(--red); }
+  .option.disabled { cursor: default; opacity: .7; }
+
+  .play-area {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+  }
+  .btn-play {
+    padding: 14px 32px; border-radius: 50px; border: none;
+    background: var(--accent); color: #fff; font-size: 16px; font-weight: 600;
+    cursor: pointer; transition: .15s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-play:hover { opacity: .9; }
+  .btn-play.playing { background: var(--green); }
+  .play-count { font-size: 13px; color: var(--sub); }
+  .btn-next {
+    padding: 12px 28px; border-radius: 10px; border: 1px solid var(--accent);
+    background: transparent; color: var(--accent); font-size: 15px;
+    cursor: pointer; font-weight: 600; display: none;
+  }
+  .btn-next.show { display: block; }
+
+  .explanation {
+    margin-top: 16px; padding: 12px 16px; border-radius: 10px;
+    font-size: 14px; line-height: 1.7; display: none;
+    background: rgba(0,0,0,.2);
+  }
+  .explanation.show { display: block; }
+  .explanation b { color: var(--accent); }
+
+  .score-summary {
+    text-align: center; padding: 40px 20px; display: none;
+  }
+  .score-summary.show { display: block; }
+  .score-big { font-size: 64px; font-weight: 700; margin: 10px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🎧 工作听力练习</h1>
+  <p>听一段真实工作对话 → 回答选择题 → 检查理解</p>
+</header>
+
+<div class="progress-row">
+  <span id="progressLabel">第 1 / 10 题</span>
+  <span id="scoreLabel">得分: 0</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div id="quizArea"></div>
+<div class="score-summary" id="scoreSummary"></div>
+
+</div>
+
+<script>
+// ── Quiz bank — based on Patrick's resume ──────────────────────────
+var quizzes = [
+  {
+    scene: 'Morning Coffee · Sarah',
+    audio: "Hey Patrick, so I heard you built this whole robot cloud platform at your last gig. That is pretty wild — like, config management, GPU monitoring across three cloud vendors? How did you even keep track of all that?",
+    cn: "嘿Patrick，听说你上家搭了一整套机器人云平台。挺厉害的——配置管理、跨三个云厂商的GPU监控？你们怎么跟踪那么多东西的？",
+    question: "What did Patrick build at his last company?",
+    options: [
+      "A mobile app for robot control",
+      "A robot cloud management platform with GPU monitoring",
+      "A video game engine",
+      "A social media dashboard"
+    ],
+    answer: 1,
+    explain: "对话中Sarah提到了 <b>'robot cloud platform'</b> 和 <b>'GPU monitoring across three cloud vendors'</b>。关键词：platform, config management, GPU monitoring。"
+  },
+  {
+    scene: 'Standup · Mike',
+    audio: "Alright, quick standup. Patrick, you are on that LLM agent feature, right? I saw you pushed some code last night — the ChromaDB integration? How is the retrieval pipeline looking? We kind of need that demo by Friday, if possible.",
+    cn: "好，快速站会。Patrick，你在做LLM agent功能对吧？我看你昨晚提交了代码——ChromaDB集成？检索pipeline怎么样了？我们最好周五前出demo。",
+    question: "When does Mike want the demo ready?",
+    options: [
+      "By the end of today",
+      "By Wednesday",
+      "By Friday",
+      "Next week"
+    ],
+    answer: 2,
+    explain: "Mike 说 <b>'we kind of need that demo by Friday'</b>。'kind of' 是口语中的委婉说法，意思就是'最好周五前'。"
+  },
+  {
+    scene: 'HR Chat · Lisa',
+    audio: "So Patrick, I was looking at your background — ten years across frontend, backend, and now AI? That is a pretty unusual path. Most people just stick to one stack. What made you keep jumping into new things? And do you have any questions about our learning stipend?",
+    cn: "Patrick，我看了你的背景——十年从前端到后端再到AI？这个路径挺不常见的。大多数人就守着一个技术栈。什么让你一直跳到新领域？对我们的学习津贴有什么问题吗？",
+    question: "What does Lisa find unusual about Patrick's background?",
+    options: [
+      "He only has one year of experience",
+      "He worked at too many companies",
+      "He switched across frontend, backend, and AI over 10 years",
+      "He has no degree"
+    ],
+    answer: 2,
+    explain: "Lisa 说 <b>'ten years across frontend, backend, and now AI — that is a pretty unusual path'</b>。她惊讶的是你跨了三个领域而非常人只守一个。"
+  },
+  {
+    scene: 'Architecture Chat · Alex',
+    audio: "Okay, so our robot fleet talks gRPC — each bot streams telemetry back to the cloud every 100 milliseconds. That is like, thousands of messages per second. You mentioned you used Kitex and Kratos at your last job? Same vibe. But have you dealt with this kind of throughput before? Because honestly, it gets messy real fast.",
+    cn: "好，我们机器人集群用gRPC通信——每个机器人每100毫秒往云端回流遥测数据。相当于每秒几千条消息。你说上家用过Kitex和Kratos？感觉差不多。但你处理过这种吞吐量吗？说实话，很快就乱成一团。",
+    question: "How often do the robots send telemetry data?",
+    options: [
+      "Every second",
+      "Every 100 milliseconds",
+      "Every minute",
+      "Once per hour"
+    ],
+    answer: 1,
+    explain: "Alex 明确说 <b>'every 100 milliseconds'</b>。'throughput' 是吞吐量，'gets messy real fast' = 很快就变得很乱。"
+  },
+  {
+    scene: 'Lunch · Jessica (PM)',
+    audio: "Wait, so you taught yourself AI? Like, from scratch? That is insane! Most engineers I know went back to school for a master's or something. You just... watched YouTube and read papers? And now you are building RAG pipelines? How long did that even take you?",
+    cn: "等等，你是自学AI的？从零开始？太疯狂了！我认识的大多数工程师都回学校读了个硕士什么的。你就...看YouTube和读论文？现在在做RAG pipeline？这花了你多长时间？",
+    question: "How did Patrick learn AI?",
+    options: [
+      "He got a Master's degree",
+      "He attended a coding bootcamp",
+      "He taught himself through videos and papers",
+      "His company sent him to training"
+    ],
+    answer: 2,
+    explain: "Jessica 说 <b>'you taught yourself AI? From scratch?'</b> 和 <b>'watched YouTube and read papers'</b>。'from scratch' = 从零开始。"
+  },
+  {
+    scene: 'Code Review · David',
+    audio: "Hey, I just put up a PR for the robot firmware versioning module. It is kind of a mess right now — we have like three different config formats floating around. You built something like this before, right? Could you take a look and tell me if I am overcomplicating it? I feel like I am going in circles.",
+    cn: "嘿，我刚提了个机器人固件版本管理模块的PR。现在有点乱——有三个不同的配置格式在漂着。你之前做过类似的对吧？能帮忙看看我是不是搞复杂了？感觉在原地打转。",
+    question: "What problem is David having with his PR?",
+    options: [
+      "The code doesn't compile",
+      "He has three different config formats and thinks it is too complex",
+      "The tests are failing",
+      "He lost the code"
+    ],
+    answer: 1,
+    explain: "David 说 <b>'three different config formats floating around'</b> 和 <b>'am I overcomplicating it'</b>。'going in circles' = 原地打转、没有进展。"
+  },
+  {
+    scene: '1:1 · Mike (Tech Lead)',
+    audio: "So, big picture — where do you see yourself in, say, six months? I know you just joined, but I want to make sure we are giving you the right projects. You mentioned you are into distributed systems and model serving. We have some gnarly inference optimization work coming up — would that interest you?",
+    cn: "宏观来看——你觉得自己六个月后会在什么位置？我知道你刚入职，但我想确保给你合适的项目。你提过对分布式系统和模型推理感兴趣。我们接下来有些棘手的推理优化工作——你有兴趣吗？",
+    question: "What project does Mike suggest for Patrick?",
+    options: [
+      "Frontend redesign",
+      "Writing documentation",
+      "Inference optimization work",
+      "Moving to another team"
+    ],
+    answer: 2,
+    explain: "Mike 说 <b>'gnarly inference optimization work coming up — would that interest you?'</b>。'gnarly' 是口语，意思是困难但有意思的。"
+  },
+  {
+    scene: 'Wrap-up · Sarah',
+    audio: "Hey, before you head out — I was checking out your GitHub last night. That GPU dashboard you built? With the multi-cloud metrics? That is seriously cool. Our infra team has been trying to build something like that for months. Would you be up for showing it at the next all-hands? No pressure, just like a ten-minute walkthrough.",
+    cn: "嘿，你走之前——我昨晚看了你的GitHub。你做的那个GPU仪表盘？带多云指标的？真的很酷。我们基础设施团队搞了好几个月想做类似的东西。你有兴趣在下次全员会上展示一下吗？不勉强，就十分钟走查。",
+    question: "What did Sarah find on Patrick's GitHub?",
+    options: [
+      "A personal blog",
+      "A GPU monitoring dashboard with multi-cloud metrics",
+      "A game he built",
+      "His college project"
+    ],
+    answer: 1,
+    explain: "Sarah 说 <b>'GPU dashboard with the multi-cloud metrics'</b>。'all-hands' = 全员大会，'walkthrough' = 走查演示。"
+  },
+  {
+    scene: 'Production Issue · Alex',
+    audio: "Crap — the robot telemetry API just spiked. P99 latency went from like 200 milliseconds to almost two seconds. That is... not great. You have dealt with production fires before, right? Can you pull up Grafana and help me trace this? I think it might be one of the gRPC connections leaking, but I am not sure.",
+    cn: "糟了——机器人遥测API刚飙升了。P99延迟从大约200毫秒涨到快两秒。这...不太好。你处理过线上事故对吧？能打开Grafana帮我追踪一下吗？我觉得可能是某个gRPC连接泄漏，但不确定。",
+    question: "What does Alex think might be causing the issue?",
+    options: [
+      "The database is down",
+      "A gRPC connection might be leaking",
+      "Someone deleted the code",
+      "The server restarted"
+    ],
+    answer: 1,
+    explain: "Alex 说 <b>'might be one of the gRPC connections leaking'</b>。'spiked' = 飙升，'production fire' = 线上事故的俚语。"
+  },
+  {
+    scene: 'VP Demo · Mike',
+    audio: "Okay, so the VP wants to see the LLM agent tomorrow at 2. I know it is short notice, but here is the thing — she cares way more about the user experience than the tech. Like, show her the robot answering questions naturally. The RAG stuff, the GPU dashboard — save that for the Q and A. Just make it look smooth, okay? You got this.",
+    cn: "好，VP明天两点想看LLM agent。我知道通知得急，但关键是——她更在意用户体验而不是技术。比如，给她看机器人自然地回答问题。RAG那些、GPU仪表盘——留到问答环节。就让它看起来流畅，好吗？你能行的。",
+    question: "What does Mike say the VP cares most about?",
+    options: [
+      "The backend architecture",
+      "The code quality",
+      "The user experience and natural interaction",
+      "The deployment pipeline"
+    ],
+    answer: 2,
+    explain: "Mike 强调 <b>'she cares way more about the user experience than the tech'</b>。'short notice' = 临时通知，'Q and A' = 问答环节，'you got this' = 你能行。"
+  }
+];
+
+// ── State ──────────────────────────────────────────────────────────
+var currentIdx = 0;
+var score = 0;
+var answered = false;
+var playCount = 0;
+
+// ── TTS ────────────────────────────────────────────────────────────
+var _voices = [];
+function loadV() { var v = speechSynthesis.getVoices(); if (v.length > 0) _voices = v; }
+loadV();
+speechSynthesis.onvoiceschanged = loadV;
+
+var _bestVoices = ['Samantha', 'Alex', 'Daniel', 'Karen'];
+
+function getBestVoice() {
+  if (_voices.length === 0) loadV();
+  for (var j = 0; j < _bestVoices.length; j++)
+    for (var i = 0; i < _voices.length; i++)
+      if (_voices[i].lang === 'en-US' && _voices[i].name.indexOf(_bestVoices[j]) !== -1) return _voices[i];
+  for (var i = 0; i < _voices.length; i++)
+    if (_voices[i].lang === 'en-US') return _voices[i];
+  return null;
+}
+
+function playAudio(sceneId) {
+  var q = quizzes[currentIdx];
+  speechSynthesis.cancel();
+  var utter = new SpeechSynthesisUtterance(q.audio);
+  utter.lang = 'en-US'; utter.rate = 0.9; utter.volume = 1;
+  var v = getBestVoice();
+  if (v) utter.voice = v;
+
+  var btn = document.getElementById('btnPlay');
+  if (btn) { btn.textContent = '🔊 播放中...'; btn.classList.add('playing'); }
+  utter.onend = utter.onerror = function() {
+    if (btn) { btn.textContent = '🔊 播放 ('+(++playCount)+')'; btn.classList.remove('playing'); }
+  };
+  speechSynthesis.speak(utter);
+  // Chrome bug
+  var rid = setInterval(function() { if (speechSynthesis.speaking) { speechSynthesis.pause(); speechSynthesis.resume(); } else clearInterval(rid); }, 4000);
+  setTimeout(function(){ clearInterval(rid); }, 30000);
+}
+
+// ── Render quiz ────────────────────────────────────────────────────
+function renderQuiz() {
+  if (currentIdx >= quizzes.length) { showSummary(); return; }
+
+  var q = quizzes[currentIdx];
+  playCount = 0;
+  answered = false;
+
+  var optHTML = '';
+  for (var i = 0; i < q.options.length; i++) {
+    optHTML += '<button class="option" onclick="selectAnswer('+i+')" id="opt'+i+'">'+escHtml(q.options[i])+'</button>';
+  }
+
+  document.getElementById('quizArea').innerHTML =
+    '<div class="quiz-card" id="quizCard">' +
+      '<div class="scene-badge">'+escHtml(q.scene)+'</div>' +
+      '<div class="play-area">' +
+        '<button class="btn-play" id="btnPlay" onclick="playAudio()">🔊 播放 (0)</button>' +
+        '<span class="play-count">可以反复听</span>' +
+      '</div>' +
+      '<div style="font-size:12px;color:var(--sub);margin-bottom:16px">🇨🇳 '+escHtml(q.cn)+'</div>' +
+      '<div class="question">'+escHtml(q.question)+'</div>' +
+      '<div class="options">'+optHTML+'</div>' +
+      '<div class="explanation" id="explain"></div>' +
+      '<div style="margin-top:16px">' +
+        '<button class="btn-next" id="btnNext" onclick="nextQuiz()">下一题 →</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('progressLabel').textContent = '第 '+(currentIdx+1)+' / '+quizzes.length+' 题';
+  document.getElementById('progressFill').style.width = ((currentIdx)/quizzes.length*100)+'%';
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+  var q = quizzes[currentIdx];
+  var correct = (idx === q.answer);
+
+  // Highlight
+  for (var i = 0; i < q.options.length; i++) {
+    var opt = document.getElementById('opt'+i);
+    if (!opt) continue;
+    opt.classList.add('disabled');
+    if (i === q.answer) opt.classList.add('correct');
+    if (i === idx && !correct) opt.classList.add('wrong');
+  }
+
+  var card = document.getElementById('quizCard');
+  var explain = document.getElementById('explain');
+
+  if (correct) {
+    score++;
+    card.classList.add('correct');
+    explain.innerHTML = '<b>✅ 正确！</b> ' + q.explain;
+  } else {
+    card.classList.add('wrong');
+    explain.innerHTML = '<b>❌ 不对。</b> 正确答案是 <b style="color:var(--green)">'+escHtml(q.options[q.answer])+'</b>。<br>' + q.explain;
+  }
+  explain.classList.add('show');
+
+  document.getElementById('btnNext').classList.add('show');
+  document.getElementById('scoreLabel').textContent = '得分: '+score;
+}
+
+function nextQuiz() {
+  currentIdx++;
+  renderQuiz();
+}
+
+function showSummary() {
+  var total = quizzes.length;
+  var pct = Math.round(score/total*100);
+  var emoji = pct >= 80 ? '🏆' : pct >= 60 ? '👍' : '📚';
+  var msg = pct >= 80 ? '听力很强！外企日常工作沟通没问题。' :
+            pct >= 60 ? '还不错，继续练，多听几遍。' : '需要多练，先从听懂关键词开始。';
+
+  document.getElementById('quizArea').innerHTML = '';
+  document.getElementById('scoreSummary').innerHTML =
+    '<h2>'+emoji+' 练习完成</h2>' +
+    '<div class="score-big" style="color:'+(pct>=80?'var(--green)':pct>=60?'var(--yellow)':'var(--red)')+'">'+score+' / '+total+'</div>' +
+    '<p style="color:var(--sub);margin-bottom:20px">'+msg+'</p>' +
+    '<button class="btn-play" onclick="resetQuiz()">🔄 再来一次</button>';
+  document.getElementById('scoreSummary').classList.add('show');
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressLabel').textContent = '完成！';
+}
+
+function resetQuiz() {
+  currentIdx = 0; score = 0;
+  document.getElementById('scoreSummary').classList.remove('show');
+  document.getElementById('scoreLabel').textContent = '得分: 0';
+  renderQuiz();
+}
+
+function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// ── Start ──────────────────────────────────────────────────────────
+renderQuiz();
+</script>
+</body>
+</html>
