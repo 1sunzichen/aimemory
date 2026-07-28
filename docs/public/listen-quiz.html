@@ -319,8 +319,8 @@ function renderQuiz() {
         '<span class="play-count">可以反复听</span>' +
       '</div>' +
       '<div style="display:flex;gap:10px;margin-bottom:16px;font-size:12px;color:var(--sub)">' +
-        '<span style="cursor:pointer" onclick="var t=this;var cn=t.getAttribute(\'data-cn\');if(t.textContent.indexOf(\'🇨🇳\')===0){t.textContent=cn}else{t.textContent=\'🇨🇳 翻译\'}" data-cn="🇨🇳 '+escHtml(q.cn)+'">🇨🇳 翻译</span>' +
-        '<span style="cursor:pointer" onclick="var t=this;var en=t.getAttribute(\'data-en\');if(t.textContent.indexOf(\'📝\')===0){t.textContent=en}else{t.textContent=\'📝 原文\'}" data-en="📝 '+escHtml(q.audio)+'">📝 原文</span>' +
+        '<span style="cursor:pointer" id="cnToggle" onclick="var t=this;var showing=t.getAttribute(\'data-show\')===\'1\';if(showing){t.textContent=\'🇨🇳 翻译\';t.setAttribute(\'data-show\',\'0\')}else{t.textContent=t.getAttribute(\'data-full\');t.setAttribute(\'data-show\',\'1\')}" data-full="🇨🇳 '+escHtml(q.cn)+'" data-show="0">🇨🇳 翻译</span>' +
+        '<span style="cursor:pointer" id="enToggle" onclick="var t=this;var showing=t.getAttribute(\'data-show\')===\'1\';if(showing){t.textContent=\'📝 原文\';t.setAttribute(\'data-show\',\'0\')}else{t.textContent=t.getAttribute(\'data-full\');t.setAttribute(\'data-show\',\'1\')}" data-full="📝 '+escHtml(q.audio)+'" data-show="0">📝 原文</span>' +
       '</div>' +
       '<div class="question">'+escHtml(q.question)+'</div>' +
       '<div class="options">'+optHTML+'</div>' +
