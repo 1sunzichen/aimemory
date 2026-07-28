@@ -219,6 +219,7 @@
     <label>贴简历关键信息（技能、经验、公司等）</label>
     <textarea id="resumeInput" placeholder="e.g.&#10;Go, Python, Docker, K8s&#10;5 years backend experience&#10;Built microservices handling 10K QPS&#10;Familiar with AWS/GCP"></textarea>
     <button class="btn-start" id="btnStart" onclick="startSim()">🔓 授权麦克风并开始</button>
+    <button class="btn-start" id="btnQuick" style="background:var(--green);margin-top:8px" onclick="startSim()">⚡ 一键开始（自动加载简历）</button>
     <div style="margin-top:10px;font-size:12px;color:var(--sub);text-align:center">
       只需授权一次麦克风，之后全程不会弹窗
     </div>
@@ -258,6 +259,20 @@
 </div>
 
 <script>
+// ── Pre-loaded resume (auto-detected from PDF) ──────────────────────
+const RESUME = {
+  name: 'Patrick (孙家奇)',
+  role: 'AI Full-Stack Engineer',
+  skills: 'Go, React, Python, LLM/RAG, K8s, Docker, Gin, Kitex, Kratos, gRPC, Redis, MySQL',
+  experience: '10 years full-stack. Currently at a robotics AI company building robot cloud platform with Go+React. Previously at TAL Education (Go microservices), Shansong (frontend). Built GPU monitoring dashboards, Feishu bot integrations, multi-cloud management.',
+  highlights: 'Robot cloud platform · AI Agent · RAG · Go microservices · Multi-cloud GPU orchestration'
+};
+
+// Pre-fill setup form
+document.getElementById('nameInput').value = RESUME.name;
+document.getElementById('roleSelect').value = RESUME.role;
+document.getElementById('resumeInput').value = RESUME.skills + '\n' + RESUME.experience;
+
 // ── Global state ───────────────────────────────────────────────────
 let userProfile = null;
 let audioStream = null; // REUSED — only ask permission once!
@@ -269,89 +284,105 @@ let sceneStates = {}; // per-scene completion
 
 // ── Scenes ─────────────────────────────────────────────────────────
 function buildScenes() {
-  const role = userProfile?.role || 'Backend Engineer';
-  const name = userProfile?.name || 'Patrick';
+  const role = userProfile?.role || RESUME.role;
+  const name = (userProfile?.name || RESUME.name).split(' ')[0]; // Just "Patrick"
 
   return [
     {
       id: 'intro', time: '9:00 AM', icon: '☕', title: 'Morning Coffee Chat',
-      coworker: 'Sarah', coworkerRole: 'Senior Engineer',
+      coworker: 'Sarah', coworkerRole: 'Senior Robotics Engineer',
       dialogue: [
-        { speaker: 'them', text: `Good morning ${name}! Welcome to the team. How was your first commute? Did you find the office okay?` },
+        { speaker: 'them', text: `Morning ${name}! So you came from a robotics AI company too? I saw your resume — you worked on a robot cloud management platform. That's exactly what we're building here. Tell me about the GPU monitoring system you built.` },
       ],
-      tips: ['回答简短即可: "Good morning! Yeah, it was smooth, about 30 minutes."', '注意 morning 的 r 不发音']
+      tips: ['用经历回应: "Yeah! We built a Go+React platform for robot config management and multi-cloud GPU monitoring. We used Feishu bots for alerts — saved the team hours every week."', '注意 built 的 t 发音，robot 读作 ROW-bot']
     },
     {
       id: 'standup', time: '9:30 AM', icon: '📋', title: 'Daily Standup',
       coworker: 'Mike', coworkerRole: 'Tech Lead',
       dialogue: [
-        { speaker: 'them', text: `Alright team, let's kick off standup. ${name}, since you're new, just tell us what you're planning to look at today.` },
+        { speaker: 'them', text: `Alright team, standup time. ${name}, you're working on the new LLM agent service today, right? How's the RAG pipeline coming along?` },
       ],
-      tips: ['模板: "Today I plan to set up my dev environment and go through the onboarding docs."', 'standup 时语调积极，dev environment 连读']
+      tips: ['结合你的技能: "Making good progress. I set up the vector database with ChromaDB yesterday and integrated the DeepSeek API. Today I'm working on the retrieval pipeline — should have a demo by EOD."', 'pipeline 读作 PIPE-line，注意重音']
     },
     {
-      id: 'onboarding', time: '10:00 AM', icon: '📖', title: 'Onboarding Session',
+      id: 'onboarding', time: '10:00 AM', icon: '📖', title: 'HR Benefits Chat',
       coworker: 'Lisa', coworkerRole: 'HR / People Ops',
       dialogue: [
-        { speaker: 'them', text: `Hi ${name}! Let me walk you through our benefits package. Do you have any questions about health insurance or the 401k?` },
+        { speaker: 'them', text: `Hi ${name}! Let me walk you through our benefits. One thing I noticed — you have 10 years of experience across different tech stacks. That's quite impressive. Do you have questions about our learning & development budget?` },
       ],
-      tips: ['可以问具体问题: "Yes, how does the health insurance enrollment work?"', '注意 insurance 重音在第2音节']
+      tips: ['可以问: "Yes! Do you cover conference tickets or online courses? I'm planning to dive deeper into distributed systems."', 'budget 读作 BUH-jit, development 重音在第2音节']
     },
     {
-      id: 'codebase', time: '11:00 AM', icon: '💻', title: 'Codebase Walkthrough',
+      id: 'codebase', time: '11:00 AM', icon: '💻', title: 'Architecture Deep Dive',
       coworker: 'Alex', coworkerRole: 'Staff Engineer',
       dialogue: [
-        { speaker: 'them', text: `So this is our main repo. We use Go for the backend services, and everything runs on Kubernetes. Have you worked with K8s before?` },
+        { speaker: 'them', text: `Since you've worked with Kitex and Kratos at TAL, you'll feel right at home. We use a similar Go microservice stack. Our robot fleet communicates via gRPC — have you worked with gRPC streaming before?` },
       ],
-      tips: ['根据你的实际经验回答: "Yeah, I've used it in production. How many clusters do you manage?"', 'Kubernetes 读作 koo-ber-NET-eez']
+      tips: ['聊具体经验: "I used gRPC for service-to-service communication with Protobuf. Haven't done streaming yet, but I'm familiar with the concepts. What's the typical message size from the robots?"', 'gRPC 读作 G-R-P-C，Protobuf 读作 PRO-to-buf']
     },
     {
-      id: 'lunch', time: '12:30 PM', icon: '🍕', title: 'Team Lunch',
+      id: 'lunch', time: '12:30 PM', icon: '🍕', title: 'Team Lunch Chat',
       coworker: 'Jessica', coworkerRole: 'Product Manager',
       dialogue: [
-        { speaker: 'them', text: `Hey ${name}, a few of us are grabbing lunch at the Thai place around the corner. Want to join?` },
+        { speaker: 'them', text: `Hey ${name}! A bunch of us are going to that hotpot place. So I heard you built a whole AI knowledge base and learning roadmap for yourself? That's pretty dedicated — what made you go deep into AI?` },
       ],
-      tips: ['自然接受: "Sounds great, I love Thai food! Let me wrap up and I'll meet you guys."', 'I\'ll 的发音像 "aisle"']
+      tips: ['自然聊: "I started by watching 3Blue1Brown and reading papers. Built a personal knowledge base with VitePress, documented everything from CNN to Transformers. It just clicked for me — I wanted to understand how these models actually work."', 'knowledge base 连读, VitePress 读作 veet-press']
     },
     {
-      id: 'pr', time: '2:00 PM', icon: '🔍', title: 'Code Review',
+      id: 'pr', time: '2:00 PM', icon: '🔍', title: 'Code Review Session',
       coworker: 'David', coworkerRole: 'Senior Engineer',
       dialogue: [
-        { speaker: 'them', text: `Hey, could you take a look at my PR when you have a minute? It's a refactor of the auth middleware, and I'd love a fresh pair of eyes on it.` },
+        { speaker: 'them', text: `Hey, I just opened a PR for the robot config management module. Since you built something similar at your last company, could you take a look? I'd love to hear how you handled version management for robot firmware.` },
       ],
-      tips: ['模板: "Sure, I'll take a look after lunch. Which part are you most concerned about?"', 'PR 读作 P-R，不缩写']
+      tips: ['结合经验: "Sure! At my last job we used a versioned config system — each robot firmware version had its own config snapshot. Let me check your approach and I'll leave some comments."', 'firmware 读作 FIRM-ware，version 的 s 是 /ʒ/']
     },
     {
-      id: 'oneonone', time: '3:30 PM', icon: '🤝', title: '1:1 with Manager',
+      id: 'oneonone', time: '3:30 PM', icon: '🤝', title: '1:1 with Tech Lead',
       coworker: 'Mike', coworkerRole: 'Tech Lead',
       dialogue: [
-        { speaker: 'them', text: `How's your first day going? Anything blocking you or anything you want to discuss? I want to make sure you're settling in well.` },
+        { speaker: 'them', text: `How's everything going? I noticed you've been pushing commits on the LLM service already. I want to make sure you're not feeling overwhelmed — also, what area do you want to grow in over the next 6 months?` },
       ],
-      tips: ['给真实反馈: "It's going well! I'm still getting my environment set up. The docs are pretty clear."', 'I\'m 和 going 可以连读成 "I'm goin"']
+      tips: ['坦率回答: "It's going well! I'm excited about the LLM work. In the next 6 months I want to get deeper into distributed systems and model serving infrastructure. Maybe take on the inference optimization work."', 'overwhelmed 读作 o-ver-WELMD, optimization 重音在第3音节']
     },
     {
       id: 'wrapup', time: '4:30 PM', icon: '📝', title: 'Day Wrap-up',
-      coworker: 'Sarah', coworkerRole: 'Senior Engineer',
+      coworker: 'Sarah', coworkerRole: 'Senior Robotics Engineer',
       dialogue: [
-        { speaker: 'them', text: `Hey ${name}, heading out soon? How did your first day go overall?` },
+        { speaker: 'them', text: `Hey ${name}, heading out? Great first day! By the way, I saw the GPU dashboard you built at your last company on GitHub. Would you be interested in presenting it at our next engineering all-hands? It could help the team understand multi-cloud monitoring.` },
       ],
-      tips: ['总结一天: "It was great! I got my dev environment set up, met the team, and started exploring the codebase. Excited for tomorrow!"', 'exploring 重音在第2音节']
+      tips: ['积极回应: "Oh, that'd be awesome! I can walk through the architecture — how we aggregated GPU metrics across Alibaba Cloud, Baidu Cloud, and Volcano Cloud, then pushed alerts through Feishu. Give me a few days to prepare."', 'dashboard 读作 DASH-bord, aggregate 重音在第1音节']
     },
     {
-      id: 'nextday_standup', time: 'Next Day 9:30AM', icon: '📋', title: 'Day 2 Standup',
+      id: 'day2_standup', time: 'Day 2 · 9:30 AM', icon: '📋', title: 'Day 2 Standup',
       coworker: 'Mike', coworkerRole: 'Tech Lead',
       dialogue: [
-        { speaker: 'them', text: `${name}, how's it going with the onboarding? Do you think you could pick up a small bug fix today?` },
+        { speaker: 'them', text: `${name}, how's the RAG pipeline? I saw you pushed the vector store integration last night. Did you run into any issues with the embedding dimensions?` },
       ],
-      tips: ['模板: "Yeah, I think so. I'm mostly set up now. What's the issue about?"', 'pick up 连读像 "pi-kup"']
+      tips: ['讲进展: "Good progress! The ChromaDB integration is done. I did hit one issue — the DeepSeek embedding model outputs 4096 dimensions but we had 1536 in our schema. Fixed it this morning. Should have the retrieval endpoint ready for testing by noon."', 'dimensions 读作 di-MEN-shuns']
     },
     {
-      id: 'debug', time: 'Day 2 2:00PM', icon: '🐛', title: 'Debugging Session',
+      id: 'debug', time: 'Day 2 · 2:00 PM', icon: '🐛', title: 'Production Issue',
       coworker: 'Alex', coworkerRole: 'Staff Engineer',
       dialogue: [
-        { speaker: 'them', text: `I noticed the API latency spiked in production. Could you help me dig into the logs and see what's going on?` },
+        { speaker: 'them', text: `We're seeing latency spikes on the robot telemetry API — p99 went from 200ms to 2 seconds. You've dealt with production incidents before, right? Can you help me dig into the logs?` },
       ],
-      tips: ['专业回答: "Of course. Which service is affected? Let me pull up the dashboard."', 'latency 读作 LAY-ten-see']
+      tips: ['专业回应: "On it. Let me pull up the Grafana dashboard and check which service is the bottleneck. Is this affecting all robots or just a specific fleet? I'll trace the gRPC calls."', 'latency 读作 LAY-ten-see, bottleneck 重音在第1音节']
+    },
+    {
+      id: 'design', time: 'Day 3 · 10:00 AM', icon: '🎨', title: 'Design Review',
+      coworker: 'Jessica', coworkerRole: 'Product Manager',
+      dialogue: [
+        { speaker: 'them', text: `${name}, we're planning the next iteration of the robot AI assistant. You mentioned you've built AI agents before. What would you suggest for the conversation flow? Should we go with a state machine or let the LLM handle it?` },
+      ],
+      tips: ['给出观点: "I'd recommend a hybrid approach. Use a state machine for the critical paths — like emergency stop and safety checks — but let the LLM handle the conversational parts. At my last job I used a similar pattern with a guard-railed agent."', 'hybrid 读作 HIGH-brid, conversational 重音在第3音节']
+    },
+    {
+      id: 'demo', time: 'Day 3 · 3:00 PM', icon: '🚀', title: 'Demo to VP',
+      coworker: 'Mike', coworkerRole: 'Tech Lead',
+      dialogue: [
+        { speaker: 'them', text: `${name}, the VP of Engineering wants a quick demo of the LLM agent service tomorrow. Just 5 minutes — show the RAG pipeline, the robot Q&A, and the GPU monitoring dashboard. You up for it?` },
+      ],
+      tips: ['自信回应: "Absolutely. I'll prep a 5-minute walkthrough: RAG retrieval → LLM response → robot command. I'll have a backup local demo in case the API has issues. Anything specific the VP cares about?"', 'walkthrough 读作 WALK-through, backup 读作 BACK-up']
     }
   ];
 }
