@@ -74,7 +74,8 @@ export default defineConfig({
             { text: 'GPT/Claude 纯解码器架构', link: '/ai-learning-notes/decoder-only' },
             { text: 'Softmax、欧拉数 e 与求导', link: '/ai-learning-notes/softmax-e-derivatives' },
             { text: 'Sigmoid 函数', link: '/ai-learning-notes/sigmoid' },
-            { text: 'MCP 协议（模型上下文协议）', link: '/ai-learning-notes/mcp-protocol' }
+            { text: 'MCP 协议（模型上下文协议）', link: '/ai-learning-notes/mcp-protocol' },
+            { text: 'ReAct: Thought→Action→Observation', link: '/ai-learning-notes/react-thought-action-observation' }
           ]
         }
       ],
