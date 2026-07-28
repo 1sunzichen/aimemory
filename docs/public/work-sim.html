@@ -582,6 +582,11 @@ function practiceReply() {
   if (doneBtn) { doneBtn.style.display = 'inline-flex'; doneBtn.textContent = '✅ 读完'; }
 
   showHint('🎤 大声朗读上方英文 — 读完后点 ✅ 读完');
+  // Add volume meter
+  var hintBar = document.getElementById('hintBar');
+  var meterHTML = '<span id="volMeter" style="display:inline-block;width:120px;height:4px;background:var(--border);border-radius:2px;vertical-align:middle;margin-left:8px;overflow:hidden">' +
+    '<span id="volFill" style="display:block;height:100%;background:var(--green);border-radius:2px;width:0%;transition:width .15s"></span></span>';
+  hintBar.innerHTML = '🎤 大声朗读 — 读完点 ✅ 读完 ' + meterHTML;
 
   try {
     mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
@@ -599,6 +604,7 @@ function practiceReply() {
     if (stopped) return;
     stopped = true;
     if (_pracTimer) clearTimeout(_pracTimer);
+    cleanupVol();
     analyzePractice();
   };
 
@@ -606,6 +612,7 @@ function practiceReply() {
     if (stopped) return;
     stopped = true;
     if (_pracTimer) clearTimeout(_pracTimer);
+    cleanupVol();
     isRecording = false;
     if (btn) { btn.textContent = '🎤 跟读这句话'; btn.classList.remove('recording'); }
     if (doneBtn) doneBtn.style.display = 'none';
@@ -616,6 +623,37 @@ function practiceReply() {
   };
 
   mediaRecorder.start(1000); // timeslice: fire ondataavailable every 1s
+
+  // Volume meter: create analyser to show real-time audio level
+  var actx = new AudioContext();
+  var src = actx.createMediaStreamSource(audioStream);
+  var ana = actx.createAnalyser();
+  ana.fftSize = 256;
+  src.connect(ana);
+
+  var volTimer = setInterval(function() {
+    var data = new Uint8Array(ana.frequencyBinCount);
+    ana.getByteFrequencyData(data);
+    var avg = 0;
+    for (var i = 0; i < data.length; i++) avg += data[i];
+    avg = avg / data.length;
+    var pct = Math.min(100, avg * 2);
+    var fill = document.getElementById('volFill');
+    if (fill) fill.style.width = pct + '%';
+
+    // Change hint color if very quiet
+    var hint = document.getElementById('hintBar');
+    if (hint && avg < 5) hint.style.color = 'var(--yellow)';
+    else if (hint) hint.style.color = '';
+  }, 150);
+
+  // Cleanup on stop
+  var cleanupVol = function() {
+    clearInterval(volTimer);
+    actx.close();
+    var fill = document.getElementById('volFill');
+    if (fill) fill.style.width = '0%';
+  };
 
   // Safety: auto-stop after 15 seconds max
   _pracTimer = setTimeout(function() {
@@ -629,7 +667,6 @@ function finishPractice() {
   isRecording = false;
 
   // Remove onstop to avoid double-fire, then stop
-  var oldOnStop = mediaRecorder.onstop;
   mediaRecorder.onstop = null;
   try { mediaRecorder.stop(); } catch(e) {}
 
@@ -640,7 +677,7 @@ function finishPractice() {
   if (doneBtn) doneBtn.style.display = 'none';
   hideHint();
 
-  // Restore onstop and analyze
+  // Analyze after a short delay
   setTimeout(function() { analyzePractice(); }, 100);
 }
 
@@ -650,8 +687,9 @@ function analyzePractice() {
   window._pracRec = url;
 
   var fb = document.getElementById('feedbackBar');
-  fb.innerHTML = '🔍 分析中...';
+  fb.innerHTML = '🔍 AI 分析中...';
   fb.classList.add('show');
+  fb.style.background = '';
 
   doSpeech().then(function(alts) {
     var best = alts[0] ? alts[0].text.toLowerCase().replace(/[.,!?]/g, '') : '';
@@ -671,14 +709,13 @@ function analyzePractice() {
     for (var i = 0; i < expWords.length; i++) {
       if (i >= gotWords.length) { issues.push('<b>'+escHtml(expWords[i])+'</b> <span class="bad">(没说)</span>'); }
       else if (gotWords[i] !== expWords[i] && levenshtein(expWords[i], gotWords[i]) > 1) {
-        // Find phonetic hint
         var hint = '';
         if (currentScene.pho) {
           for (var j = 0; j < currentScene.pho.length; j++) {
             if (currentScene.pho[j].w === expWords[i]) { hint = ' /'+currentScene.pho[j].p+'/'; break; }
           }
         }
-        issues.push('<b>'+escHtml(expWords[i])+'</b> → 读成 "<span class="bad">'+escHtml(gotWords[i])+'</span>"'+hint);
+        issues.push('<b>'+escHtml(expWords[i])+'</b> → "<span class="bad">'+escHtml(gotWords[i])+'</span>"'+hint);
       }
     }
 
@@ -686,28 +723,41 @@ function analyzePractice() {
     var sd = document.getElementById('scoreDetail');
     if (score >= 80) {
       sb.className = 'score-badge good'; sb.textContent = '✅ '+score+'%';
-      sd.textContent = '发音不错！点击 → 发送回复';
+      sd.textContent = '发音不错！点击 → 发送';
+      fb.style.background = 'rgba(46,204,113,.1)';
     } else if (score >= 50) {
       sb.className = 'score-badge ok'; sb.textContent = '⚠️ '+score+'%';
       sd.textContent = '还行，再练几次';
+      fb.style.background = 'rgba(243,156,18,.1)';
     } else {
       sb.className = 'score-badge bad'; sb.textContent = '❌ '+score+'%';
       sd.textContent = '需要多练，点击单词听标准发音';
+      fb.style.background = 'rgba(231,76,60,.08)';
     }
 
-    var issueHTML = issues.length > 0 ? '<br>⚠️ 需改进: '+issues.join(' · ') : '<br><span class="ok">✅ 所有单词识别正确</span>';
+    var spokenLine = best ? '你说: "<b>'+escHtml(best)+'</b>"' : '<span class="bad">未识别到语音</span>';
+    var confLine = best ? ' (置信度 '+Math.round(conf*100)+'%)' : '';
+    var issueHTML = issues.length > 0 ? '<br>⚠️ 需改进: '+issues.join(' · ') : (best ? '<br><span class="ok">✅ 所有单词识别正确</span>' : '');
+
     fb.innerHTML =
-      '<span class="'+(score>=80?'ok':score>=50?'warn':'bad')+'">你说: "'+escHtml(best||'(未识别)')+'" (置信度 '+Math.round(conf*100)+'%)</span>' +
+      '<span class="'+(score>=80?'ok':score>=50?'warn':'bad')+'">'+spokenLine+confLine+'</span>' +
       issueHTML +
-      ' <button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的</button>' +
-      ' <button class="btn-sm" onclick="practiceReply()">🔄 再练</button>';
+      ' <button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的录音</button>' +
+      ' <button class="btn-sm" onclick="playTTS(null,\''+escAttr(currentScene.reply)+'\')">🔊 听标准</button>' +
+      ' <button class="btn-sm" onclick="practiceReply()">🔄 再练</button>' +
+      (best ? '' : '<br><span style="font-size:12px;color:var(--sub)">💡 提示：请离麦克风近一些，用正常语速朗读，中间不要停顿太久</span>');
   }).catch(function(err) {
     var fb = document.getElementById('feedbackBar');
-    fb.innerHTML = '<span class="bad">⚠️ 识别失败: '+err.message+'</span> · 请大声清晰朗读';
+    fb.innerHTML =
+      '<span class="bad">⚠️ 识别失败: '+err.message+'</span>' +
+      ' <button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的录音</button>' +
+      ' <button class="btn-sm" onclick="practiceReply()">🔄 再练</button>' +
+      '<br><span style="font-size:12px;color:var(--sub)">💡 可能原因：① 网络不通（语音识别需要联网）② 背景噪音大 ③ 语速太快</span>';
     fb.classList.add('show');
+    fb.style.background = 'rgba(231,76,60,.08)';
     document.getElementById('scoreBadge').className = 'score-badge bad';
     document.getElementById('scoreBadge').textContent = '❌';
-    document.getElementById('scoreDetail').textContent = '未识别到语音';
+    document.getElementById('scoreDetail').textContent = err.message;
   });
 }
 
