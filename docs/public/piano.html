@@ -3,205 +3,274 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>数字钢琴 · 0-9 键盘弹奏</title>
+<title>数字钢琴 · 念张师</title>
 <style>
   :root {
     --bg: #0f0f1a; --card: #1a1a2e; --accent: #4a9eff;
-    --text: #e0e0e0; --sub: #888; --border: #2a2a3e;
+    --text: #e0e0e0; --sub: #888; --border: #2a2a3e; --green: #2ecc71;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg); color: var(--text);
     min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; padding: 20px;
+    align-items: center; padding: 20px;
   }
   h1 { font-size: 22px; margin-bottom: 4px; color: #fff; }
-  .sub { font-size: 13px; color: var(--sub); margin-bottom: 30px; }
+  .sub { font-size: 13px; color: var(--sub); margin-bottom: 20px; }
 
   .piano {
-    display: flex; gap: 6px; margin-bottom: 30px; flex-wrap: wrap;
+    display: flex; gap: 5px; margin-bottom: 24px; flex-wrap: wrap;
     justify-content: center;
   }
   .key {
-    width: 64px; height: 160px; border-radius: 10px;
+    width: 56px; height: 140px; border-radius: 8px;
     background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
     border: 2px solid #ccc; cursor: pointer;
     display: flex; flex-direction: column; align-items: center;
-    justify-content: flex-end; padding-bottom: 14px;
-    transition: all .08s; user-select: none;
-    box-shadow: 0 4px 8px rgba(0,0,0,.2);
+    justify-content: flex-end; padding-bottom: 10px;
+    transition: all .06s; user-select: none;
+    box-shadow: 0 3px 6px rgba(0,0,0,.2);
   }
   .key:hover { background: linear-gradient(180deg, #f0f0ff 0%, #ddd 100%); }
   .key:active, .key.pressed {
     background: linear-gradient(180deg, #cce0ff 0%, #aac8ff 100%);
-    transform: translateY(4px);
-    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    transform: translateY(3px); box-shadow: 0 1px 2px rgba(0,0,0,.2);
     border-color: #4a9eff;
   }
-  .key .num { font-size: 22px; font-weight: 700; color: #333; }
-  .key .note { font-size: 11px; color: #888; margin-top: 4px; }
+  .key .num { font-size: 20px; font-weight: 700; color: #333; }
+  .key .note { font-size: 10px; color: #888; margin-top: 2px; }
 
-  .melody-section {
+  .panel {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 20px; max-width: 500px;
-    text-align: center;
+    border-radius: 12px; padding: 20px; max-width: 600px; width: 100%;
+    margin-bottom: 12px;
   }
-  .melody-section h3 { font-size: 15px; color: var(--accent); margin-bottom: 10px; }
-  .melody-keys {
-    display: flex; gap: 4px; justify-content: center;
-    flex-wrap: wrap; margin-bottom: 12px;
-  }
-  .melody-key {
-    padding: 8px 14px; border-radius: 8px; background: rgba(74,158,255,.1);
-    color: var(--accent); font-size: 18px; font-weight: 700;
-  }
-  .btn {
-    padding: 10px 24px; border-radius: 10px; border: none;
-    background: var(--accent); color: #fff; font-size: 15px;
-    font-weight: 600; cursor: pointer; margin: 4px;
-  }
-  .btn:hover { opacity: .9; }
-  .btn-outline {
-    background: transparent; border: 1px solid var(--accent); color: var(--accent);
-  }
+  .panel h3 { font-size: 14px; color: var(--accent); margin-bottom: 10px; }
 
-  .record-bar {
-    margin-top: 16px; font-size: 14px; color: var(--sub); min-height: 22px;
+  /* Sequence input */
+  .seq-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .seq-input {
+    flex: 1; min-width: 200px; padding: 10px 14px; border-radius: 8px;
+    border: 1px solid var(--border); background: rgba(0,0,0,.3);
+    color: #fff; font-size: 16px; font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
   }
+  .seq-input:focus { outline: none; border-color: var(--accent); }
+  .btn {
+    padding: 8px 16px; border-radius: 8px; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;
+  }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { opacity: .9; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-outline:hover { border-color: var(--accent); }
+  .btn-green { background: var(--green); color: #fff; }
+
+  /* Preset slots */
+  .slot-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+  .slot {
+    padding: 6px 12px; border-radius: 6px; font-size: 12px;
+    background: rgba(74,158,255,.08); color: var(--accent);
+    cursor: pointer; border: 1px solid rgba(74,158,255,.2);
+    transition: .15s;
+  }
+  .slot:hover { background: rgba(74,158,255,.2); }
+  .play-indicator {
+    font-size: 13px; color: var(--green); min-height: 20px; margin-top: 8px;
+  }
+  .chord-ref { font-size: 12px; color: var(--sub); margin-top: 8px; line-height: 1.6; }
+
+  .tips { font-size: 12px; color: var(--sub); margin-top: 4px; }
 </style>
 </head>
 <body>
 
-<h1>🎹 数字钢琴</h1>
-<p class="sub">按键盘 0-9 或点击琴键弹奏</p>
+<h1>🎹 数字钢琴 · 念张师</h1>
+<p class="sub">按键盘 0-9 弹奏 · 下面输入序列自动播放 · 边看视频边抄谱</p>
 
 <div class="piano" id="piano"></div>
 
-<div class="melody-section">
-  <h3>🎵 预设旋律</h3>
-  <div class="melody-keys" id="melodyDisplay"></div>
-  <button class="btn" onclick="playMelody()">▶ 自动播放</button>
-  <button class="btn btn-outline" onclick="toggleRecord()" id="btnRecord">🔴 录制</button>
-  <div class="record-bar" id="recordBar"></div>
+<div class="panel">
+  <h3>📝 旋律序列（空格分隔数字，支持 - 延长）</h3>
+  <div class="seq-row">
+    <input class="seq-input" id="seqInput" placeholder="5 5 6 7 8 7 6 5 - -" value="">
+    <button class="btn btn-accent" onclick="playSequence()">▶ 播放</button>
+    <button class="btn btn-outline" onclick="stopPlay()">⏹ 停</button>
+  </div>
+  <div class="play-indicator" id="playIndicator"></div>
+
+  <h3 style="margin-top:14px">💾 预设槽（点 ▶ 播，点 ✎ 覆盖）</h3>
+  <div class="slot-row" id="presetSlots"></div>
+
+  <div class="chord-ref">
+    🎵 <b>和弦参考</b>（B♭ 大调）：B♭ → F/A → Gm → E♭ → B♭ → F → Cm7 → Dm
+  </div>
 </div>
 
+<div class="panel">
+  <h3>🔴 实时录制</h3>
+  <div class="seq-row">
+    <button class="btn btn-outline" id="btnRec" onclick="toggleRec()">🔴 开始录制</button>
+    <button class="btn btn-outline" onclick="clearRec()">🗑 清空</button>
+  </div>
+  <div class="seq-input" id="recDisplay" style="margin-top:8px;font-size:13px;letter-spacing:1px;min-height:32px;padding:8px">弹奏的按键会出现在这里...</div>
+  <div class="seq-row" style="margin-top:6px">
+    <button class="btn btn-green" onclick="copyRecToInput()">📋 复制到播放入口</button>
+    <button class="btn btn-outline" onclick="saveRecAsPreset()">💾 存为预设</button>
+  </div>
+</div>
+
+<div class="tips">
+  💡 用法：打开 B 站「念张师 钢琴改编」视频 → 看 UP 主弹什么键 → 在上面输入框敲数字 → 点 ▶ 播放 → 反复调到对 → 存预设
+</div>
+
+<audio id="clickSound" style="display:none" src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACAf39/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4CAf39/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4CAf39/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4B/f3+AgH9/f3+Af39/gIB/f39/gH9/f4B/f3+AgH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/f3+Af39/gH9/"></audio>
+
 <script>
-// ── Piano notes mapping (0-9) ──────────────────────────────────────
-// C major scale: C4 D4 E4 F4 G4 A4 B4 C5 D5 E5
+// ── Piano notes ────────────────────────────────────────────────────
 var notes = [
-  { key: '0', note: 'C4',  freq: 261.63 },
-  { key: '1', note: 'D4',  freq: 293.66 },
-  { key: '2', note: 'E4',  freq: 329.63 },
-  { key: '3', note: 'F4',  freq: 349.23 },
-  { key: '4', note: 'G4',  freq: 392.00 },
-  { key: '5', note: 'A4',  freq: 440.00 },
-  { key: '6', note: 'B4',  freq: 493.88 },
-  { key: '7', note: 'C5',  freq: 523.25 },
-  { key: '8', note: 'D5',  freq: 587.33 },
-  { key: '9', note: 'E5',  freq: 659.25 },
+  { key:'0', note:'C4',  freq:261.63 },
+  { key:'1', note:'D4',  freq:293.66 },
+  { key:'2', note:'E4',  freq:329.63 },
+  { key:'3', note:'F4',  freq:349.23 },
+  { key:'4', note:'G4',  freq:392.00 },
+  { key:'5', note:'A4',  freq:440.00 },
+  { key:'6', note:'B4',  freq:493.88 },
+  { key:'7', note:'C5',  freq:523.25 },
+  { key:'8', note:'D5',  freq:587.33 },
+  { key:'9', note:'E5',  freq:659.25 },
 ];
-
 var audioCtx = null;
-var recording = false;
-var recordedKeys = [];
+var isPlaying = false;
+var playTimer = null;
+var recorded = [];
+var isRec = false;
 
-// ── Render piano keys ──────────────────────────────────────────────
+// ── Render keys ────────────────────────────────────────────────────
 var piano = document.getElementById('piano');
 for (var i = 0; i < notes.length; i++) {
-  var n = notes[i];
-  var div = document.createElement('div');
-  div.className = 'key';
-  div.id = 'key-' + n.key;
-  div.innerHTML = '<span class="num">' + n.key + '</span><span class="note">' + n.note + '</span>';
-  div.onmousedown = function(k) { return function(e) { e.preventDefault(); playNote(k); }; }(n);
-  piano.appendChild(div);
+  (function(n){
+    var div = document.createElement('div');
+    div.className = 'key';
+    div.id = 'key-'+n.key;
+    div.innerHTML = '<span class="num">'+n.key+'</span><span class="note">'+n.note+'</span>';
+    div.onmousedown = function(e){ e.preventDefault(); hit(n.key); };
+    piano.appendChild(div);
+  })(notes[i]);
 }
 
-// ── Play a single note ────────────────────────────────────────────
-function playNote(note) {
+// ── Play single note ──────────────────────────────────────────────
+function hit(k) {
+  var note = null;
+  for (var i = 0; i < notes.length; i++) { if (notes[i].key === k) { note = notes[i]; break; } }
+  if (!note) return;
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
   var now = audioCtx.currentTime;
-  var osc = audioCtx.createOscillator();
-  var gain = audioCtx.createGain();
-
-  osc.type = 'triangle';  // 接近钢琴音色
+  var osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+  osc.type = 'triangle';
   osc.frequency.setValueAtTime(note.freq, now);
-
-  // ADSR envelope for piano-like sound
   gain.gain.setValueAtTime(0.5, now);
-  gain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start(now);
-  osc.stop(now + 1.2);
-
-  // Visual feedback
-  var keyEl = document.getElementById('key-' + note.key);
-  if (keyEl) {
-    keyEl.classList.add('pressed');
-    setTimeout(function() { keyEl.classList.remove('pressed'); }, 150);
-  }
-
-  // Record
-  if (recording) {
-    recordedKeys.push(note.key);
-    document.getElementById('recordBar').textContent = '🔴 录制中: ' + recordedKeys.join(' ');
-  }
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.3);
+  var el = document.getElementById('key-'+note.key);
+  if (el) { el.classList.add('pressed'); setTimeout(function(){ el.classList.remove('pressed'); }, 120); }
+  if (isRec) { recorded.push(note.key); updateRecDisplay(); }
 }
 
-// ── Keyboard input ─────────────────────────────────────────────────
-document.addEventListener('keydown', function(e) {
-  if (e.repeat) return;
+// ── Keyboard ──────────────────────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if (e.repeat || e.target.tagName === 'INPUT') return;
   for (var i = 0; i < notes.length; i++) {
-    if (e.key === notes[i].key) { playNote(notes[i]); return; }
+    if (e.key === notes[i].key) { hit(notes[i].key); return; }
   }
 });
 
-// ── Melody preset: "念张师" melody (Chinese name tones) ────────────
-// "念张师": nian4 zhang1 shi1 → mapped to number keys creating a musical phrase
-var melody = ['5','3','2','1','2','3','5'];  // Simple pentatonic melody
-
-var melodyDisplay = document.getElementById('melodyDisplay');
-for (var i = 0; i < melody.length; i++) {
-  var span = document.createElement('span');
-  span.className = 'melody-key';
-  span.textContent = melody[i];
-  melodyDisplay.appendChild(span);
-}
-
-function playMelody() {
-  var i = 0;
-  var interval = setInterval(function() {
-    if (i >= melody.length) { clearInterval(interval); return; }
-    var note = null;
-    for (var j = 0; j < notes.length; j++) {
-      if (notes[j].key === melody[i]) { note = notes[j]; break; }
+// ── Sequence player ───────────────────────────────────────────────
+function parseSeq(str) {
+  var parts = str.trim().split(/\s+/);
+  var seq = [];
+  for (var i = 0; i < parts.length; i++) {
+    var p = parts[i];
+    if (p === '-' || p === '—') {
+      if (seq.length > 0) seq[seq.length-1].dur += 200;
+    } else if (/^[0-9]$/.test(p)) {
+      seq.push({ key: p, dur: 200 });
     }
-    if (note) playNote(note);
-    i++;
-  }, 300);
-}
-
-// ── Record ─────────────────────────────────────────────────────────
-function toggleRecord() {
-  recording = !recording;
-  var btn = document.getElementById('btnRecord');
-  var bar = document.getElementById('recordBar');
-
-  if (recording) {
-    recordedKeys = [];
-    btn.textContent = '⏹ 停止录制';
-    btn.style.background = '#e74c3c';
-    bar.textContent = '🔴 录制中... 用键盘0-9弹奏';
-  } else {
-    btn.textContent = '🔴 录制';
-    btn.style.background = '';
-    bar.textContent = '已录制: ' + recordedKeys.join(' ');
   }
+  return seq;
 }
+
+function playSequence() {
+  stopPlay();
+  var seq = parseSeq(document.getElementById('seqInput').value);
+  if (seq.length === 0) return;
+  isPlaying = true;
+  document.getElementById('playIndicator').textContent = '▶ 播放中...';
+  var i = 0;
+  function step() {
+    if (!isPlaying || i >= seq.length) { stopPlay(); return; }
+    hit(seq[i].key);
+    i++;
+    playTimer = setTimeout(step, seq[i-1].dur);
+  }
+  step();
+}
+
+function stopPlay() {
+  isPlaying = false;
+  if (playTimer) clearTimeout(playTimer);
+  document.getElementById('playIndicator').textContent = '';
+}
+
+// ── Record ────────────────────────────────────────────────────────
+function toggleRec() {
+  isRec = !isRec;
+  var btn = document.getElementById('btnRec');
+  if (isRec) { btn.textContent = '⏹ 停止录制'; btn.style.background = '#e74c3c'; btn.style.color = '#fff'; btn.style.borderColor = '#e74c3c'; }
+  else { btn.textContent = '🔴 开始录制'; btn.style.background = ''; btn.style.color = ''; btn.style.borderColor = ''; }
+}
+function clearRec() { recorded = []; updateRecDisplay(); }
+function updateRecDisplay() { document.getElementById('recDisplay').textContent = recorded.join(' ') || '弹奏的按键会出现在这里...'; }
+function copyRecToInput() { document.getElementById('seqInput').value = recorded.join(' '); }
+function saveRecAsPreset() {
+  var name = prompt('预设名称（如：主歌、副歌）:');
+  if (!name) return;
+  savePreset(name, recorded.join(' '));
+}
+
+// ── Presets ───────────────────────────────────────────────────────
+var presets = {};
+try { presets = JSON.parse(localStorage.getItem('piano_presets') || '{}'); } catch(e){}
+
+function savePreset(name, seq) {
+  presets[name] = seq;
+  localStorage.setItem('piano_presets', JSON.stringify(presets));
+  renderPresets();
+}
+function renderPresets() {
+  var el = document.getElementById('presetSlots');
+  var html = '';
+  var names = Object.keys(presets);
+  if (names.length === 0) { html = '<span style="color:var(--sub);font-size:12px">暂无预设，录制后点「存为预设」</span>'; }
+  for (var i = 0; i < names.length; i++) {
+    var n = names[i];
+    html += '<span class="slot" style="display:inline-flex;align-items:center;gap:4px">' +
+      '<b>'+escHtml(n)+'</b> ' +
+      '<span onclick="document.getElementById(\'seqInput\').value=\''+escAttr(presets[n])+'\';playSequence()" style="cursor:pointer">▶</span> ' +
+      '<span onclick="document.getElementById(\'seqInput\').value=\''+escAttr(presets[n])+'\'" style="cursor:pointer">✎</span> ' +
+      '<span onclick="deletePreset(\''+escAttr(n)+'\')" style="cursor:pointer;color:var(--red)">×</span>' +
+      '</span>';
+  }
+  el.innerHTML = html;
+}
+function deletePreset(name) { delete presets[name]; localStorage.setItem('piano_presets', JSON.stringify(presets)); renderPresets(); }
+
+function escHtml(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function escAttr(s) { return s.replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+renderPresets();
 </script>
 </body>
 </html>
