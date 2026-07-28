@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 1 · 英语发音跟练</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --accent: #4a9eff;
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --yellow: #f39c12;
+    --text: #e0e0e0;
+    --sub: #888;
+    --border: #2a2a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; padding: 20px;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  header {
+    text-align: center; padding: 40px 0 30px;
+  }
+  header h1 { font-size: 28px; color: #fff; margin-bottom: 6px; }
+  header p { color: var(--sub); font-size: 15px; }
+  .focus-badges {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    margin-top: 14px;
+  }
+  .badge {
+    background: var(--card); border: 1px solid var(--border);
+    padding: 5px 12px; border-radius: 20px; font-size: 13px; color: var(--accent);
+  }
+
+  .sentence-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 18px;
+    transition: border-color .3s;
+  }
+  .sentence-card.active { border-color: var(--accent); }
+  .sentence-card.done { border-color: var(--green); opacity: .85; }
+
+  .sentence-num {
+    font-size: 12px; color: var(--sub); margin-bottom: 4px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .sentence-text {
+    font-size: 22px; font-weight: 600; color: #fff;
+    margin-bottom: 6px; letter-spacing: 0.5px;
+  }
+  .sentence-hint {
+    font-size: 13px; color: var(--sub); margin-bottom: 16px;
+  }
+  .sentence-hint span { color: var(--yellow); }
+
+  .ref-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .btn {
+    padding: 10px 20px; border-radius: 10px; border: none;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all .2s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-ref {
+    background: rgba(74,158,255,.15); color: var(--accent);
+  }
+  .btn-ref:hover { background: rgba(74,158,255,.25); }
+  .btn-record {
+    background: var(--red); color: #fff; font-size: 16px; padding: 12px 28px;
+    border-radius: 50px;
+  }
+  .btn-record:hover { background: #c0392b; }
+  .btn-record.recording {
+    animation: pulse 1s infinite; background: #ff4757;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(231,76,60,.4); }
+    50% { box-shadow: 0 0 0 12px rgba(231,76,60,0); }
+  }
+  .btn-replay {
+    background: var(--card); color: var(--text); border: 1px solid var(--border);
+  }
+  .btn-replay:hover { border-color: var(--accent); }
+
+  .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  .result-box {
+    margin-top: 16px; padding: 16px; border-radius: 10px;
+    background: rgba(0,0,0,.2); display: none;
+  }
+  .result-box.show { display: block; }
+
+  .recognized {
+    font-size: 18px; color: #fff; margin-bottom: 8px; word-break: break-word;
+  }
+  .recognized .match { color: var(--green); }
+  .recognized .mismatch { color: var(--red); text-decoration: line-through; }
+  .recognized .missing { color: var(--yellow); }
+
+  .feedback { font-size: 14px; line-height: 1.8; }
+  .feedback .good { color: var(--green); }
+  .feedback .warn { color: var(--yellow); }
+  .feedback .bad { color: var(--red); }
+
+  .progress-bar {
+    height: 4px; background: var(--border); border-radius: 2px;
+    margin: 4px 0 12px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--accent); border-radius: 2px;
+    transition: width .4s;
+  }
+
+  .recording-status {
+    font-size: 13px; color: var(--red); margin-top: 8px; display: none;
+  }
+  .recording-status.show { display: block; }
+
+  .chapter-progress {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; font-size: 14px; color: var(--sub);
+  }
+
+  .volume-meter {
+    height: 3px; background: var(--border); border-radius: 2px;
+    width: 100px; overflow: hidden; display: inline-block; vertical-align: middle;
+  }
+  .volume-fill {
+    height: 100%; background: var(--red); border-radius: 2px;
+    transition: width .1s; width: 0%;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🗣️ Chapter 1 · 发音基础纠正</h1>
+  <p>先听示范 → 自己录音 → AI 对比纠错</p>
+  <div class="focus-badges">
+    <span class="badge">θ/s 区分</span>
+    <span class="badge">v/w 区分</span>
+    <span class="badge">æ/e 区分</span>
+    <span class="badge">尾音不吞</span>
+    <span class="badge">节奏模仿</span>
+  </div>
+</header>
+
+<div class="chapter-progress">
+  <span id="progressText">0 / 10</span>
+  <span id="scoreText"></span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div id="sentences"></div>
+
+</div>
+
+<script>
+// ── Sentence bank ─────────────────────────────────────────────────
+const sentences = [
+  {
+    id: 1, text: "I think this is the best thing.",
+    focus: "θ 音 (think/thing) — 舌尖轻触上齿，不要发成 s",
+    tips: ["'think' 的 th 舌尖要碰到上牙", "'thing' 结尾的 ng 要发出来不要吞"],
+    keywords: ["think","thing","this"]
+  },
+  {
+    id: 2, text: "She sells seashells by the seashore.",
+    focus: "s / ʃ 区分 — sells(sh) vs seashells(s)",
+    tips: ["'she' 和 'seashells' 的 sh 要嘟嘴", "'sells' 的 s 是清辅音，声带不震"],
+    keywords: ["she","sells","seashells","seashore"]
+  },
+  {
+    id: 3, text: "Very well, I will visit the village.",
+    focus: "v / w 区分 — very vs well, visit vs village",
+    tips: ["'very' 的 v 上牙咬下唇", "'well' 的 w 双唇收圆但不咬"],
+    keywords: ["very","well","visit","village"]
+  },
+  {
+    id: 4, text: "The cat sat on the mat with a hat.",
+    focus: "æ 音 (cat/sat/mat/hat) — 嘴巴张大，像「哎」但更开",
+    tips: ["æ 嘴巴要比 e 大", "四个 æ 单词节奏要均匀"],
+    keywords: ["cat","sat","mat","hat"]
+  },
+  {
+    id: 5, text: "I have lived here for five years.",
+    focus: "尾音不吞 — lived(d), years(s) 都要发出来",
+    tips: ["'lived' 结尾的 d 舌尖点一下上颚", "'years' 的 s 是浊辅音/z/"],
+    keywords: ["have","lived","five","years"]
+  },
+  {
+    id: 6, text: "They went there together.",
+    focus: "ð 音 (they/there/together) — 和 θ 一样舌位，但声带要震",
+    tips: ["ð 是浊音，摸喉咙要有震动", "'together' 的 to-ge-ther 三个音节"],
+    keywords: ["they","there","together"]
+  },
+  {
+    id: 7, text: "Peter Piper picked a peck of pickled peppers.",
+    focus: "p 爆破音 + 节奏感 — 每个 p 都要有气流冲出",
+    tips: ["p 是送气音，手掌放嘴前能感到气流", "保持句子节奏像 rap"],
+    keywords: ["peter","piper","picked","peck","pickled","peppers"]
+  },
+  {
+    id: 8, text: "Red lorry, yellow lorry.",
+    focus: "r / l 区分 — 中国学习者最大难点之一",
+    tips: ["r: 舌尖卷起不碰任何地方", "l: 舌尖顶上颚", "反复切换 r→l→r→l"],
+    keywords: ["red","lorry","yellow"]
+  },
+  {
+    id: 9, text: "I'd like a bottle of water.",
+    focus: "英式腔调 — bottle 的 t 是喉塞音(ʔ), water 的 t 是闪音",
+    tips: ["英式：bo'l (t 几乎消失)", "'water' 的 t → 轻弹 d 音"],
+    keywords: ["bottle","water"]
+  },
+  {
+    id: 10, text: "How much wood would a woodchuck chuck?",
+    focus: "w / oo / u 音 — wood, would, woodchuck, chuck",
+    tips: ["'wood' 的 oo 是短元音/ʊ/，不是「乌」", "'would' 和 'wood' 发音一样", "整句节奏：哒-哒 哒 哒-哒 哒 哒-哒 哒"],
+    keywords: ["wood","would","woodchuck","chuck"]
+  }
+];
+
+// ── State ──────────────────────────────────────────────────────────
+let results = {}; // { id: { transcribed, score } }
+let mediaRecorder = null;
+let audioChunks = [];
+let currentSentenceId = null;
+let audioContext = null;
+let analyser = null;
+let recordingTimer = null;
+
+// ── Init ───────────────────────────────────────────────────────────
+function renderAll() {
+  const el = document.getElementById('sentences');
+  el.innerHTML = sentences.map(s => `
+    <div class="sentence-card" id="card-${s.id}">
+      <div class="sentence-num">#${s.id} · ${s.focus.split('—')[0].trim()}</div>
+      <div class="sentence-text">${s.text}</div>
+      <div class="sentence-hint">🎯 ${s.focus} <span>(${s.tips[0]})</span></div>
+      <div class="ref-row">
+        <button class="btn btn-ref" onclick="playRef(${s.id})">🔊 听示范</button>
+        <span style="font-size:13px;color:var(--sub)">先听再录</span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-record" id="btn-${s.id}" onclick="toggleRecord(${s.id})">🎤 录音</button>
+        <button class="btn btn-replay" id="replay-${s.id}" onclick="playMyVoice(${s.id})" style="display:none">🔁 听我的</button>
+      </div>
+      <div class="recording-status" id="status-${s.id}">🔴 录音中... 大声朗读上面句子</div>
+      <div class="result-box" id="result-${s.id}"></div>
+    </div>
+  `).join('');
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = Object.keys(results).length;
+  document.getElementById('progressText').textContent = `${done} / ${sentences.length}`;
+  document.getElementById('progressFill').style.width = `${(done/sentences.length)*100}%`;
+}
+
+// ── TTS (Reference) ────────────────────────────────────────────────
+function playRef(id) {
+  const s = sentences.find(x => x.id === id);
+  if (!s) return;
+  const utter = new SpeechSynthesisUtterance(s.text);
+  utter.lang = 'en-US';
+  utter.rate = 0.85;
+  // Try to use a good voice
+  const voices = speechSynthesis.getVoices();
+  const en = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
+             voices.find(v => v.lang === 'en-US') ||
+             voices[0];
+  if (en) utter.voice = en;
+  speechSynthesis.speak(utter);
+}
+
+// ── Record ─────────────────────────────────────────────────────────
+async function toggleRecord(id) {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    stopRecord(id);
+    return;
+  }
+
+  // Stop any other recording
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+  }
+
+  currentSentenceId = id;
+  audioChunks = [];
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    // Set up audio analysis
+    audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      stream.getTracks().forEach(t => t.stop());
+      processRecording(id);
+    };
+
+    mediaRecorder.start();
+    document.getElementById(`btn-${id}`).textContent = '⏹ 停止';
+    document.getElementById(`btn-${id}`).classList.add('recording');
+    document.getElementById(`status-${id}`).classList.add('show');
+    document.getElementById(`card-${id}`).classList.add('active');
+
+    // Volume meter update
+    recordingTimer = setInterval(() => {
+      if (!analyser) return;
+      const data = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(data);
+      const avg = data.reduce((a,b) => a+b, 0) / data.length;
+      const pct = Math.min(100, avg * 1.5);
+      const meterEl = document.getElementById(`status-${id}`);
+      if (meterEl && avg < 3) {
+        meterEl.innerHTML = '🔴 录音中... (⚠️ 没检测到声音，请靠近麦克风大声读)';
+        meterEl.style.color = 'var(--yellow)';
+      } else if (meterEl) {
+        meterEl.innerHTML = `🔴 录音中... 大声朗读上面句子 ▁▂▃${'▄'.repeat(Math.floor(pct/15))}`;
+        meterEl.style.color = 'var(--red)';
+      }
+    }, 200);
+
+    // Auto-stop after 10s
+    setTimeout(() => {
+      if (mediaRecorder && mediaRecorder.state === 'recording') stopRecord(id);
+    }, 10000);
+
+  } catch (err) {
+    alert('麦克风权限被拒绝或不可用: ' + err.message);
+  }
+}
+
+function stopRecord(id) {
+  if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
+
+  clearInterval(recordingTimer);
+  mediaRecorder.stop();
+
+  document.getElementById(`btn-${id}`).textContent = '🎤 重录';
+  document.getElementById(`btn-${id}`).classList.remove('recording');
+  document.getElementById(`status-${id}`).classList.remove('show');
+  document.getElementById(`card-${id}`).classList.remove('active');
+}
+
+// ── Process ────────────────────────────────────────────────────────
+async function processRecording(id) {
+  const s = sentences.find(x => x.id === id);
+  const blob = new Blob(audioChunks, { type: 'audio/webm' });
+  const url = URL.createObjectURL(blob);
+
+  // Store for replay
+  if (!window._recordings) window._recordings = {};
+  window._recordings[id] = url;
+
+  // Show replay button
+  const replayBtn = document.getElementById(`replay-${id}`);
+  replayBtn.style.display = 'inline-flex';
+  replayBtn.onclick = () => {
+    const a = new Audio(window._recordings[id]);
+    a.play();
+  };
+
+  // Speech recognition
+  const resultBox = document.getElementById(`result-${id}`);
+  resultBox.innerHTML = '<span style="color:var(--sub)">🔍 AI 正在分析你的发音...</span>';
+  resultBox.classList.add('show');
+
+  try {
+    const transcribed = await doSpeechRecognition(s);
+    const analysis = analyzeText(s.text, transcribed);
+    results[id] = { transcribed, ...analysis };
+    showResult(id, analysis, transcribed);
+    document.getElementById(`card-${id}`).classList.add('done');
+    updateProgress();
+  } catch (err) {
+    resultBox.innerHTML = `<div style="color:var(--red)">⚠️ 语音识别失败: ${err.message}</div>
+      <div style="margin-top:8px;font-size:13px;color:var(--sub)">
+      请确保: ① 周围安静 ② 大声清晰朗读 ③ 允许麦克风权限
+      </div>
+      <div style="margin-top:8px">
+        <button class="btn btn-replay" onclick="playMyVoice(${id})" style="display:inline-flex">🔁 听我的录音</button>
+        <button class="btn btn-ref" onclick="playRef(${id})" style="display:inline-flex">🔊 听示范对比</button>
+      </div>`;
+  }
+}
+
+function playMyVoice(id) {
+  if (window._recordings && window._recordings[id]) {
+    const a = new Audio(window._recordings[id]);
+    a.play();
+  }
+}
+
+// ── Speech Recognition ─────────────────────────────────────────────
+function doSpeechRecognition(sentence) {
+  return new Promise((resolve, reject) => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      reject(new Error('浏览器不支持语音识别（请用 Chrome 或 Edge）'));
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 3;
+    recognition.continuous = false;
+
+    recognition.onresult = (event) => {
+      // Get all alternatives
+      const alts = [];
+      for (let i = 0; i < event.results[0].length; i++) {
+        alts.push({
+          text: event.results[0][i].transcript.trim(),
+          confidence: event.results[0][i].confidence
+        });
+      }
+      resolve(alts);
+    };
+
+    recognition.onerror = (event) => {
+      reject(new Error(event.error));
+    };
+
+    recognition.onnomatch = () => {
+      reject(new Error('未识别到语音内容'));
+    };
+
+    recognition.start();
+  });
+}
+
+// ── Analysis ───────────────────────────────────────────────────────
+function analyzeText(expected, alternatives) {
+  const best = alternatives[0]?.text || '';
+  const conf = alternatives[0]?.confidence || 0;
+  const expectedLower = expected.toLowerCase();
+  const bestLower = best.toLowerCase();
+
+  // Word-level comparison
+  const expWords = expectedLower.split(/\s+/);
+  const gotWords = bestLower.split(/\s+/);
+
+  // Build word comparison
+  const wordResults = expWords.map((ew, i) => {
+    const gw = gotWords[i];
+    if (!gw) return { word: ew, status: 'missing' };
+    if (gw === ew) return { word: ew, status: 'match' };
+    // Check if close (edit distance)
+    if (levenshtein(ew, gw) <= 1) return { word: ew, recognized: gw, status: 'close' };
+    return { word: ew, recognized: gw, status: 'mismatch' };
+  });
+
+  // Extra words the user said
+  const extra = gotWords.slice(expWords.length);
+
+  const matchCount = wordResults.filter(w => w.status === 'match').length;
+  const accuracy = expWords.length > 0 ? matchCount / expWords.length : 0;
+
+  // Specific tips based on mismatches
+  const tips = generateTips(wordResults);
+
+  return {
+    best, conf, wordResults, extra, accuracy, tips,
+    score: Math.round(accuracy * 100)
+  };
+}
+
+function levenshtein(a, b) {
+  if (!a || !b) return Math.max(a?.length||0, b?.length||0);
+  const m = Array.from({length: a.length+1}, (_,i) => [i]);
+  for (let j = 0; j <= b.length; j++) m[0][j] = j;
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      m[i][j] = a[i-1] === b[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j], m[i][j-1], m[i-1][j-1]) + 1;
+  return m[a.length][b.length];
+}
+
+function generateTips(wordResults) {
+  const tips = [];
+  const specificMap = {
+    'think': ['θ 音：舌尖轻触上齿，气流从舌齿间挤出，声带不震'],
+    'thing': ['θ 音：同上，舌尖必须碰到上牙'],
+    'this': ['ð 音：和 θ 一样舌位，但声带要震动（摸喉咙有震动感）'],
+    'they': ['ð 音：浊音，声带震动'],
+    'there': ['ð 音：同上'],
+    'very': ['v 音：上牙轻咬下唇，声带震动。不要发成 w！'],
+    'visit': ['v 音：同上。不是 "wisit"'],
+    'village': ['v 音：首尾都有难音，v 咬唇，-age 发 /ɪdʒ/'],
+    'well': ['w 音：双唇收圆向前，不要咬唇。和 v 的区别！'],
+    'cat': ['æ 音：嘴巴上下张大，舌尖抵下齿，像中文"哎"但更开'],
+    'sat': ['æ 音：同上'],
+    'mat': ['æ 音：同上'],
+    'hat': ['æ 音：同上'],
+    'lived': ['尾音 d：舌尖快速点一下上颚，不要吞掉！'],
+    'bottle': ['英式 bottle：t 发喉塞音 ʔ，舌头不弹，气流在喉咙阻断'],
+    'water': ['英式 water：t 变闪音，像很快的 d，"waw-der"'],
+    'red': ['r 音：舌尖卷起但不要碰到任何地方！'],
+    'lorry': ['l 音：舌尖顶住上颚。和 r 的区别：l 要碰到，r 不碰'],
+    'wood': ['oo 发短音 /ʊ/，不是中文"乌"。嘴唇放松微微收圆即可'],
+    'would': ['和 wood 发音完全一样！都是 /wʊd/'],
+  };
+
+  for (const wr of wordResults) {
+    if (wr.status === 'mismatch' || wr.status === 'close') {
+      const hint = specificMap[wr.word];
+      if (hint) {
+        tips.push({ word: wr.word, recognized: wr.recognized, hint: hint[0] });
+      } else if (wr.status === 'mismatch') {
+        tips.push({ word: wr.word, recognized: wr.recognized, hint: `发音偏差较大，请仔细听示范模仿` });
+      }
+    }
+  }
+
+  if (wordResults.some(w => w.status === 'missing')) {
+    tips.push({ word: '⚠️', recognized: '', hint: '有单词没读出来，注意不要跳词/吞词' });
+  }
+
+  return tips;
+}
+
+// ── Display result ─────────────────────────────────────────────────
+function showResult(id, analysis, transcribed) {
+  const box = document.getElementById(`result-${id}`);
+  const confColor = analysis.conf > 0.7 ? 'var(--green)' : analysis.conf > 0.4 ? 'var(--yellow)' : 'var(--red)';
+
+  // Build word-by-word display
+  const wordHTML = analysis.wordResults.map(w => {
+    switch (w.status) {
+      case 'match': return `<span class="match">${w.word}</span>`;
+      case 'close': return `<span class="mismatch" title="识别为: ${w.recognized}">${w.word}</span>`;
+      case 'mismatch': return `<span class="mismatch" title="识别为: ${w.recognized}">${w.word}→${w.recognized}</span>`;
+      case 'missing': return `<span class="missing">${w.word}?</span>`;
+    }
+  }).join(' ');
+
+  const scoreEmoji = analysis.score >= 80 ? '✅' : analysis.score >= 50 ? '⚠️' : '❌';
+  const tipsHTML = analysis.tips.map(t =>
+    `<div style="margin-top:4px">• <b>${t.word}</b>${t.recognized ? ` (你读成了 "${t.recognized}")` : ''} — ${t.hint}</div>`
+  ).join('');
+
+  box.innerHTML = `
+    <div style="margin-bottom:12px;font-size:20px;font-weight:700">
+      ${scoreEmoji} 匹配度: <span style="color:${confColor}">${analysis.score}%</span>
+      <span style="font-size:13px;color:var(--sub);margin-left:8px">(置信度: ${Math.round(analysis.conf*100)}%)</span>
+    </div>
+    <div class="recognized">${wordHTML}</div>
+    ${tipsHTML ? `<div class="feedback" style="margin-top:12px"><b>🔍 需要改进:</b>${tipsHTML}</div>` : ''}
+    ${analysis.extra.length > 0 ? `<div style="margin-top:8px;font-size:13px;color:var(--yellow)">⚠️ 多余词汇: ${analysis.extra.join(', ')}</div>` : ''}
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-replay" onclick="playMyVoice(${id})" style="display:inline-flex">🔁 听我读的</button>
+      <button class="btn btn-ref" onclick="playRef(${id})" style="display:inline-flex">🔊 听示范对比</button>
+    </div>
+  `;
+}
+
+// ── Load voices ────────────────────────────────────────────────────
+speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+
+// ── Start ──────────────────────────────────────────────────────────
+renderAll();
+</script>
+</body>
+</html>
