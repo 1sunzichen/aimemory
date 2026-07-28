@@ -92,9 +92,16 @@
 <div class="piano" id="piano"></div>
 
 <div class="panel">
-  <h3>📝 旋律序列（空格分隔数字，支持 - 延长）</h3>
+  <h3>📝 旋律序列</h3>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+    <span style="font-size:12px;color:var(--sub)">预期:</span>
+    <input id="expectCount" style="width:50px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,.3);color:#fff;font-size:12px;text-align:center" placeholder="?" oninput="checkCount()">
+    <span style="font-size:12px;color:var(--sub)">实际:</span>
+    <span id="actualCount" style="font-size:14px;font-weight:600;color:var(--accent)">0</span>
+    <span id="countStatus" style="font-size:12px"></span>
+  </div>
   <div class="seq-row">
-    <input class="seq-input" id="seqInput" placeholder="5 5 6 7 8 7 6 5 - -" value="">
+    <input class="seq-input" id="seqInput" placeholder="4 7 6 8 7 8 7 8 * * 6" value="" oninput="checkCount()">
     <button class="btn btn-accent" onclick="playSequence()">▶ 播放</button>
     <button class="btn btn-outline" onclick="stopPlay()">⏹ 停</button>
   </div>
@@ -226,7 +233,6 @@ function parseSeq(str) {
     } else if (/^[0-9]$/.test(p) || p === '/' || p === '*' || p === '+' || p === '.') {
       seq.push({ key: p, dur: 200 });
     } else if (p === '-') {
-      // '-' is ambiguous: rest OR A5 key. If it follows a digit, it's A5 key
       if (seq.length > 0 && /^[0-9]$/.test(parts[i-1])) {
         seq.push({ key: '-', dur: 200 });
       } else {
@@ -235,6 +241,31 @@ function parseSeq(str) {
     }
   }
   return seq;
+}
+
+// ── Note count checker ─────────────────────────────────────────────
+function checkCount() {
+  var input = document.getElementById('seqInput').value;
+  var parts = input.trim().split(/\s+/).filter(function(p){ return p !== '—' && p !== ''; });
+  var count = parts.length;
+  document.getElementById('actualCount').textContent = count;
+
+  var expect = parseInt(document.getElementById('expectCount').value);
+  var status = document.getElementById('countStatus');
+  if (!isNaN(expect)) {
+    if (count === expect) {
+      status.textContent = '✅ 匹配';
+      status.style.color = 'var(--green)';
+    } else if (count < expect) {
+      status.textContent = '⚠️ 少 '+(expect-count)+' 个';
+      status.style.color = 'var(--yellow)';
+    } else {
+      status.textContent = '❌ 多 '+(count-expect)+' 个';
+      status.style.color = 'var(--red)';
+    }
+  } else {
+    status.textContent = '';
+  }
 }
 
 function playSequence() {
