@@ -561,39 +561,87 @@ function playTTS(btn, text) {
 function playWord(word) { playTTS(null, word); }
 
 // ── Practice: record & check pronunciation ─────────────────────────
+var _pracTimer = null;
+
 function practiceReply() {
   if (!audioStream) { alert('麦克风不可用'); return; }
   if (isRecording) return;
+
+  // Clean up any previous recorder
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.onstop = null;
+    mediaRecorder.stop();
+  }
+  if (_pracTimer) clearTimeout(_pracTimer);
 
   isRecording = true; audioChunks = [];
   var btn = document.getElementById('btnPractice');
   if (btn) { btn.textContent = '🔴 录音中...'; btn.classList.add('recording'); }
 
-  // Show "done" button
   var doneBtn = document.getElementById('btnDone');
-  if (doneBtn) doneBtn.style.display = 'inline-flex';
+  if (doneBtn) { doneBtn.style.display = 'inline-flex'; doneBtn.textContent = '✅ 读完'; }
 
   showHint('🎤 大声朗读上方英文 — 读完后点 ✅ 读完');
 
-  mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
-  mediaRecorder.ondataavailable = function(e) { audioChunks.push(e.data); };
-  mediaRecorder.onstop = function() { analyzePractice(); };
-  mediaRecorder.start();
+  try {
+    mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' });
+  } catch(e) {
+    mediaRecorder = new MediaRecorder(audioStream);
+  }
 
-  // Max 12s safety
-  setTimeout(function() {
-    if (isRecording && mediaRecorder.state === 'recording') finishPractice();
-  }, 12000);
+  var stopped = false;
+
+  mediaRecorder.ondataavailable = function(e) {
+    if (e.data && e.data.size > 0) audioChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = function() {
+    if (stopped) return;
+    stopped = true;
+    if (_pracTimer) clearTimeout(_pracTimer);
+    analyzePractice();
+  };
+
+  mediaRecorder.onerror = function(e) {
+    if (stopped) return;
+    stopped = true;
+    if (_pracTimer) clearTimeout(_pracTimer);
+    isRecording = false;
+    if (btn) { btn.textContent = '🎤 跟读这句话'; btn.classList.remove('recording'); }
+    if (doneBtn) doneBtn.style.display = 'none';
+    hideHint();
+    var fb = document.getElementById('feedbackBar');
+    fb.innerHTML = '<span class="bad">⚠️ 录音出错，请重试</span>';
+    fb.classList.add('show');
+  };
+
+  mediaRecorder.start(1000); // timeslice: fire ondataavailable every 1s
+
+  // Safety: auto-stop after 15 seconds max
+  _pracTimer = setTimeout(function() {
+    if (isRecording && !stopped) finishPractice();
+  }, 15000);
 }
 
 function finishPractice() {
   if (!mediaRecorder || mediaRecorder.state !== 'recording') return;
-  isRecording = false; mediaRecorder.stop();
+  if (_pracTimer) clearTimeout(_pracTimer);
+  isRecording = false;
+
+  // Remove onstop to avoid double-fire, then stop
+  var oldOnStop = mediaRecorder.onstop;
+  mediaRecorder.onstop = null;
+  try { mediaRecorder.stop(); } catch(e) {}
+
+  // If stop didn't fire onstop (already cleared), manually trigger
   var btn = document.getElementById('btnPractice');
   if (btn) { btn.textContent = '🎤 跟读这句话'; btn.classList.remove('recording'); }
   var doneBtn = document.getElementById('btnDone');
   if (doneBtn) doneBtn.style.display = 'none';
   hideHint();
+
+  // Restore onstop and analyze
+  setTimeout(function() { analyzePractice(); }, 100);
 }
 
 function analyzePractice() {
