@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数字钢琴 · 0-9 键盘弹奏</title>
+<style>
+  :root {
+    --bg: #0f0f1a; --card: #1a1a2e; --accent: #4a9eff;
+    --text: #e0e0e0; --sub: #888; --border: #2a2a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; color: #fff; }
+  .sub { font-size: 13px; color: var(--sub); margin-bottom: 30px; }
+
+  .piano {
+    display: flex; gap: 6px; margin-bottom: 30px; flex-wrap: wrap;
+    justify-content: center;
+  }
+  .key {
+    width: 64px; height: 160px; border-radius: 10px;
+    background: linear-gradient(180deg, #fff 0%, #e8e8e8 100%);
+    border: 2px solid #ccc; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: flex-end; padding-bottom: 14px;
+    transition: all .08s; user-select: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,.2);
+  }
+  .key:hover { background: linear-gradient(180deg, #f0f0ff 0%, #ddd 100%); }
+  .key:active, .key.pressed {
+    background: linear-gradient(180deg, #cce0ff 0%, #aac8ff 100%);
+    transform: translateY(4px);
+    box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    border-color: #4a9eff;
+  }
+  .key .num { font-size: 22px; font-weight: 700; color: #333; }
+  .key .note { font-size: 11px; color: #888; margin-top: 4px; }
+
+  .melody-section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; max-width: 500px;
+    text-align: center;
+  }
+  .melody-section h3 { font-size: 15px; color: var(--accent); margin-bottom: 10px; }
+  .melody-keys {
+    display: flex; gap: 4px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .melody-key {
+    padding: 8px 14px; border-radius: 8px; background: rgba(74,158,255,.1);
+    color: var(--accent); font-size: 18px; font-weight: 700;
+  }
+  .btn {
+    padding: 10px 24px; border-radius: 10px; border: none;
+    background: var(--accent); color: #fff; font-size: 15px;
+    font-weight: 600; cursor: pointer; margin: 4px;
+  }
+  .btn:hover { opacity: .9; }
+  .btn-outline {
+    background: transparent; border: 1px solid var(--accent); color: var(--accent);
+  }
+
+  .record-bar {
+    margin-top: 16px; font-size: 14px; color: var(--sub); min-height: 22px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🎹 数字钢琴</h1>
+<p class="sub">按键盘 0-9 或点击琴键弹奏</p>
+
+<div class="piano" id="piano"></div>
+
+<div class="melody-section">
+  <h3>🎵 预设旋律</h3>
+  <div class="melody-keys" id="melodyDisplay"></div>
+  <button class="btn" onclick="playMelody()">▶ 自动播放</button>
+  <button class="btn btn-outline" onclick="toggleRecord()" id="btnRecord">🔴 录制</button>
+  <div class="record-bar" id="recordBar"></div>
+</div>
+
+<script>
+// ── Piano notes mapping (0-9) ──────────────────────────────────────
+// C major scale: C4 D4 E4 F4 G4 A4 B4 C5 D5 E5
+var notes = [
+  { key: '0', note: 'C4',  freq: 261.63 },
+  { key: '1', note: 'D4',  freq: 293.66 },
+  { key: '2', note: 'E4',  freq: 329.63 },
+  { key: '3', note: 'F4',  freq: 349.23 },
+  { key: '4', note: 'G4',  freq: 392.00 },
+  { key: '5', note: 'A4',  freq: 440.00 },
+  { key: '6', note: 'B4',  freq: 493.88 },
+  { key: '7', note: 'C5',  freq: 523.25 },
+  { key: '8', note: 'D5',  freq: 587.33 },
+  { key: '9', note: 'E5',  freq: 659.25 },
+];
+
+var audioCtx = null;
+var recording = false;
+var recordedKeys = [];
+
+// ── Render piano keys ──────────────────────────────────────────────
+var piano = document.getElementById('piano');
+for (var i = 0; i < notes.length; i++) {
+  var n = notes[i];
+  var div = document.createElement('div');
+  div.className = 'key';
+  div.id = 'key-' + n.key;
+  div.innerHTML = '<span class="num">' + n.key + '</span><span class="note">' + n.note + '</span>';
+  div.onmousedown = function(k) { return function(e) { e.preventDefault(); playNote(k); }; }(n);
+  piano.appendChild(div);
+}
+
+// ── Play a single note ────────────────────────────────────────────
+function playNote(note) {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  var now = audioCtx.currentTime;
+  var osc = audioCtx.createOscillator();
+  var gain = audioCtx.createGain();
+
+  osc.type = 'triangle';  // 接近钢琴音色
+  osc.frequency.setValueAtTime(note.freq, now);
+
+  // ADSR envelope for piano-like sound
+  gain.gain.setValueAtTime(0.5, now);
+  gain.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 1.2);
+
+  // Visual feedback
+  var keyEl = document.getElementById('key-' + note.key);
+  if (keyEl) {
+    keyEl.classList.add('pressed');
+    setTimeout(function() { keyEl.classList.remove('pressed'); }, 150);
+  }
+
+  // Record
+  if (recording) {
+    recordedKeys.push(note.key);
+    document.getElementById('recordBar').textContent = '🔴 录制中: ' + recordedKeys.join(' ');
+  }
+}
+
+// ── Keyboard input ─────────────────────────────────────────────────
+document.addEventListener('keydown', function(e) {
+  if (e.repeat) return;
+  for (var i = 0; i < notes.length; i++) {
+    if (e.key === notes[i].key) { playNote(notes[i]); return; }
+  }
+});
+
+// ── Melody preset: "念张师" melody (Chinese name tones) ────────────
+// "念张师": nian4 zhang1 shi1 → mapped to number keys creating a musical phrase
+var melody = ['5','3','2','1','2','3','5'];  // Simple pentatonic melody
+
+var melodyDisplay = document.getElementById('melodyDisplay');
+for (var i = 0; i < melody.length; i++) {
+  var span = document.createElement('span');
+  span.className = 'melody-key';
+  span.textContent = melody[i];
+  melodyDisplay.appendChild(span);
+}
+
+function playMelody() {
+  var i = 0;
+  var interval = setInterval(function() {
+    if (i >= melody.length) { clearInterval(interval); return; }
+    var note = null;
+    for (var j = 0; j < notes.length; j++) {
+      if (notes[j].key === melody[i]) { note = notes[j]; break; }
+    }
+    if (note) playNote(note);
+    i++;
+  }, 300);
+}
+
+// ── Record ─────────────────────────────────────────────────────────
+function toggleRecord() {
+  recording = !recording;
+  var btn = document.getElementById('btnRecord');
+  var bar = document.getElementById('recordBar');
+
+  if (recording) {
+    recordedKeys = [];
+    btn.textContent = '⏹ 停止录制';
+    btn.style.background = '#e74c3c';
+    bar.textContent = '🔴 录制中... 用键盘0-9弹奏';
+  } else {
+    btn.textContent = '🔴 录制';
+    btn.style.background = '';
+    bar.textContent = '已录制: ' + recordedKeys.join(' ');
+  }
+}
+</script>
+</body>
+</html>
