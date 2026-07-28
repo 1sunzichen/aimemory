@@ -266,19 +266,74 @@ function updateProgress() {
 }
 
 // ── TTS (Reference) ────────────────────────────────────────────────
+let _voicesReady = false;
+let _englishVoices = [];
+
+// Preload voices — Chrome loads them async
+function loadVoices() {
+  const voices = speechSynthesis.getVoices();
+  if (voices.length > 0) {
+    _englishVoices = voices.filter(v => v.lang.startsWith('en'));
+    _voicesReady = true;
+  }
+}
+loadVoices();
+speechSynthesis.onvoiceschanged = () => {
+  loadVoices();
+};
+
 function playRef(id) {
   const s = sentences.find(x => x.id === id);
   if (!s) return;
+
+  // Cancel any ongoing speech
+  speechSynthesis.cancel();
+
   const utter = new SpeechSynthesisUtterance(s.text);
   utter.lang = 'en-US';
   utter.rate = 0.85;
-  // Try to use a good voice
-  const voices = speechSynthesis.getVoices();
-  const en = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
-             voices.find(v => v.lang === 'en-US') ||
-             voices[0];
-  if (en) utter.voice = en;
-  speechSynthesis.speak(utter);
+  utter.volume = 1;
+
+  // Pick best available English voice
+  if (_englishVoices.length === 0) loadVoices();
+
+  const pref = _englishVoices.find(v => v.name.includes('Google')) ||
+               _englishVoices.find(v => v.name.includes('Samantha')) ||
+               _englishVoices.find(v => v.name.includes('Daniel')) ||
+               _englishVoices.find(v => v.lang === 'en-US') ||
+               _englishVoices[0];
+
+  if (pref) utter.voice = pref;
+
+  // Visual feedback
+  const btn = document.querySelector(`#card-${id} .btn-ref`);
+  if (btn) {
+    btn.textContent = '🔊 播放中...';
+    btn.style.background = 'rgba(46,204,113,.2)';
+    btn.style.color = '#2ecc71';
+  }
+
+  utter.onend = utter.onerror = () => {
+    if (btn) {
+      btn.textContent = '🔊 听示范';
+      btn.style.background = 'rgba(74,158,255,.15)';
+      btn.style.color = 'var(--accent)';
+    }
+  };
+
+  // Force speak with a small delay to ensure context
+  setTimeout(() => speechSynthesis.speak(utter), 50);
+
+  // Chrome bug workaround: if speech stops after ~15s, restart
+  const resumeTimer = setInterval(() => {
+    if (speechSynthesis.speaking) {
+      speechSynthesis.pause();
+      speechSynthesis.resume();
+    } else {
+      clearInterval(resumeTimer);
+    }
+  }, 5000);
+  setTimeout(() => clearInterval(resumeTimer), 30000);
 }
 
 // ── Record ─────────────────────────────────────────────────────────
