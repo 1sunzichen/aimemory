@@ -266,27 +266,27 @@ function buildScenes() {
   return [
     {
       id:'intro', time:'9:00 AM', icon:'☕', title:'Morning Coffee Chat', coworker:'Sarah', role:'Senior Robotics Engineer',
-      text: "Morning "+n+"! So you came from a robotics AI company too? I saw your resume — you worked on a robot cloud management platform. That is exactly what we are building here. Tell me about the GPU monitoring system you built.",
-      cn: "早上好"+n+"！你之前也是机器人AI公司的？我看了你的简历——你做过机器人云管理平台，我们这儿做的正好一样。跟我说说你做的GPU监控系统吧。",
+      text: "Oh hey "+n+"! So you came from a robotics startup too? That is awesome — I saw you built, like, a whole robot cloud platform. With GPU monitoring and everything. Tell me about that — how did you guys handle the multi-cloud part?",
+      cn: "嘿"+n+"！你也是从机器人创业公司来的？太巧了——我看你搭了一整套机器人云平台，还有GPU监控什么的。跟我说说呗，多云那块你们怎么搞的？",
       words: [
-        {en:'robotics',zh:'机器人技术'},{en:'resume',zh:'简历'},{en:'platform',zh:'平台'},
-        {en:'exactly',zh:'恰好'},{en:'monitoring',zh:'监控'},{en:'system',zh:'系统'}
+        {en:'robotics',zh:'机器人技术'},{en:'startup',zh:'创业公司'},{en:'platform',zh:'平台'},
+        {en:'monitoring',zh:'监控'},{en:'multi-cloud',zh:'多云'}
       ],
-      reply: "Yeah! We built a Go+React platform for robot config management and multi-cloud GPU monitoring. We used Feishu bots for alerts — it saved the team hours every week.",
-      replyCn: "是的！我们用Go+React做了个机器人配置管理和多云GPU监控平台。用飞书机器人推送告警——每周给团队省了好多时间。",
-      pho: [{w:'robot',p:'ROW-bot'},{w:'platform',p:'PLAT-form'},{w:'monitoring',p:'MON-i-ter-ing'},{w:'alerts',p:'a-LERTS'},{w:'config',p:'CON-fig'}]
+      reply: "Yeah! We built it with Go and React — robot config management, version control, the whole thing. For multi-cloud we aggregated GPU metrics from Alibaba, Baidu, and Volcano Cloud. Feishu bots pushed the alerts. Honestly saved us hours every week.",
+      replyCn: "对！用Go和React搭的——机器人配置管理、版本控制、全栈。多云那块我们汇总了阿里、百度、火山云的GPU指标，飞书机器人推告警。说实话每周省了好多时间。",
+      pho: [{w:'aggregated',p:'AG-gre-gay-ted'},{w:'metrics',p:'MET-rics'},{w:'alerts',p:'a-LERTS'},{w:'honestly',p:'ON-est-ly'}]
     },
     {
       id:'standup', time:'9:30 AM', icon:'📋', title:'Daily Standup', coworker:'Mike', role:'Tech Lead',
-      text: "Alright team, standup time. "+n+", you are working on the new LLM agent service today, right? How is the RAG pipeline coming along?",
-      cn: "好了大家，站会时间。"+n+"，你今天在做新的LLM agent服务对吧？RAG pipeline进展怎么样？",
+      text: "Okay, quick standup. "+n+", you are on the LLM agent thing today, yeah? How is that RAG pipeline coming? Anything blocking you?",
+      cn: "好，快速站会。"+n+"，你今天搞LLM agent对吧？RAG pipeline怎么样了？有什么卡住的吗？",
       words: [
-        {en:'standup',zh:'站会'},{en:'agent',zh:'智能体'},{en:'service',zh:'服务'},
-        {en:'pipeline',zh:'流水线'},{en:'coming along',zh:'进展'}
+        {en:'standup',zh:'站会'},{en:'agent',zh:'智能体'},{en:'pipeline',zh:'流水线'},
+        {en:'blocking',zh:'卡住'}
       ],
-      reply: "Making good progress. I set up the vector database with ChromaDB yesterday and integrated the DeepSeek API. Today I am working on the retrieval pipeline — should have a demo by end of day.",
-      replyCn: "进展不错。昨天用ChromaDB搭好了向量数据库，集成了DeepSeek API。今天在做检索pipeline——下班前应该能出demo。",
-      pho: [{w:'progress',p:'PRO-gress'},{w:'vector',p:'VEC-tor'},{w:'database',p:'DAY-ta-base'},{w:'integrated',p:'IN-te-gray-ted'},{w:'retrieval',p:'re-TREE-val'},{w:'pipeline',p:'PIPE-line'}]
+      reply: "Going pretty well actually! Got ChromaDB set up yesterday, DeepSeek API is integrated. Working on the retrieval piece now — should have something to demo by EOD. No blockers so far.",
+      replyCn: "其实挺顺利的！昨天搞定了ChromaDB，DeepSeek API也接好了。正在做检索那块——下班前应该能demo。目前没什么卡住的。",
+      pho: [{w:'actually',p:'AC-chu-a-lly'},{w:'integrated',p:'IN-te-gray-ted'},{w:'retrieval',p:'re-TREE-val'},{w:'blockers',p:'BLOCK-ers'}]
     },
     {
       id:'onboarding', time:'10:00 AM', icon:'📖', title:'HR Benefits Chat', coworker:'Lisa', role:'HR/People Ops',
@@ -680,7 +680,7 @@ function finishPractice() {
   // Analyze after a short delay
   setTimeout(function() { analyzePractice(); }, 100);
 }
-
+// ── Analyze: try Google STT first, fallback to self-assessment ─────
 function analyzePractice() {
   var blob = new Blob(audioChunks, { type: 'audio/webm' });
   var url = URL.createObjectURL(blob);
@@ -689,30 +689,87 @@ function analyzePractice() {
   var fb = document.getElementById('feedbackBar');
   fb.classList.add('show');
   fb.style.background = 'rgba(74,158,255,.08)';
+  fb.innerHTML = '🔍 AI 分析中...（如被墙会切换到自评模式）';
 
-  // Self-assessment: no Google API needed (blocked in China)
-  fb.innerHTML =
-    '<span style="color:var(--accent)">🎧 录音完成 — 对照标准发音自评</span><br>' +
-    '<button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()" style="margin-top:6px;font-weight:600">🔁 听我的录音</button> ' +
-    '<button class="btn-sm" onclick="playTTS(null,\''+escAttr(currentScene.reply)+'\')" style="margin-top:6px;font-weight:600">🔊 听标准发音</button> ' +
-    '<button class="btn-sm" onclick="practiceReply()" style="margin-top:6px">🔄 再录一次</button>' +
-    '<div style="margin-top:10px;font-size:13px;color:var(--sub)">👆 先听自己的录音，再听标准 — 对比后自己打分：</div>' +
-    '<div style="display:flex;gap:6px;margin-top:6px">' +
-      '<button class="btn-sm" onclick="selfScore(90)" style="background:rgba(46,204,113,.15);color:var(--green);border-color:var(--green)">✅ 很像 (90%)</button>' +
-      '<button class="btn-sm" onclick="selfScore(65)" style="background:rgba(243,156,18,.15);color:var(--yellow);border-color:var(--yellow)">⚠️ 还行 (65%)</button>' +
-      '<button class="btn-sm" onclick="selfScore(30)" style="background:rgba(231,76,60,.15);color:var(--red);border-color:var(--red)">❌ 差很多 (30%)</button>' +
-    '</div>';
+  // Try Google speech recognition first
+  doSpeech().then(function(alts) {
+    var best = alts[0] ? alts[0].text.toLowerCase().replace(/[.,!?]/g, '') : '';
+    var conf = alts[0] ? alts[0].confidence : 0;
+    var expected = (currentScene.reply || '').toLowerCase().replace(/[.,!?]/g, '');
+    var expWords = expected.split(/\s+/);
+    var gotWords = best.split(/\s+/);
 
-  document.getElementById('scoreBadge').className = 'score-badge none';
-  document.getElementById('scoreBadge').textContent = '👂';
-  document.getElementById('scoreDetail').textContent = '自评中...';
+    var matchCount = 0;
+    for (var i = 0; i < Math.min(expWords.length, gotWords.length); i++) {
+      if (gotWords[i] === expWords[i]) matchCount++;
+    }
+    var score = Math.max(0, expWords.length > 0 ? Math.round(matchCount / expWords.length * 100) : 0);
+
+    var issues = [];
+    for (var i = 0; i < expWords.length; i++) {
+      if (i >= gotWords.length) { issues.push('<b>'+escHtml(expWords[i])+'</b> <span class="bad">(没说)</span>'); }
+      else if (gotWords[i] !== expWords[i] && levenshtein(expWords[i], gotWords[i]) > 1) {
+        var hint = '';
+        if (currentScene.pho) {
+          for (var j = 0; j < currentScene.pho.length; j++) {
+            if (currentScene.pho[j].w === expWords[i]) { hint = ' /'+currentScene.pho[j].p+'/'; break; }
+          }
+        }
+        issues.push('<b>'+escHtml(expWords[i])+'</b> → "<span class="bad">'+escHtml(gotWords[i])+'</span>"'+hint);
+      }
+    }
+
+    var sb = document.getElementById('scoreBadge');
+    var sd = document.getElementById('scoreDetail');
+    if (score >= 80) {
+      sb.className = 'score-badge good'; sb.textContent = '✅ '+score+'%';
+      sd.textContent = '发音不错！点 → 发送';
+      fb.style.background = 'rgba(46,204,113,.1)';
+    } else if (score >= 50) {
+      sb.className = 'score-badge ok'; sb.textContent = '⚠️ '+score+'%';
+      sd.textContent = '还行，再练几次';
+      fb.style.background = 'rgba(243,156,18,.1)';
+    } else {
+      sb.className = 'score-badge bad'; sb.textContent = '❌ '+score+'%';
+      sd.textContent = '需要多练';
+      fb.style.background = 'rgba(231,76,60,.08)';
+    }
+
+    var spokenLine = best ? '你说: "<b>'+escHtml(best)+'</b>"' : '<span class="bad">未识别到语音</span>';
+    var confLine = best ? ' (AI置信度 '+Math.round(conf*100)+'%)' : '';
+    var issueHTML = issues.length > 0 ? '<br>⚠️ 需改进: '+issues.join(' · ') : (best ? '<br><span class="ok">✅ 所有单词识别正确</span>' : '');
+
+    fb.innerHTML =
+      '<span class="'+(score>=80?'ok':score>=50?'warn':'bad')+'">'+spokenLine+confLine+'</span>' +
+      issueHTML +
+      ' <button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()">🔁 听我的录音</button>' +
+      ' <button class="btn-sm" onclick="playTTS(null,\''+escAttr(currentScene.reply)+'\')">🔊 听标准</button>' +
+      ' <button class="btn-sm" onclick="practiceReply()">🔄 再练</button>';
+  }).catch(function(err) {
+    // Google blocked → fallback to self-assessment
+    var fb = document.getElementById('feedbackBar');
+    fb.style.background = 'rgba(74,158,255,.08)';
+    fb.innerHTML =
+      '<span style="color:var(--yellow)">⚠️ AI评分不可用 ('+err.message+') — 改为自评</span><br>' +
+      '<button class="btn-sm" onclick="var a=new Audio(window._pracRec);a.play()" style="margin-top:6px;font-weight:600">🔁 听我的录音</button> ' +
+      '<button class="btn-sm" onclick="playTTS(null,\''+escAttr(currentScene.reply)+'\')" style="margin-top:6px;font-weight:600">🔊 听标准发音</button> ' +
+      '<button class="btn-sm" onclick="practiceReply()" style="margin-top:6px">🔄 再录一次</button>' +
+      '<div style="margin-top:10px;font-size:13px;color:var(--sub)">👆 先听自己的录音，再听标准 — 自己打分：</div>' +
+      '<div style="display:flex;gap:6px;margin-top:6px">' +
+        '<button class="btn-sm" onclick="selfScore(90)" style="background:rgba(46,204,113,.15);color:var(--green);border-color:var(--green)">✅ 很像</button>' +
+        '<button class="btn-sm" onclick="selfScore(65)" style="background:rgba(243,156,18,.15);color:var(--yellow);border-color:var(--yellow)">⚠️ 还行</button>' +
+        '<button class="btn-sm" onclick="selfScore(30)" style="background:rgba(231,76,60,.15);color:var(--red);border-color:var(--red)">❌ 差很多</button>' +
+      '</div>';
+    document.getElementById('scoreBadge').className = 'score-badge none';
+    document.getElementById('scoreBadge').textContent = '👂';
+    document.getElementById('scoreDetail').textContent = '自评中...';
+  });
 }
 
 function selfScore(score) {
   var sb = document.getElementById('scoreBadge');
   var sd = document.getElementById('scoreDetail');
   var fb = document.getElementById('feedbackBar');
-
   if (score >= 80) {
     sb.className = 'score-badge good'; sb.textContent = '✅ '+score+'%';
     sd.textContent = '很好！点 → 发送';
@@ -722,12 +779,12 @@ function selfScore(score) {
     sb.className = 'score-badge ok'; sb.textContent = '⚠️ '+score+'%';
     sd.textContent = '再练练';
     fb.style.background = 'rgba(243,156,18,.1)';
-    fb.innerHTML = '<span class="warn">⚠️ 自评 '+score+'% — 建议再练一次，重点听单词发音</span>';
+    fb.innerHTML = '<span class="warn">⚠️ 自评 '+score+'% — 建议再练一次</span>';
   } else {
     sb.className = 'score-badge bad'; sb.textContent = '❌ '+score+'%';
     sd.textContent = '多练';
     fb.style.background = 'rgba(231,76,60,.08)';
-    fb.innerHTML = '<span class="bad">❌ 自评 '+score+'% — 先逐个单词跟读，点下面单词标签听单个发音</span>';
+    fb.innerHTML = '<span class="bad">❌ 自评 '+score+'% — 先逐个单词跟读</span>';
   }
 }
 
@@ -740,6 +797,24 @@ function levenshtein(a, b) {
     for (j = 1; j <= b.length; j++)
       m[i][j] = a[i-1] === b[j-1] ? m[i-1][j-1] : Math.min(m[i-1][j], m[i][j-1], m[i-1][j-1]) + 1;
   return m[a.length][b.length];
+}
+
+// ── Speech Recognition (Google STT) ─────────────────────────────────
+function doSpeech() {
+  return new Promise(function(resolve, reject) {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { reject(new Error('浏览器不支持，请用 Chrome')); return; }
+    var r = new SR(); r.lang = 'en-US'; r.maxAlternatives = 3; r.interimResults = false;
+    r.onresult = function(e) {
+      var alts = [];
+      for (var i = 0; i < e.results[0].length; i++)
+        alts.push({ text: e.results[0][i].transcript.trim(), confidence: e.results[0][i].confidence });
+      resolve(alts);
+    };
+    r.onerror = function(e) { reject(new Error(e.error)); };
+    r.onnomatch = function() { reject(new Error('no-speech')); };
+    r.start();
+  });
 }
 
 // ── Send text ──────────────────────────────────────────────────────
