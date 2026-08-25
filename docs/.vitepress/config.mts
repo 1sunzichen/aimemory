@@ -19,6 +19,7 @@ export default defineConfig({
       { text: 'Memory', link: '/memory/' },
       { text: 'Projects', link: '/projects/' },
       { text: 'AI 路线图', link: '/ai-learning-roadmap/' },
+      { text: '知识树', link: '/ai-knowledge-tree.html' },
       { text: '最简地基', link: '/ai-foundation-plain' },
       { text: '自测', link: '/ai-quiz/' },
       { text: '错题本', link: '/ai-quiz/wrong/' },
@@ -75,7 +76,8 @@ export default defineConfig({
             { text: 'Softmax、欧拉数 e 与求导', link: '/ai-learning-notes/softmax-e-derivatives' },
             { text: 'Sigmoid 函数', link: '/ai-learning-notes/sigmoid' },
             { text: 'MCP 协议（模型上下文协议）', link: '/ai-learning-notes/mcp-protocol' },
-            { text: 'ReAct: Thought→Action→Observation', link: '/ai-learning-notes/react-thought-action-observation' }
+            { text: 'ReAct: Thought→Action→Observation', link: '/ai-learning-notes/react-thought-action-observation' },
+            { text: 'Function Calling 工具调用', link: '/ai-learning-notes/function-calling' }
           ]
         }
       ],
