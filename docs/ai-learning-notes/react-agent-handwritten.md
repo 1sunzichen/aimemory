@@ -1,6 +1,6 @@
 # 手写 ReAct Agent：程序驱动的循环
 
-> 30 天冲刺 Day 16。不用框架，纯 Python 把 ReAct 跑通 —— 代码在 `~/react-agent-learning/react_agent.py`（uv 项目，VSCode 里 F5 调试）。
+> 30 天冲刺 Day 16。不用框架，纯 Python 把 ReAct 跑通 —— 代码在本仓库 `learning-code/agent/react-agent/`（uv 项目，VSCode 里 F5 调试）。
 
 ---
 
