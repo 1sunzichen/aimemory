@@ -18,4 +18,7 @@
 | [注意力机制：Q/K/V、缩放与两种实现](./attention-qkv-and-scaling) | Q/K/V 是什么、为什么除以 √d_k、点积 vs 加型注意力、自回归 |
 | [Softmax、欧拉数 e 与求导](./softmax-e-derivatives) | Softmax 公式详解、为什么用 e（不用 10）、求导的极限定义、e 从连续复利来 |
 | [Sigmoid 函数](./sigmoid) | 激活函数, S 形曲线, 为什么后来用 ReLU 替代 |
+| [MCP 协议](./mcp-protocol) | AI 应用的 USB-C 接口：统一连接外部数据源和工具的开放标准 |
+| [ReAct 循环：Thought → Action → Observation](./react-thought-action-observation) | Agent 决策的核心循环，所有 AI Agent 底层的模式 |
 | [Function Calling 工具调用](./function-calling) | 让 LLM 结构化调用工具：白名单、tool_calls、参数解包 |
+| [手写 ReAct Agent：程序驱动的循环](./react-agent-handwritten) | 不用框架纯 Python 实现 ReAct，程序驱动循环 + ast 白名单安全求值 |
