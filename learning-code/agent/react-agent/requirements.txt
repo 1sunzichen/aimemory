@@ -1,0 +1,5 @@
+# 运行依赖
+openai>=1.40
+python-dotenv>=1.0
+# VSCode F5 调试依赖
+debugpy>=1.8

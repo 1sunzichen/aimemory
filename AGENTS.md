@@ -22,7 +22,7 @@
 ### 代码目录的 .env / .venv 约定
 
 - 每个代码目录自带 `.gitignore`：`.env`（含 API key）和 `.venv` **一律不入库、不提交**。
-- 换机器后跑代码：`git pull` 拿到代码 → `cp .env.example .env` 填 key → `uv sync` → `uv run python xxx.py`。
+- 换机器后跑代码：`git pull` 拿到代码 → `python3 -m venv .venv` → `pip install -r requirements.txt` → `cp .env.example .env` 填 key → `python xxx.py`（用 Python 自带 venv，Mac/WSL 通用，不依赖 uv）。
 
 ---
 
