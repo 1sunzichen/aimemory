@@ -22,3 +22,4 @@
 | [ReAct 循环：Thought → Action → Observation](./react-thought-action-observation) | Agent 决策的核心循环，所有 AI Agent 底层的模式 |
 | [Function Calling 工具调用](./function-calling) | 让 LLM 结构化调用工具：白名单、tool_calls、参数解包 |
 | [手写 ReAct Agent：程序驱动的循环](./react-agent-handwritten) | 不用框架纯 Python 实现 ReAct，程序驱动循环 + ast 白名单安全求值 |
+| [Blender 入门：简单指令](./blender-basics-2026-09-07) | 选择、视角、编辑模式、框选下巴、移动与撤销；人机交替练习 |
