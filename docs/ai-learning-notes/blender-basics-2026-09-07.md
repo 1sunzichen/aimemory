@@ -70,3 +70,7 @@
 
 - [ReAct 循环：操作后观察结果](./react-thought-action-observation)
 - [Function Calling 工具调用](./function-calling)
+
+## 检查移动是否生效
+
+点击视图左下角的 Move 面板，查看 X / Y / Z 数值。本次下巴底部整圈已选对，但面板显示三个方向都是 0 m，说明该次移动没有产生位移，不能只凭按过快捷键就判断成功。下一步可双击面板的 Y 数值，输入 -0.015 并回车，将这次移动设为目标值；不要改 X 或 Z。
